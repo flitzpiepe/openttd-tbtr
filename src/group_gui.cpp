@@ -25,6 +25,7 @@
 #include "vehicle_gui_base.h"
 #include "core/geometry_func.hpp"
 #include "company_base.h"
+#include "tbtr_gui.h"
 
 #include "widgets/group_widget.h"
 
@@ -829,6 +830,9 @@ public:
 				assert(this->vehicles.Length() != 0);
 
 				switch (index) {
+					case ADI_TBTR:    // Template Replacement window
+						ShowTbtrGui();
+						break;
 					case ADI_REPLACE: // Replace window
 						ShowReplaceGroupVehicleWindow(this->vli.index, this->vli.vtype);
 						break;

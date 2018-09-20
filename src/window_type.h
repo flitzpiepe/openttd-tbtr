@@ -693,6 +693,11 @@ enum WindowClass {
 	 */
 	WC_FRAMETIME_GRAPH,
 
+	/**
+	 * Template Replacement GUI
+	 */
+	WC_TBTR_GUI,
+
 	WC_INVALID = 0xFFFF, ///< Invalid window.
 };
 

@@ -87,6 +87,7 @@ stringfilter.cpp
 strings.cpp
 story.cpp
 subsidy.cpp
+tbtr_gui.cpp
 tbtr_template_vehicle.cpp
 textbuf.cpp
 texteff.cpp
