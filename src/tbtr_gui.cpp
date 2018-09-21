@@ -130,6 +130,21 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	FinishInitNested(VEH_TRAIN);
 }
 
+void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
+{
+	switch (widget)
+	{
+		case TRW_WIDGET_TOP_MATRIX:
+			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
+			size->height = 8 * resize->height;
+			break;
+		case TRW_WIDGET_BOTTOM_MATRIX:
+			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP);
+			size->height = 4 * resize->height;
+			break;
+	}
+}
+
 void ShowTbtrGui()
 {
 	new TbtrGui(&_tbtr_gui_desc);

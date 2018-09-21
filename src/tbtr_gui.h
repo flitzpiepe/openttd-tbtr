@@ -14,10 +14,12 @@
 
 #include "stdafx.h"
 #include "window_gui.h"
+#include "vehicle_gui_base.h"
 
 class TbtrGui : public Window {
 public:
     TbtrGui(WindowDesc*);
+    virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 };
 
 void ShowTbtrGui();
