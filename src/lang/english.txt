@@ -316,11 +316,11 @@ STR_TBTR_RPL_TITLE												:{WHITE}Template Replacement
 STR_TBTR_TEMPLATE_REPLACEMENT									:Template Replacement
 STR_TBTR_TRAINS_IN_GROUP										:{BLACK}Trains in group
 STR_TBTR_AVAILABLE_TEMPLATES									:{BLACK}Available Templates
-STR_TBTR_DEFINE_TEMPLATE										:{BLACK}New
-STR_TBTR_EDIT_TEMPLATE											:{BLACK}Edit
+STR_TBTR_DEFINE_TEMPLATE										:{TINY_FONT}{GRAY}New
+STR_TBTR_EDIT_TEMPLATE											:{TINY_FONT}{GRAY}Edit
 STR_TBTR_CREATE_CLONE_VEH										:{BLACK}Clone
 STR_TBTR_DELETE_TEMPLATE										:{BLACK}Delete
-STR_TBTR_RPL_ALL_TMPL											:{BLACK}Replace All Templates
+STR_TBTR_RPL_ALL_TMPL											:{TINY_FONT}{GRAY}Replace All Templates
 STR_TBTR_NEW_VEHICLE											:{BLACK}New Vehicle
 STR_TBTR_CONFIRM												:{BLACK}Ok
 STR_TBTR_CANCEL													:{BLACK}Cancel
