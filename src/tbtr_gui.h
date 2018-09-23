@@ -16,10 +16,24 @@
 #include "window_gui.h"
 #include "vehicle_gui_base.h"
 
+#include "group.h"
+#include "company_func.h"
+
+typedef GUIList<const Group*> GUIGroupList;
+
 class TbtrGui : public Window {
 public:
-    TbtrGui(WindowDesc*);
-    virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
+	TbtrGui(WindowDesc*);
+	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
+	virtual void OnPaint();
+	void DrawGroups(int, const Rect&) const;
+
+private:
+	void BuildGroupList(Owner);
+
+	Scrollbar* vscroll[2];          ///< Scrollbars for the matrix widgets
+	int step_h = 12;                ///< step size for the matrix widgets
+	GUIGroupList groups;            ///< List of groups
 };
 
 void ShowTbtrGui();

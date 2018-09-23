@@ -127,7 +127,17 @@ static WindowDesc _tbtr_gui_desc(
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
+	vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
+	vscroll[1] = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
+	vscroll[0]->SetStepSize(step_h / 2);
+	vscroll[1]->SetStepSize(step_h);
 	FinishInitNested(VEH_TRAIN);
+
+	groups.ForceRebuild();
+	groups.NeedResort();
+	BuildGroupList(_local_company);
+	// TODO
+	//this->groups.Sort(&GroupNameSorter);
 }
 
 void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
@@ -143,6 +153,83 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 			size->height = 4 * resize->height;
 			break;
 	}
+}
+
+void TbtrGui::BuildGroupList(Owner owner)
+{
+	if (!groups.NeedRebuild()) {
+		return;
+	}
+	groups.Clear();
+
+	const Group *g;
+	FOR_ALL_GROUPS(g) {
+		if (g->owner == owner ) {
+			*groups.Append() = g;
+		}
+	}
+
+	groups.Compact();
+	groups.RebuildDone();
+	vscroll[0]->SetCount(groups.Length());
+}
+
+void TbtrGui::DrawGroups(int line_height, const Rect &r) const
+{
+	int left = r.left + WD_MATRIX_LEFT;
+	int right = r.right - WD_MATRIX_RIGHT;
+	int y = r.top;
+	int max = min(this->vscroll[0]->GetPosition() + this->vscroll[0]->GetCapacity(), this->groups.Length());
+
+	/* Then treat all groups defined by/for the current company */
+	//for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
+	//	const Group *g = (this->groups)[i];
+	//	short g_id = g->index;
+
+	//	/* Fill the background of the current cell in a darker tone for the currently selected template */
+	//	if ( this->selected_group_index == i ) {
+	//		GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
+	//	}
+
+	//	SetDParam(0, g_id);
+	//	StringID str = STR_GROUP_NAME;
+	//	DrawString(left+30, right, y+2, str, TC_BLACK);
+
+	//	/* Draw the template in use for this group, if there is one */
+	//	short template_in_use = FindTemplateIndexForGroup(g_id);
+	//	if ( template_in_use >= 0 ) {
+	//		SetDParam(0, template_in_use);
+	//		DrawString ( left, right, y+2, STR_TMPL_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
+	//	}
+	//	/* If there isn't a template applied from the current group, check if there is one for another rail type */
+	//	else if ( GetTemplateReplacementByGroupID(g_id) ) {
+	//		DrawString ( left, right, y+2, STR_TMPL_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
+	//	}
+
+	//	/* Draw the number of trains that still need to be treated by the currently selected template replacement */
+	//	TemplateReplacement *tr = GetTemplateReplacementByGroupID(g_id);
+	//	if ( tr ) {
+	//		TemplateVehicle *tv = TemplateVehicle::Get(tr->sel_template);
+	//		int num_trains = NumTrainsNeedTemplateReplacement(g_id, tv);
+	//		// Draw text
+	//		TextColour color = TC_GREY;
+	//		if ( num_trains ) color = TC_BLACK;
+	//		DrawString(left, right-16, y+2, STR_TMPL_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
+	//		// Draw number
+	//		if ( num_trains ) color = TC_ORANGE;
+	//		else color = TC_GREY;
+	//		SetDParam(0, num_trains);
+	//		DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
+	//	}
+
+	//	y+=line_height / 2;
+	//}
+}
+
+void TbtrGui::OnPaint()
+{
+	BuildGroupList(_local_company);
+	DrawWidgets();
 }
 
 void ShowTbtrGui()
