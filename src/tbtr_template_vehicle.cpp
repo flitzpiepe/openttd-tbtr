@@ -5,14 +5,15 @@ INSTANTIATE_POOL_METHODS(Template)
 
 TemplateVehicle::TemplateVehicle()
 {
-	Init(INVALID_ENGINE);
+	this->Init(INVALID_ENGINE);
 }
 
 TemplateVehicle::TemplateVehicle(EngineID eid)
 {
-	Init(eid);
+	this->Init(eid);
 }
 
+// TODO
 TemplateVehicle::~TemplateVehicle()
 {
 	//TemplateVehicle* tv = this->next;
@@ -22,16 +23,16 @@ TemplateVehicle::~TemplateVehicle()
 
 void TemplateVehicle::Init(EngineID eid)
 {
-	next = NULL;
-	prev = NULL;
-	first = this;
+	this->next = NULL;
+	this->prev = NULL;
+	this->first = this;
 
-	engine_type = eid;
-	owner_byte = _current_company;
+	this->engine_type = eid;
+	this->owner_byte = _current_company;
 
-	cur_image = SPR_IMG_QUERY;
+	this->cur_image = SPR_IMG_QUERY;
 
-	reuse_depot_vehicles = true;
-	keep_remaining_vehicles = true;
-	refit_as_template = true;
+	this->reuse_depot_vehicles = true;
+	this->keep_remaining_vehicles = true;
+	this->refit_as_template = true;
 }

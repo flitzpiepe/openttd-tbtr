@@ -35,7 +35,7 @@ private:
 
 	Scrollbar* vscroll[2];          ///< Scrollbars for the matrix widgets
 	int line_height = 12;                ///< step size for the matrix widgets
-	int selected_group_index = -1;
+	int index_selected_group = -1;
 	GUIGroupList groups;            ///< List of groups
 };
 

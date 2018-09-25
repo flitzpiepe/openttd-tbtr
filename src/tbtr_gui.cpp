@@ -127,15 +127,15 @@ static WindowDesc _tbtr_gui_desc(
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
-	vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
-	vscroll[1] = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
-	vscroll[0]->SetStepSize(line_height / 2);
-	vscroll[1]->SetStepSize(line_height);
+	this->vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
+	this->vscroll[1] = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
+	this->vscroll[0]->SetStepSize(line_height / 2);
+	this->vscroll[1]->SetStepSize(line_height);
 	FinishInitNested(VEH_TRAIN);
 
-	groups.ForceRebuild();
-	groups.NeedResort();
-	BuildGroupList(_local_company);
+	this->groups.ForceRebuild();
+	this->groups.NeedResort();
+	this->BuildGroupList(_local_company);
 	// TODO
 	//this->groups.Sort(&GroupNameSorter);
 }
@@ -160,18 +160,18 @@ void TbtrGui::BuildGroupList(Owner owner)
 	if (!groups.NeedRebuild()) {
 		return;
 	}
-	groups.Clear();
+	this->groups.Clear();
 
 	const Group *g;
 	FOR_ALL_GROUPS(g) {
-		if (g->owner == owner ) {
-			*groups.Append() = g;
+		if (g->owner == owner) {
+			*(this->groups).Append() = g;
 		}
 	}
 
-	groups.Compact();
-	groups.RebuildDone();
-	vscroll[0]->SetCount(groups.Length());
+	this->groups.Compact();
+	this->groups.RebuildDone();
+	this->vscroll[0]->SetCount(groups.Length());
 }
 
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
@@ -179,7 +179,7 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 	switch(widget) {
 		case TRW_WIDGET_TOP_MATRIX: {
 			// TODO line height
-			DrawGroups(10, r);
+			this->DrawGroups(10, r);
 			break;
 		}
 	}
@@ -198,7 +198,7 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		short g_id = g->index;
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
-		if ( this->selected_group_index == i ) {
+		if ( this->index_selected_group == i ) {
 			GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
 		}
 
