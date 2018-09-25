@@ -23,12 +23,18 @@
 #include "vehicle_base.h"
 
 typedef uint32 TemplateID;
+typedef uint16 TemplateReplacementID;
 
 class TemplateVehicle;
+class TemplateReplacement;
 
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
+
+/** A pool to store up to 1024 template replacements */
+typedef Pool<TemplateReplacement, TemplateReplacementID, 16, 1024> TemplateReplacementPool;
+extern TemplateReplacementPool _template_replacement_pool;
 
 /** Main Template Vehicle class */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
@@ -68,6 +74,14 @@ private:
 	bool refit_as_template;             ///< whether to refit the cargo configuration
 
 	void Init(EngineID);
+};
+
+class TemplateReplacement : TemplateReplacementPool::PoolItem<&_template_replacement_pool> {
+	GroupID group_id;
+	TemplateID template_id;
+	TemplateReplacement(GroupID gid, TemplateID tid)
+			: group_id(gid), template_id(tid)
+	{}
 };
 
 #endif /* !TBTR_TEMPLATE_VEHICLE_H */
