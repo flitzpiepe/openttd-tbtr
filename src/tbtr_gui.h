@@ -13,6 +13,7 @@
 #define TBTR_GUI_H
 
 #include "stdafx.h"
+#include "strings_func.h"
 #include "window_gui.h"
 #include "vehicle_gui_base.h"
 
@@ -26,13 +27,15 @@ public:
 	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 	virtual void OnPaint();
-	void DrawGroups(int, const Rect&) const;
+	virtual void DrawWidget(const Rect&, int) const;
 
 private:
 	void BuildGroupList(Owner);
+	void DrawGroups(int, const Rect&) const;
 
 	Scrollbar* vscroll[2];          ///< Scrollbars for the matrix widgets
-	int step_h = 12;                ///< step size for the matrix widgets
+	int line_height = 12;                ///< step size for the matrix widgets
+	int selected_group_index = -1;
 	GUIGroupList groups;            ///< List of groups
 };
 

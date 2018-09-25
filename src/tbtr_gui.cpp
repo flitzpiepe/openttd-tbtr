@@ -129,8 +129,8 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	CreateNestedTree(wdesc);
 	vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
 	vscroll[1] = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
-	vscroll[0]->SetStepSize(step_h / 2);
-	vscroll[1]->SetStepSize(step_h);
+	vscroll[0]->SetStepSize(line_height / 2);
+	vscroll[1]->SetStepSize(line_height);
 	FinishInitNested(VEH_TRAIN);
 
 	groups.ForceRebuild();
@@ -174,6 +174,17 @@ void TbtrGui::BuildGroupList(Owner owner)
 	vscroll[0]->SetCount(groups.Length());
 }
 
+void TbtrGui::DrawWidget(const Rect& r, int widget) const
+{
+	switch(widget) {
+		case TRW_WIDGET_TOP_MATRIX: {
+			// TODO line height
+			DrawGroups(10, r);
+			break;
+		}
+	}
+}
+
 void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 {
 	int left = r.left + WD_MATRIX_LEFT;
@@ -182,19 +193,20 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 	int max = min(this->vscroll[0]->GetPosition() + this->vscroll[0]->GetCapacity(), this->groups.Length());
 
 	/* Then treat all groups defined by/for the current company */
-	//for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
-	//	const Group *g = (this->groups)[i];
-	//	short g_id = g->index;
+	for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
+		const Group *g = (this->groups)[i];
+		short g_id = g->index;
 
-	//	/* Fill the background of the current cell in a darker tone for the currently selected template */
-	//	if ( this->selected_group_index == i ) {
-	//		GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
-	//	}
+		/* Fill the background of the current cell in a darker tone for the currently selected template */
+		if ( this->selected_group_index == i ) {
+			GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
+		}
 
-	//	SetDParam(0, g_id);
-	//	StringID str = STR_GROUP_NAME;
-	//	DrawString(left+30, right, y+2, str, TC_BLACK);
+		SetDParam(0, g_id);
+		StringID str = STR_GROUP_NAME;
+		DrawString(left+30, right, y+2, str, TC_BLACK);
 
+	//	TODO
 	//	/* Draw the template in use for this group, if there is one */
 	//	short template_in_use = FindTemplateIndexForGroup(g_id);
 	//	if ( template_in_use >= 0 ) {
@@ -222,8 +234,8 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 	//		DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 	//	}
 
-	//	y+=line_height / 2;
-	//}
+		y+=line_height / 2;
+	}
 }
 
 void TbtrGui::OnPaint()
