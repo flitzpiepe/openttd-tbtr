@@ -3,6 +3,9 @@
 TemplatePool _template_pool("TemplatePool");
 INSTANTIATE_POOL_METHODS(Template)
 
+TemplateReplacementPool _template_replacement_pool("TemplateReplacementPool");
+INSTANTIATE_POOL_METHODS(TemplateReplacement)
+
 TemplateVehicle::TemplateVehicle()
 {
 	this->Init(INVALID_ENGINE);
@@ -35,4 +38,14 @@ void TemplateVehicle::Init(EngineID eid)
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;
 	this->refit_as_template = true;
+}
+
+TemplateReplacement* FindTemplateReplacementForGroup(GroupID gid)
+{
+	TemplateReplacement *tr;
+	FOR_ALL_TEMPLATE_REPLACEMENTS(tr) {
+		if ( tr->Group() == gid )
+			return tr;
+	}
+	return 0;
 }

@@ -20,6 +20,8 @@
 #include "group.h"
 #include "company_func.h"
 
+#include "tbtr_template_vehicle.h"
+
 typedef GUIList<const Group*> GUIGroupList;
 
 class TbtrGui : public Window {
@@ -27,16 +29,17 @@ public:
 	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 	virtual void OnPaint();
+    virtual void OnResize();
 	virtual void DrawWidget(const Rect&, int) const;
 
 private:
 	void BuildGroupList(Owner);
 	void DrawGroups(int, const Rect&) const;
 
-	Scrollbar* vscroll[2];          ///< Scrollbars for the matrix widgets
-	int line_height = 12;                ///< step size for the matrix widgets
+	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
+	int line_height = 12;               ///< step size for the matrix widgets
 	int index_selected_group = -1;
-	GUIGroupList groups;            ///< List of groups
+	GUIGroupList groups;                ///< List of groups
 };
 
 void ShowTbtrGui();

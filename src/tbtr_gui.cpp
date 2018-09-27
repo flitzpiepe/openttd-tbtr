@@ -157,11 +157,11 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 
 void TbtrGui::BuildGroupList(Owner owner)
 {
-	if (!groups.NeedRebuild()) {
+	if (!this->groups.NeedRebuild()) {
 		return;
 	}
-	this->groups.Clear();
 
+	this->groups.Clear();
 	const Group *g;
 	FOR_ALL_GROUPS(g) {
 		if (g->owner == owner) {
@@ -171,7 +171,6 @@ void TbtrGui::BuildGroupList(Owner owner)
 
 	this->groups.Compact();
 	this->groups.RebuildDone();
-	this->vscroll[0]->SetCount(groups.Length());
 }
 
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
@@ -195,6 +194,7 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 	/* Then treat all groups defined by/for the current company */
 	for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
 		const Group *g = (this->groups)[i];
+		// TODO rename g_id
 		short g_id = g->index;
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
@@ -206,18 +206,33 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		StringID str = STR_GROUP_NAME;
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
-	//	TODO
-	//	/* Draw the template in use for this group, if there is one */
-	//	short template_in_use = FindTemplateIndexForGroup(g_id);
-	//	if ( template_in_use >= 0 ) {
-	//		SetDParam(0, template_in_use);
-	//		DrawString ( left, right, y+2, STR_TMPL_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
-	//	}
-	//	/* If there isn't a template applied from the current group, check if there is one for another rail type */
-	//	else if ( GetTemplateReplacementByGroupID(g_id) ) {
-	//		DrawString ( left, right, y+2, STR_TMPL_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
-	//	}
+        // TODO enable
+		//TemplateReplacement* tr = FindTemplateReplacementForGroup(g_id);
 
+		//if ( tr != NULL ) {
+		//	// TODO if template replacement exists for this group
+		//	if ( true ) {
+		//		SetDParam(0, tr->template_id);
+		//		DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
+		//	}
+		//	else {
+		//		DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
+		//	}
+		//}
+
+		// TODO rm
+		///* Draw the template in use for this group, if there is one */
+		//short template_in_use = FindTemplateIndexForGroup(g_id);
+		//if ( template_in_use >= 0 ) {
+		//	SetDParam(0, template_in_use);
+		//	DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
+		//}
+		///* If there isn't a template applied from the current group, check if there is one for another rail type */
+		//else if ( FindTemplateReplacementForGroup(g_id) ) {
+		//	DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
+		//}
+
+	//	TODO integrate
 	//	/* Draw the number of trains that still need to be treated by the currently selected template replacement */
 	//	TemplateReplacement *tr = GetTemplateReplacementByGroupID(g_id);
 	//	if ( tr ) {
@@ -242,6 +257,19 @@ void TbtrGui::OnPaint()
 {
 	BuildGroupList(_local_company);
 	DrawWidgets();
+}
+
+void TbtrGui::OnResize()
+{
+    /* Top Matrix */
+    NWidgetCore *nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
+    this->vscroll[0]->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
+    nwi->widget_data = (this->vscroll[0]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+
+    /* Bottom Matrix */
+    NWidgetCore *nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
+    this->vscroll[1]->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
+    nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
 void ShowTbtrGui()
