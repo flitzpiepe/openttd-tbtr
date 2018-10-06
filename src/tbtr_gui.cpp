@@ -207,47 +207,34 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
         // TODO enable
-		//TemplateReplacement* tr = FindTemplateReplacementForGroup(g_id);
+		TemplateReplacement* tr = FindTemplateReplacementForGroup(g_id);
 
-		//if ( tr != NULL ) {
-		//	// TODO if template replacement exists for this group
-		//	if ( true ) {
-		//		SetDParam(0, tr->template_id);
-		//		DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
-		//	}
-		//	else {
-		//		DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
-		//	}
-		//}
+		if ( tr != NULL ) {
+			// TODO if template replacement exists for this group
+			if ( true ) {
+				SetDParam(0, tr->template_id);
+				DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
+			}
+			else {
+				DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
+			}
+		}
 
-		// TODO rm
-		///* Draw the template in use for this group, if there is one */
-		//short template_in_use = FindTemplateIndexForGroup(g_id);
-		//if ( template_in_use >= 0 ) {
-		//	SetDParam(0, template_in_use);
-		//	DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
-		//}
-		///* If there isn't a template applied from the current group, check if there is one for another rail type */
-		//else if ( FindTemplateReplacementForGroup(g_id) ) {
-		//	DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
-		//}
-
-	//	TODO integrate
-	//	/* Draw the number of trains that still need to be treated by the currently selected template replacement */
-	//	TemplateReplacement *tr = GetTemplateReplacementByGroupID(g_id);
-	//	if ( tr ) {
-	//		TemplateVehicle *tv = TemplateVehicle::Get(tr->sel_template);
-	//		int num_trains = NumTrainsNeedTemplateReplacement(g_id, tv);
-	//		// Draw text
-	//		TextColour color = TC_GREY;
-	//		if ( num_trains ) color = TC_BLACK;
-	//		DrawString(left, right-16, y+2, STR_TMPL_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
-	//		// Draw number
-	//		if ( num_trains ) color = TC_ORANGE;
-	//		else color = TC_GREY;
-	//		SetDParam(0, num_trains);
-	//		DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
-	//	}
+		/* Draw the number of trains that still need to be treated by the currently selected template replacement */
+		if ( tr ) {
+			TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
+            // TODO impl
+			int num_trains = 0;//NumTrainsNeedTemplateReplacement(g_id, tv);
+			// Draw text
+			TextColour color = TC_GREY;
+			if ( num_trains ) color = TC_BLACK;
+			DrawString(left, right-16, y+2, STR_TBTR_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
+			// Draw number
+			if ( num_trains ) color = TC_ORANGE;
+			else color = TC_GREY;
+			SetDParam(0, num_trains);
+			DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
+		}
 
 		y+=line_height / 2;
 	}
