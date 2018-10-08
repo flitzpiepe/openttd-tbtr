@@ -19,6 +19,7 @@
 
 #include "group.h"
 #include "company_func.h"
+#include "tilehighlight_func.h"
 
 #include "tbtr_template_vehicle.h"
 
@@ -28,9 +29,11 @@ class TbtrGui : public Window {
 public:
 	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
+	virtual void DrawWidget(const Rect&, int) const;
+    virtual void OnClick(Point, int, int);
 	virtual void OnPaint();
     virtual void OnResize();
-	virtual void DrawWidget(const Rect&, int) const;
+    //virtual void OnVehicleSelect(const Vehicle*);
 
 private:
 	void BuildGroupList(Owner);

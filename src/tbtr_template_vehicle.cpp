@@ -36,3 +36,8 @@ void TemplateVehicle::Init(EngineID eid)
 	this->keep_remaining_vehicles = true;
 	this->refit_as_template = true;
 }
+
+bool TemplateVehicle::CloneFromTrain(Train* t)
+{
+    // TODO
+}

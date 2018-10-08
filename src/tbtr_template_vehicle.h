@@ -70,6 +70,8 @@ private:
 	bool refit_as_template;             ///< whether to refit the cargo configuration
 
 	void Init(EngineID);
+
+    bool CloneFromTrain(Train*);
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);

@@ -240,6 +240,25 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 	}
 }
 
+void TbtrGui::OnClick(Point pt, int widget, int click_count)
+{
+    switch (widget) {
+        case TRW_WIDGET_TMPL_BUTTONS_CLONE: {
+            this->SetWidgetDirty(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+            this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+
+            if (this->IsWidgetLowered(TRW_WIDGET_TMPL_BUTTONS_CLONE)) {
+                static const CursorID clone_icon =	SPR_CURSOR_CLONE_TRAIN;
+                SetObjectToPlaceWnd(clone_icon, PAL_NONE, HT_VEHICLE, this);
+            } else {
+                ResetObjectToPlace();
+            }
+            break;
+        }
+    }
+    this->SetDirty();
+}
+
 void TbtrGui::OnPaint()
 {
 	BuildGroupList(_local_company);
