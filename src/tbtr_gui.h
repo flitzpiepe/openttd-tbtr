@@ -24,6 +24,7 @@
 #include "tbtr_template_vehicle.h"
 
 typedef GUIList<const Group*> GUIGroupList;
+typedef GUIList<const TemplateVehicle*> GUITemplateList;
 
 class TbtrGui : public Window {
 public:
@@ -33,16 +34,19 @@ public:
     virtual void OnClick(Point, int, int);
 	virtual void OnPaint();
     virtual void OnResize();
-    //virtual void OnVehicleSelect(const Vehicle*);
+    virtual bool OnVehicleSelect(const Vehicle*);
 
 private:
 	void BuildGroupList(Owner);
+	void BuildTemplateList(GUITemplateList*, Scrollbar*, Owner, RailType);
 	void DrawGroups(int, const Rect&) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
 	int line_height = 12;               ///< step size for the matrix widgets
 	int index_selected_group = -1;
 	GUIGroupList groups;                ///< List of groups
+    GUITemplateList templates;
+    RailType railtype;
 };
 
 void ShowTbtrGui();

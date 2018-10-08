@@ -26,6 +26,9 @@ typedef uint32 TemplateID;
 
 class TemplateVehicle;
 
+#define FOR_ALL_TEMPLATES_FROM(var, start) FOR_ALL_ITEMS_FROM(TemplateVehicle, template_index, var, start)
+#define FOR_ALL_TEMPLATES(var) FOR_ALL_TEMPLATES_FROM(var, 0)
+
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
@@ -72,6 +75,15 @@ private:
 	void Init(EngineID);
 
     bool CloneFromTrain(Train*);
+
+public:
+    inline Owner getOwner() const {return this->owner;}
+    // TODO declare here and move impl to .cpp
+    // TODO impl
+    inline bool IsPrimaryVehicle() const {return true;}
+    inline bool IsFreeWagonChain() const {return true;}
+    // TODO impl from TemplateVehicleContainsEngineOfRailtype(_2_)
+    inline bool ContainsRailType(RailType rt) const {return true;}
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);

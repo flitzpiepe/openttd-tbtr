@@ -173,6 +173,22 @@ void TbtrGui::BuildGroupList(Owner owner)
 	this->groups.RebuildDone();
 }
 
+void TbtrGui::BuildTemplateList(GUITemplateList* list, Scrollbar* vscroll, Owner owner, RailType railtype)
+{
+	list->Clear();
+	const TemplateVehicle *tv;
+
+    // TODO missing functions
+	FOR_ALL_TEMPLATES(tv) {
+		if (tv->getOwner() == owner && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
+			*list->Append() = tv;
+
+	}
+
+	list->RebuildDone();
+	if (vscroll) vscroll->SetCount(list->Length());
+}
+
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
@@ -276,6 +292,22 @@ void TbtrGui::OnResize()
     NWidgetCore *nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
     this->vscroll[1]->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
     nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+}
+
+bool TbtrGui::OnVehicleSelect(const Vehicle* v)
+{
+    // create a new template from the clicked vehicle
+    // TODO
+    //TemplateVehicle *tv = CloneTemplateVehicleFromTrain((const Train*)v);
+    TemplateVehicle* tv;
+    if ( !tv )	return false;
+
+    BuildTemplateList(&this->templates, vscroll[1], _local_company, this->railtype);
+    this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+    ResetObjectToPlace();
+    this->SetDirty();
+
+    return true;
 }
 
 void ShowTbtrGui()
