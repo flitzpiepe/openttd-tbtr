@@ -18,6 +18,9 @@
 #include "vehicle_type.h"
 #include "engine_type.h"
 
+typedef uint32 TemplateID;
+#define NO_TEMPLATE 0;
+
 typedef Pool<Group, GroupID, 16, 64000> GroupPool;
 extern GroupPool _group_pool; ///< Pool of groups.
 
@@ -72,6 +75,8 @@ struct Group : GroupPool::PoolItem<&_group_pool> {
 	GroupStatistics statistics;             ///< NOSAVE: Statistics and caches on the vehicles in the group.
 
 	GroupID parent;                         ///< Parent group
+
+	TemplateID template_id;                 ///< Template used for replacement of trains belonging to this group
 
 	Group(CompanyID owner = INVALID_COMPANY);
 	~Group();

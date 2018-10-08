@@ -22,22 +22,15 @@
 #include "train.h"
 #include "vehicle_base.h"
 
-#define FOR_ALL_TEMPLATE_REPLACEMENTS_FROM(var, start) FOR_ALL_ITEMS_FROM(TemplateReplacement, template_replacement_index, var, start)
-#define FOR_ALL_TEMPLATE_REPLACEMENTS(var) FOR_ALL_TEMPLATE_REPLACEMENTS_FROM(var, 0)
-
 typedef uint32 TemplateID;
-typedef uint16 TemplateReplacementID;
 
 class TemplateVehicle;
-class TemplateReplacement;
 
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
 
-/** A pool to store up to 1024 template replacements */
-typedef Pool<TemplateReplacement, TemplateReplacementID, 16, 1024> TemplateReplacementPool;
-extern TemplateReplacementPool _template_replacement_pool;
+#define NO_TEMPLATE 0;
 
 /** Main Template Vehicle class */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
@@ -79,16 +72,6 @@ private:
 	void Init(EngineID);
 };
 
-struct TemplateReplacement : TemplateReplacementPool::PoolItem<&_template_replacement_pool> {
-	GroupID group_id;
-	TemplateID template_id;
-	TemplateReplacement(GroupID gid, TemplateID tid)
-			: group_id(gid), template_id(tid)
-	{}
-	inline GroupID Group() {return group_id;}
-};
-
 TemplateID FindTemplateIndexForGroup(GroupID);
-TemplateReplacement* FindTemplateReplacementForGroup(GroupID);
 
 #endif /* !TBTR_TEMPLATE_VEHICLE_H */
