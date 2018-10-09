@@ -21,6 +21,7 @@
 #include "newgrf_spritegroup.h"
 #include "train.h"
 #include "vehicle_base.h"
+#include "vehicle_func.h"
 
 typedef uint32 TemplateID;
 
@@ -58,7 +59,12 @@ private:
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
     byte subtype;                       ///< The vehicle subtype
-	RailType railtype;                  ///< The railtype of this vehicle
+	RailTypeByte railtype;                  ///< The railtype of this vehicle
+	uint16 max_speed;
+	uint16 power;
+	uint16 weight;
+	uint16 max_te;
+
 	CargoID cargo_type;                 ///< type of cargo this vehicle is carrying
 	uint16 cargo_cap;                   ///< total capacity
 	byte cargo_subtype;                 ///< cargo subtype
@@ -76,9 +82,8 @@ private:
 
 	void Init(EngineID);
 
-    bool CloneFromTrain(Train*);
-
 public:
+    bool CloneFromTrain(const Train*);
     // TODO declare here and move impl to .cpp
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
@@ -111,7 +116,6 @@ public:
 			tv = tv->next;
 		return tv;
 	}
-
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);

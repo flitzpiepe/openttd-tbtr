@@ -293,13 +293,10 @@ void TbtrGui::OnResize()
     nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
-bool TbtrGui::OnVehicleSelect(const Vehicle* v)
+bool TbtrGui::OnVehicleSelect(const Train* train)
 {
-    // create a new template from the clicked vehicle
-    // TODO
-    //TemplateVehicle *tv = CloneTemplateVehicleFromTrain((const Train*)v);
-    TemplateVehicle* tv;
-    if ( !tv )	return false;
+	TemplateVehicle* tv  = new TemplateVehicle();
+	tv->CloneFromTrain(train);
 
     BuildTemplateList(&this->templates, vscroll[1], _local_company, this->railtype);
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);

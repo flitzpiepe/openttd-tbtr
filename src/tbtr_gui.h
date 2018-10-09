@@ -34,7 +34,7 @@ public:
     virtual void OnClick(Point, int, int);
 	virtual void OnPaint();
     virtual void OnResize();
-    virtual bool OnVehicleSelect(const Vehicle*);
+    virtual bool OnVehicleSelect(const Train*);
 
 private:
 	void BuildGroupList(Owner);
