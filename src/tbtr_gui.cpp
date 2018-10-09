@@ -136,7 +136,7 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->groups.ForceRebuild();
 	this->groups.NeedResort();
 	this->BuildGroupList(_local_company);
-	// TODO
+	// TODO impl sorting
 	//this->groups.Sort(&GroupNameSorter);
 }
 
@@ -178,9 +178,8 @@ void TbtrGui::BuildTemplateList(GUITemplateList* list, Scrollbar* vscroll, Owner
 	list->Clear();
 	const TemplateVehicle *tv;
 
-    // TODO missing functions
 	FOR_ALL_TEMPLATES(tv) {
-		if (tv->getOwner() == owner && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
+		if (tv->HasOwner(owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
 			*list->Append() = tv;
 
 	}

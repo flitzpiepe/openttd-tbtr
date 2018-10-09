@@ -57,6 +57,8 @@ private:
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
+    byte subtype;                       ///< The vehicle subtype
+	RailType railtype;                  ///< The railtype of this vehicle
 	CargoID cargo_type;                 ///< type of cargo this vehicle is carrying
 	uint16 cargo_cap;                   ///< total capacity
 	byte cargo_subtype;                 ///< cargo subtype
@@ -77,13 +79,39 @@ private:
     bool CloneFromTrain(Train*);
 
 public:
-    inline Owner getOwner() const {return this->owner;}
     // TODO declare here and move impl to .cpp
-    // TODO impl
-    inline bool IsPrimaryVehicle() const {return true;}
-    inline bool IsFreeWagonChain() const {return true;}
-    // TODO impl from TemplateVehicleContainsEngineOfRailtype(_2_)
-    inline bool ContainsRailType(RailType rt) const {return true;}
+    inline bool HasOwner(Owner owner) const {return this->owner == owner;}
+    inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
+    inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
+    bool ContainsRailType(RailType railtype) const
+	{
+		const TemplateVehicle* tv = this;
+		/* For non-electrified rail engines, the whole chain must not contain any electrified engines or wagons */
+		if ( railtype == RAILTYPE_BEGIN || railtype == RAILTYPE_RAIL ) {
+			while ( tv ) {
+			if ( tv->railtype != railtype )
+				return false;
+			tv = tv->GetNextUnit();
+			}
+			return true;
+		}
+		/* For electrified rail engines, non-electrified engines or wagons are also allowed */
+		while ( tv ) {
+			if ( tv->railtype == railtype )
+				return true;
+			tv = tv->GetNextUnit();
+		}
+		return false;
+	}
+	TemplateVehicle* GetNextUnit() const
+	{
+		TemplateVehicle* tv = this->next;
+		while ( tv && HasBit(tv->subtype, GVSF_ARTICULATED_PART) ) tv = tv->next;
+		if ( tv && HasBit(tv->subtype, GVSF_MULTIHEADED) && !HasBit(tv->subtype, GVSF_ENGINE) )
+			tv = tv->next;
+		return tv;
+	}
+
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
