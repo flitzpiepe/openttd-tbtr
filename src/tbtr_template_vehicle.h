@@ -50,11 +50,7 @@ private:
 	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
 
 	/** essential template info */
-	// TODO is owner used anywhere in the old code?
-	//      how is it retrieved when passed to the ctor?
-	//      it would be good if it could be added to the almost-default ctor
 	Owner owner;                        ///< template owner
-	OwnerByte owner_byte;               ///< template owner byte
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
