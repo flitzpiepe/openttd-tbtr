@@ -26,6 +26,9 @@
 typedef GUIList<const Group*> GUIGroupList;
 typedef GUIList<const TemplateVehicle*> GUITemplateList;
 
+/*
+ * TBTR's main window - for managing templates and setting up train groups for replacement.
+ */
 class TbtrGui : public Window {
 public:
 	TbtrGui(WindowDesc*);

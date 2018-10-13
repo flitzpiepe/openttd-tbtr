@@ -36,7 +36,13 @@ extern TemplatePool _template_pool;
 
 #define NO_TEMPLATE 0;
 
-/** Main Template Vehicle class */
+/** Main Template Vehicle class
+ *
+ * A template vehicle is basically like a train with a minimal set of attributes. I.e. it is a chain
+ * of template vehicles, like a train.
+ *
+ * All templates are stored in their own pool so that they don't interfere with a company's allowed number of
+ * trains. */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
 public:
 	TemplateVehicle(EngineID);
