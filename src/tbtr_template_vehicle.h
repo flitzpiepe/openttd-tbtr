@@ -79,39 +79,13 @@ private:
 	void Init(EngineID);
 
 public:
-    bool CloneFromTrain(const Train*);
-    // TODO declare here and move impl to .cpp
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
     inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
-    bool ContainsRailType(RailType railtype) const
-	{
-		const TemplateVehicle* tv = this;
-		/* For non-electrified rail engines, the whole chain must not contain any electrified engines or wagons */
-		if ( railtype == RAILTYPE_BEGIN || railtype == RAILTYPE_RAIL ) {
-			while ( tv ) {
-			if ( tv->railtype != railtype )
-				return false;
-			tv = tv->GetNextUnit();
-			}
-			return true;
-		}
-		/* For electrified rail engines, non-electrified engines or wagons are also allowed */
-		while ( tv ) {
-			if ( tv->railtype == railtype )
-				return true;
-			tv = tv->GetNextUnit();
-		}
-		return false;
-	}
-	TemplateVehicle* GetNextUnit() const
-	{
-		TemplateVehicle* tv = this->next;
-		while ( tv && HasBit(tv->subtype, GVSF_ARTICULATED_PART) ) tv = tv->next;
-		if ( tv && HasBit(tv->subtype, GVSF_MULTIHEADED) && !HasBit(tv->subtype, GVSF_ENGINE) )
-			tv = tv->next;
-		return tv;
-	}
+
+    bool CloneFromTrain(const Train*);
+    bool ContainsRailType(RailType) const;
+	TemplateVehicle* GetNextUnit() const;
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
