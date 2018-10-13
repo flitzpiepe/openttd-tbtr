@@ -38,7 +38,7 @@ public:
 
 private:
 	void BuildGroupList(Owner);
-	void BuildTemplateList(GUITemplateList*, Scrollbar*, Owner, RailType);
+	void BuildTemplateList(Owner);
 	void DrawGroups(int, const Rect&) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets

@@ -173,19 +173,19 @@ void TbtrGui::BuildGroupList(Owner owner)
 	this->groups.RebuildDone();
 }
 
-void TbtrGui::BuildTemplateList(GUITemplateList* list, Scrollbar* vscroll, Owner owner, RailType railtype)
+void TbtrGui::BuildTemplateList(Owner owner)
 {
-	list->Clear();
+	this->templates.Clear();
 	const TemplateVehicle *tv;
 
 	FOR_ALL_TEMPLATES(tv) {
 		if (tv->HasOwner(owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
-			*list->Append() = tv;
+			*(this->templates.Append()) = tv;
 
 	}
 
-	list->RebuildDone();
-	if (vscroll) vscroll->SetCount(list->Length());
+	this->templates.RebuildDone();
+	this->vscroll[1]->SetCount(this->templates.Length());
 }
 
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
@@ -298,7 +298,7 @@ bool TbtrGui::OnVehicleSelect(const Train* train)
 	TemplateVehicle* tv  = new TemplateVehicle();
 	tv->CloneFromTrain(train);
 
-    BuildTemplateList(&this->templates, vscroll[1], _local_company, this->railtype);
+    BuildTemplateList(_local_company);
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
     ResetObjectToPlace();
     this->SetDirty();
