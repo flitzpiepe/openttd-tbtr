@@ -1,6 +1,6 @@
 #include "tbtr_template_vehicle.h"
 
-TemplatePool _template_pool("TemplatePool");
+TemplatePool _template_pool("Template");
 INSTANTIATE_POOL_METHODS(Template)
 
 /*

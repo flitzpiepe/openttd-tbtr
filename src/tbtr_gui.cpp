@@ -330,10 +330,16 @@ void TbtrGui::OnResize()
  * @param train:  pointer to the train that was clicked on, assumes that this is the first vehicle
  *                of the train
  */
-bool TbtrGui::OnVehicleSelect(const Train* train)
+bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 {
+	if (v->type != VEH_TRAIN)
+		return false;
+
+	if (!TemplateVehicle::CanAllocateItem())
+		return false;
+
 	TemplateVehicle* tv  = new TemplateVehicle();
-	tv->CloneFromTrain(train);
+	tv->CloneFromTrain(static_cast<const Train*>(v));
 
     BuildTemplateList(_local_company);
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
