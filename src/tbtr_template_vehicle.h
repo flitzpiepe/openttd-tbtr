@@ -50,7 +50,6 @@ public:
 	~TemplateVehicle();
 	TemplateID index;                   ///< Vehicle index
 
-private:
 	TemplateVehicle* next;              ///< pointer to the next template vehicle in the chain
 	TemplateVehicle* prev;              ///< NOSAVE: pointer to the previous template vehicle in the chain
 	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
@@ -85,6 +84,8 @@ private:
 	void Init(EngineID);
 
 public:
+	inline TemplateVehicle* Next() const {return this->next;}
+
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
     inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
