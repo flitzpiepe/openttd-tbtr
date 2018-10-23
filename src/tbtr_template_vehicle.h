@@ -21,10 +21,14 @@
 #include "newgrf_spritegroup.h"
 #include "train.h"
 #include "vehicle_base.h"
+#include "vehicle_func.h"
 
 typedef uint32 TemplateID;
 
 class TemplateVehicle;
+
+#define FOR_ALL_TEMPLATES_FROM(var, start) FOR_ALL_ITEMS_FROM(TemplateVehicle, template_index, var, start)
+#define FOR_ALL_TEMPLATES(var) FOR_ALL_TEMPLATES_FROM(var, 0)
 
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
@@ -32,7 +36,13 @@ extern TemplatePool _template_pool;
 
 #define NO_TEMPLATE 0;
 
-/** Main Template Vehicle class */
+/** Main Template Vehicle class
+ *
+ * A template vehicle is basically like a train with a minimal set of attributes. I.e. it is a chain
+ * of template vehicles, like a train.
+ *
+ * All templates are stored in their own pool so that they don't interfere with a company's allowed number of
+ * trains. */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
 public:
 	TemplateVehicle(EngineID);
@@ -46,14 +56,17 @@ private:
 	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
 
 	/** essential template info */
-	// TODO is owner used anywhere in the old code?
-	//      how is it retrieved when passed to the ctor?
-	//      it would be good if it could be added to the almost-default ctor
 	Owner owner;                        ///< template owner
-	OwnerByte owner_byte;               ///< template owner byte
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
+    byte subtype;                       ///< The vehicle subtype
+	RailTypeByte railtype;                  ///< The railtype of this vehicle
+	uint16 max_speed;
+	uint16 power;
+	uint16 weight;
+	uint16 max_te;
+
 	CargoID cargo_type;                 ///< type of cargo this vehicle is carrying
 	uint16 cargo_cap;                   ///< total capacity
 	byte cargo_subtype;                 ///< cargo subtype
@@ -70,6 +83,15 @@ private:
 	bool refit_as_template;             ///< whether to refit the cargo configuration
 
 	void Init(EngineID);
+
+public:
+    inline bool HasOwner(Owner owner) const {return this->owner == owner;}
+    inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
+    inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
+
+    bool CloneFromTrain(const Train*);
+    bool ContainsRailType(RailType) const;
+	TemplateVehicle* GetNextUnit() const;
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);

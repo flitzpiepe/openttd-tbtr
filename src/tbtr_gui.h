@@ -19,27 +19,37 @@
 
 #include "group.h"
 #include "company_func.h"
+#include "tilehighlight_func.h"
 
 #include "tbtr_template_vehicle.h"
 
 typedef GUIList<const Group*> GUIGroupList;
+typedef GUIList<const TemplateVehicle*> GUITemplateList;
 
+/*
+ * TBTR's main window - for managing templates and setting up train groups for replacement.
+ */
 class TbtrGui : public Window {
 public:
 	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
+	virtual void DrawWidget(const Rect&, int) const;
+    virtual void OnClick(Point, int, int);
 	virtual void OnPaint();
     virtual void OnResize();
-	virtual void DrawWidget(const Rect&, int) const;
+    virtual bool OnVehicleSelect(const Vehicle*);
 
 private:
 	void BuildGroupList(Owner);
+	void BuildTemplateList(Owner);
 	void DrawGroups(int, const Rect&) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
 	int line_height = 12;               ///< step size for the matrix widgets
 	int index_selected_group = -1;
 	GUIGroupList groups;                ///< List of groups
+    GUITemplateList templates;
+    RailType railtype;
 };
 
 void ShowTbtrGui();

@@ -124,6 +124,9 @@ static WindowDesc _tbtr_gui_desc(
 	_widgets, lengthof(_widgets)
 );
 
+/**
+ * Constructor, initialize GUI with a window descriptor
+ */
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
@@ -136,10 +139,13 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->groups.ForceRebuild();
 	this->groups.NeedResort();
 	this->BuildGroupList(_local_company);
-	// TODO
+	// TODO impl sorting
 	//this->groups.Sort(&GroupNameSorter);
 }
 
+/*
+ * Recalculate the size of the window's components
+ */
 void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 {
 	switch (widget)
@@ -155,6 +161,10 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 	}
 }
 
+/*
+ * Update the list of groups to display for a given owner.
+ * @param owner:  the owner of the groups to display, should the current company when the GUI is opened
+ */
 void TbtrGui::BuildGroupList(Owner owner)
 {
 	if (!this->groups.NeedRebuild()) {
@@ -173,6 +183,29 @@ void TbtrGui::BuildGroupList(Owner owner)
 	this->groups.RebuildDone();
 }
 
+/*
+ * Update the list of templates to display for a given owner and rail type.
+ *
+ * @param owner
+ */
+void TbtrGui::BuildTemplateList(Owner owner)
+{
+	this->templates.Clear();
+	const TemplateVehicle *tv;
+
+	FOR_ALL_TEMPLATES(tv) {
+		if (tv->HasOwner(owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
+			*(this->templates.Append()) = tv;
+
+	}
+
+	this->templates.RebuildDone();
+	this->vscroll[1]->SetCount(this->templates.Length());
+}
+
+/*
+ * Draw a widget of this GUI
+ */
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
@@ -184,6 +217,9 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 	}
 }
 
+/*
+ * Draw all train groups
+ */
 void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 {
 	int left = r.left + WD_MATRIX_LEFT;
@@ -240,12 +276,40 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 	}
 }
 
+/*
+ * Handle mouse clicks on the GUI
+ */
+void TbtrGui::OnClick(Point pt, int widget, int click_count)
+{
+    switch (widget) {
+        case TRW_WIDGET_TMPL_BUTTONS_CLONE: {
+            this->SetWidgetDirty(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+            this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+
+            if (this->IsWidgetLowered(TRW_WIDGET_TMPL_BUTTONS_CLONE)) {
+                static const CursorID clone_icon =	SPR_CURSOR_CLONE_TRAIN;
+                SetObjectToPlaceWnd(clone_icon, PAL_NONE, HT_VEHICLE, this);
+            } else {
+                ResetObjectToPlace();
+            }
+            break;
+        }
+    }
+    this->SetDirty();
+}
+
+/*
+ * Draw this GUI
+ */
 void TbtrGui::OnPaint()
 {
 	BuildGroupList(_local_company);
 	DrawWidgets();
 }
 
+/*
+ * Update GUI components on resize
+ */
 void TbtrGui::OnResize()
 {
     /* Top Matrix */
@@ -259,6 +323,35 @@ void TbtrGui::OnResize()
     nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
+/*
+ * Handle the selection when a train in the game world has been clicked,
+ * This is used for cloning a train into a template vehicle chain.
+ *
+ * @param train:  pointer to the train that was clicked on, assumes that this is the first vehicle
+ *                of the train
+ */
+bool TbtrGui::OnVehicleSelect(const Vehicle* v)
+{
+	if (v->type != VEH_TRAIN)
+		return false;
+
+	if (!TemplateVehicle::CanAllocateItem())
+		return false;
+
+	TemplateVehicle* tv  = new TemplateVehicle();
+	tv->CloneFromTrain(static_cast<const Train*>(v));
+
+    BuildTemplateList(_local_company);
+    this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+    ResetObjectToPlace();
+    this->SetDirty();
+
+    return true;
+}
+
+/*
+ * Show the TBTR Gui
+ */
 void ShowTbtrGui()
 {
 	new TbtrGui(&_tbtr_gui_desc);
