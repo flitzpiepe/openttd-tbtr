@@ -214,13 +214,18 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 			this->DrawGroups(10, r);
 			break;
 		}
+		case TRW_WIDGET_BOTTOM_MATRIX: {
+			// TODO line height
+			this->DrawTemplates(10, r);
+			break;
+		}
 	}
 }
 
 /*
  * Draw all train groups
  */
-void TbtrGui::DrawGroups(int line_height, const Rect &r) const
+void TbtrGui::DrawGroups(int line_height, const Rect& r) const
 {
 	int left = r.left + WD_MATRIX_LEFT;
 	int right = r.right - WD_MATRIX_RIGHT;
@@ -274,6 +279,10 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 
 		y+=line_height / 2;
 	}
+}
+
+void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
+{
 }
 
 /*

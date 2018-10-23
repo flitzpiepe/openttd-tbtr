@@ -43,6 +43,7 @@ private:
 	void BuildGroupList(Owner);
 	void BuildTemplateList(Owner);
 	void DrawGroups(int, const Rect&) const;
+	void DrawTemplates(int, const Rect&) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
 	int line_height = 12;               ///< step size for the matrix widgets
