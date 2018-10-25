@@ -300,8 +300,10 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 			GfxFillRect(left, y, right, y+this->line_height, _colour_gradient[COLOUR_GREY][3]);
 		}
 
-		// TODO
 		/* Draw a notification string for chains that are not runnable */
+		if ( tv->IsFreeWagonChain() ) {
+			DrawString(left, right-2, y+line_height-FONT_HEIGHT_SMALL-WD_FRAMERECT_BOTTOM - 2, STR_TBTR_WARNING_FREE_WAGON, TC_RED, SA_RIGHT);
+		}
 
 		// TODO
 		/* Draw the template's length in tile-units */
