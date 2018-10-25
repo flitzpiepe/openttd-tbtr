@@ -305,8 +305,10 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 			DrawString(left, right-2, y+line_height-FONT_HEIGHT_SMALL-WD_FRAMERECT_BOTTOM - 2, STR_TBTR_WARNING_FREE_WAGON, TC_RED, SA_RIGHT);
 		}
 
-		// TODO
 		/* Draw the template's length in tile-units */
+		SetDParam(0, tv->GetRealLength());
+		SetDParam(1, 1);
+		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
 		tv->Draw(left+50, right, y);
@@ -384,7 +386,9 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 		return false;
 
 	TemplateVehicle* tv  = new TemplateVehicle();
-	tv->CloneFromTrain(static_cast<const Train*>(v));
+	const Train* clicked = static_cast<const Train*>(v);
+	tv->CloneFromTrain(clicked);
+	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
     BuildTemplateList(_local_company);
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);

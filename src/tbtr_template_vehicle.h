@@ -56,6 +56,7 @@ public:
 
 	/** essential template info */
 	Owner owner;                        ///< template owner
+	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
@@ -86,6 +87,7 @@ public:
 public:
 	inline TemplateVehicle* Next() const {return this->next;}
 
+	inline uint16 GetRealLength() const {return real_length;}
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
     inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}

@@ -40,6 +40,7 @@ void TemplateVehicle::Init(EngineID eid)
 
 	this->engine_type = eid;
 	this->owner = _current_company;
+	this->real_length = 0;
 
 	this->cur_image = SPR_IMG_QUERY;
 
