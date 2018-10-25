@@ -91,6 +91,9 @@ public:
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
     inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
+	inline bool IsSetReuseDepotVehicles() const {return reuse_depot_vehicles;}
+	inline bool IsSetKeepRemainingVehicles() const {return keep_remaining_vehicles;}
+	inline bool IsSetRefitAsTemplate() const {return refit_as_template;}
 
     bool CloneFromTrain(const Train*);
     bool ContainsRailType(RailType) const;

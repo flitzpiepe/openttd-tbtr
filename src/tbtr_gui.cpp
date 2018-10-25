@@ -319,8 +319,21 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 		/* Index of current template vehicle in the list of all templates for its company */
 		SetDParam(0, i);
 		DrawString(left+5, left+25, y + line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
+
+		// TODO
 		/* Draw whether the current template is in use by any group */
+
 		/* Draw information about template configuration settings */
+		TextColour color;
+		if ( tv->IsSetReuseDepotVehicles() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+200, right, y+2, STR_TBTR_CONFIG_USEDEPOT, color, SA_LEFT);
+		if ( tv->IsSetKeepRemainingVehicles() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+275, right, y+2, STR_TBTR_CONFIG_KEEPREMAINDERS, color, SA_LEFT);
+		if ( tv->IsSetRefitAsTemplate() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+350, right, y+2, STR_TBTR_CONFIG_REFIT, color, SA_LEFT);
 
 		y += line_height;
 	}
