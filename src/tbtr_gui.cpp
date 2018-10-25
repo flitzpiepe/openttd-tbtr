@@ -283,6 +283,38 @@ void TbtrGui::DrawGroups(int line_height, const Rect& r) const
 
 void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 {
+	int left = r.left;
+	int right = r.right;
+	int y = r.top;
+
+	// TODO rename
+	Scrollbar* draw_vscroll = vscroll[1];
+	uint max = min(draw_vscroll->GetPosition() + draw_vscroll->GetCapacity(), this->templates.Length());
+	const TemplateVehicle* tv;
+	for ( uint i = draw_vscroll->GetPosition(); i<max; ++i)
+	{
+		tv = (this->templates)[i];
+
+		// TODO
+		/* Fill the background of the current cell in a darker tone for the currently selected template */
+
+		// TODO
+		/* Draw a notification string for chains that are not runnable */
+
+		// TODO
+		/* Draw the template's length in tile-units */
+
+		/* Draw the template */
+		tv->Draw(left+50, right, y);
+
+		// TODO
+		/* Buying cost */
+		/* Index of current template vehicle in the list of all templates for its company */
+		/* Draw whether the current template is in use by any group */
+		/* Draw information about template configuration settings */
+
+		y += line_height;
+	}
 }
 
 /*

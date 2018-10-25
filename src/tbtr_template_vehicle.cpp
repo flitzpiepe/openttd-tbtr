@@ -119,6 +119,16 @@ bool TemplateVehicle::ContainsRailType(RailType railtype) const
 	return false;
 }
 
+void TemplateVehicle::Draw(int left, int right, int y) const
+{
+	int offset = left;
+	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
+	DrawSprite(this->cur_image, pal, offset, y+12);
+
+	if (this->next)
+		this->next->Draw(offset+this->image_width, right, y);
+}
+
 /*
  * Return the next 'real' unit following this template, i.e. disregarding articulated parts.
  *

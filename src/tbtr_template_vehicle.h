@@ -93,6 +93,8 @@ public:
     bool CloneFromTrain(const Train*);
     bool ContainsRailType(RailType) const;
 	TemplateVehicle* GetNextUnit() const;
+
+	void Draw(int, int, int) const;
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
