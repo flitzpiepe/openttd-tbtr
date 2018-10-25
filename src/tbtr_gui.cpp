@@ -315,7 +315,10 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 
 		// TODO
 		/* Buying cost */
+
 		/* Index of current template vehicle in the list of all templates for its company */
+		SetDParam(0, i);
+		DrawString(left+5, left+25, y + line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
 		/* Draw whether the current template is in use by any group */
 		/* Draw information about template configuration settings */
 
