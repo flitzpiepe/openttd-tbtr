@@ -295,8 +295,10 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 	{
 		tv = (this->templates)[i];
 
-		// TODO
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
+		if ( this->index_selected_template == (int32)i ) {
+			GfxFillRect(left, y, right, y+this->line_height, _colour_gradient[COLOUR_GREY][3]);
+		}
 
 		// TODO
 		/* Draw a notification string for chains that are not runnable */

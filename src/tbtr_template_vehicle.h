@@ -60,7 +60,7 @@ public:
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
     byte subtype;                       ///< The vehicle subtype
-	RailTypeByte railtype;                  ///< The railtype of this vehicle
+	RailTypeByte railtype;              ///< The railtype of this vehicle
 	uint16 max_speed;
 	uint16 power;
 	uint16 weight;
