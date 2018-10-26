@@ -18,7 +18,7 @@
 #include "vehicle_type.h"
 #include "engine_type.h"
 
-typedef uint32 TemplateID;
+typedef int16 TemplateID;
 #define INVALID_TEMPLATE -1
 
 typedef Pool<Group, GroupID, 16, 64000> GroupPool;

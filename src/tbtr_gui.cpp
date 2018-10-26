@@ -236,7 +236,7 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		// TODO rename g_id
 		short g_id = g->index;
 
-		/* Fill the background of the current cell in a darker tone for the currently selected template */
+		/* Fill the background of the current cell in a darker tone for the currently selected group */
 		if ( this->index_selected_group == i ) {
 			GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
 		}
@@ -245,24 +245,15 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		StringID str = STR_GROUP_NAME;
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
-        // TODO enable
-		//TemplateReplacement* tr = FindTemplateReplacementForGroup(g_id);
-
-		//if ( tr != NULL ) {
-		//	// TODO if template replacement exists for this group
-		//	if ( true ) {
-		//		SetDParam(0, tr->template_id);
-		//		DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
-		//	}
-		//	else {
-		//		DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
-		//	}
-		//}
+		if (g->template_id >= 0)
+		{
+			SetDParam(0, g->template_id);
+			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
+		}
 
 		///* Draw the number of trains that still need to be treated by the currently selected template replacement */
 		//if ( tr ) {
 		//	TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
-        //    // TODO impl
 		//	int num_trains = 0;//NumTrainsNeedTemplateReplacement(g_id, tv);
 		//	// Draw text
 		//	TextColour color = TC_GREY;
