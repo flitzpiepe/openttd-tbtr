@@ -18,12 +18,14 @@
 #include "core/pool_type.hpp"
 
 #include "company_func.h"
+#include "group.h"
 #include "newgrf_spritegroup.h"
 #include "train.h"
 #include "vehicle_base.h"
 #include "vehicle_func.h"
 
 typedef uint32 TemplateID;
+#define INVALID_TEMPLATE -1
 
 class TemplateVehicle;
 
@@ -33,8 +35,6 @@ class TemplateVehicle;
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
-
-#define NO_TEMPLATE 0;
 
 /** Main Template Vehicle class
  *
@@ -97,6 +97,8 @@ public:
 
     bool CloneFromTrain(const Train*);
     bool ContainsRailType(RailType) const;
+	/* Count the number of groups which use this template vehicle */
+	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
 
 	void Draw(int, int, int) const;

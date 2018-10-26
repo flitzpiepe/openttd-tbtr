@@ -19,7 +19,7 @@
 #include "engine_type.h"
 
 typedef uint32 TemplateID;
-#define NO_TEMPLATE 0;
+#define INVALID_TEMPLATE -1
 
 typedef Pool<Group, GroupID, 16, 64000> GroupPool;
 extern GroupPool _group_pool; ///< Pool of groups.

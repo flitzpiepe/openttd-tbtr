@@ -120,6 +120,18 @@ bool TemplateVehicle::ContainsRailType(RailType railtype) const
 	return false;
 }
 
+int TemplateVehicle::CountGroups() const
+{
+	int count = 0;
+	Group* g;
+	FOR_ALL_GROUPS(g)
+	{
+		if (g->owner == this->owner && g->template_id == this->index)
+			++count;
+	}
+	return count;
+}
+
 void TemplateVehicle::Draw(int left, int right, int y) const
 {
 	int offset = left;
