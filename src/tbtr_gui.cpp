@@ -127,7 +127,7 @@ static WindowDesc _tbtr_gui_desc(
 /**
  * Constructor, initialize GUI with a window descriptor
  */
-TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
+TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(height)
 {
 	CreateNestedTree(wdesc);
 	this->vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
@@ -210,13 +210,11 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
 		case TRW_WIDGET_TOP_MATRIX: {
-			// TODO line height
-			this->DrawGroups(10, r);
+			this->DrawGroups(r);
 			break;
 		}
 		case TRW_WIDGET_BOTTOM_MATRIX: {
-			// TODO line height
-			this->DrawTemplates(10, r);
+			this->DrawTemplates(r);
 			break;
 		}
 	}
@@ -225,7 +223,7 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 /*
  * Draw all train groups
  */
-void TbtrGui::DrawGroups(int line_height, const Rect& r) const
+void TbtrGui::DrawGroups(const Rect& r) const
 {
 	int left = r.left + WD_MATRIX_LEFT;
 	int right = r.right - WD_MATRIX_RIGHT;
@@ -277,11 +275,11 @@ void TbtrGui::DrawGroups(int line_height, const Rect& r) const
 		//	DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 		//}
 
-		y+=line_height / 2;
+		y += this->line_height / 2;
 	}
 }
 
-void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
+void TbtrGui::DrawTemplates(const Rect& r) const
 {
 	int left = r.left;
 	int right = r.right;
@@ -302,7 +300,7 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 
 		/* Draw a notification string for chains that are not runnable */
 		if ( tv->IsFreeWagonChain() ) {
-			DrawString(left, right-2, y+line_height-FONT_HEIGHT_SMALL-WD_FRAMERECT_BOTTOM - 2, STR_TBTR_WARNING_FREE_WAGON, TC_RED, SA_RIGHT);
+			DrawString(left, right-2, y+this->line_height-FONT_HEIGHT_SMALL-WD_FRAMERECT_BOTTOM - 2, STR_TBTR_WARNING_FREE_WAGON, TC_RED, SA_RIGHT);
 		}
 
 		/* Draw the template's length in tile-units */
@@ -315,15 +313,15 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
-		DrawString(left+35, right, y + line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_OVR_VALUE_notinyfont, TC_BLUE, SA_LEFT);
+		DrawString(left+35, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_OVR_VALUE_notinyfont, TC_BLUE, SA_LEFT);
 
 		/* Index of current template vehicle in the list of all templates for its company */
 		SetDParam(0, i);
-		DrawString(left+5, left+25, y + line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
+		DrawString(left+5, left+25, y + this->line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
 
 		/* Draw whether the current template is in use by any group */
 		SetDParam(0, tv->CountGroups());
-		DrawString(left+200, right, y + line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
+		DrawString(left+200, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
 
 		/* Draw information about template configuration settings */
 		TextColour color;
@@ -337,7 +335,7 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 		else color = TC_GREY;
 		DrawString(left+350, right, y+2, STR_TBTR_CONFIG_REFIT, color, SA_LEFT);
 
-		y += line_height;
+		y += this->line_height;
 	}
 }
 
@@ -419,7 +417,7 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 /*
  * Show the TBTR Gui
  */
-void ShowTbtrGui()
+void ShowTbtrGui(uint16 line_height)
 {
-	new TbtrGui(&_tbtr_gui_desc);
+	new TbtrGui(&_tbtr_gui_desc, line_height);
 }
