@@ -320,8 +320,12 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left+5, left+25, y + this->line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
 
 		/* Draw whether the current template is in use by any group */
-		SetDParam(0, tv->CountGroups());
-		DrawString(left+200, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
+		int n_groups = tv->CountGroups();
+		if ( n_groups > 0 )
+		{
+			SetDParam(0, n_groups);
+			DrawString(left+200, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
+		}
 
 		/* Draw information about template configuration settings */
 		TextColour color;
