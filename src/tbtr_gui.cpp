@@ -374,6 +374,14 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_template = index_new;
 			break;
 		}
+		case TRW_WIDGET_START:
+		{
+			if (this->index_selected_group>=0 && this->index_selected_template>=0)
+			{
+				Group::Get(this->index_selected_group)->template_id = this->index_selected_template;
+			}
+			break;
+		}
 	}
 	this->SetDirty();
 }
