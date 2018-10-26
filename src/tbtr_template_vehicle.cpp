@@ -40,12 +40,22 @@ void TemplateVehicle::Init(EngineID eid)
 
 	this->engine_type = eid;
 	this->owner = _current_company;
+	this->real_length = 0;
 
 	this->cur_image = SPR_IMG_QUERY;
 
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;
 	this->refit_as_template = true;
+}
+
+Money TemplateVehicle::CalculateCost() const
+{
+	Money val = 0;
+	const TemplateVehicle* tv = this;
+	for (; tv; tv=tv->Next())
+		val += (Engine::Get(tv->engine_type))->GetCost();
+	return val;
 }
 
 /**
@@ -117,6 +127,28 @@ bool TemplateVehicle::ContainsRailType(RailType railtype) const
 		tv = tv->GetNextUnit();
 	}
 	return false;
+}
+
+int TemplateVehicle::CountGroups() const
+{
+	int count = 0;
+	Group* g;
+	FOR_ALL_GROUPS(g)
+	{
+		if (g->owner == this->owner && g->template_id == this->index)
+			++count;
+	}
+	return count;
+}
+
+void TemplateVehicle::Draw(int left, int right, int y) const
+{
+	int offset = left;
+	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
+	DrawSprite(this->cur_image, pal, offset, y+12);
+
+	if (this->next)
+		this->next->Draw(offset+this->image_width, right, y);
 }
 
 /*

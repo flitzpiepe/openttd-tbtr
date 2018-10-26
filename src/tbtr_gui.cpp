@@ -127,7 +127,7 @@ static WindowDesc _tbtr_gui_desc(
 /**
  * Constructor, initialize GUI with a window descriptor
  */
-TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
+TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(height)
 {
 	CreateNestedTree(wdesc);
 	this->vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
@@ -210,8 +210,11 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
 		case TRW_WIDGET_TOP_MATRIX: {
-			// TODO line height
-			this->DrawGroups(10, r);
+			this->DrawGroups(r);
+			break;
+		}
+		case TRW_WIDGET_BOTTOM_MATRIX: {
+			this->DrawTemplates(r);
 			break;
 		}
 	}
@@ -220,7 +223,7 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 /*
  * Draw all train groups
  */
-void TbtrGui::DrawGroups(int line_height, const Rect &r) const
+void TbtrGui::DrawGroups(const Rect& r) const
 {
 	int left = r.left + WD_MATRIX_LEFT;
 	int right = r.right - WD_MATRIX_RIGHT;
@@ -233,7 +236,7 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		// TODO rename g_id
 		short g_id = g->index;
 
-		/* Fill the background of the current cell in a darker tone for the currently selected template */
+		/* Fill the background of the current cell in a darker tone for the currently selected group */
 		if ( this->index_selected_group == i ) {
 			GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
 		}
@@ -242,24 +245,15 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		StringID str = STR_GROUP_NAME;
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
-        // TODO enable
-		//TemplateReplacement* tr = FindTemplateReplacementForGroup(g_id);
-
-		//if ( tr != NULL ) {
-		//	// TODO if template replacement exists for this group
-		//	if ( true ) {
-		//		SetDParam(0, tr->template_id);
-		//		DrawString ( left, right, y+2, STR_TBTR_GROUP_USES_TEMPLATE, TC_BLACK, SA_HOR_CENTER);
-		//	}
-		//	else {
-		//		DrawString ( left, right, y+2, STR_TBTR_TMPLRPL_EX_DIFF_RAILTYPE, TC_SILVER, SA_HOR_CENTER);
-		//	}
-		//}
+		if (g->template_id >= 0)
+		{
+			SetDParam(0, g->template_id);
+			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
+		}
 
 		///* Draw the number of trains that still need to be treated by the currently selected template replacement */
 		//if ( tr ) {
 		//	TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
-        //    // TODO impl
 		//	int num_trains = 0;//NumTrainsNeedTemplateReplacement(g_id, tv);
 		//	// Draw text
 		//	TextColour color = TC_GREY;
@@ -272,7 +266,71 @@ void TbtrGui::DrawGroups(int line_height, const Rect &r) const
 		//	DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 		//}
 
-		y+=line_height / 2;
+		y += this->line_height / 2;
+	}
+}
+
+void TbtrGui::DrawTemplates(const Rect& r) const
+{
+	int left = r.left;
+	int right = r.right;
+	int y = r.top;
+
+	// TODO rename
+	Scrollbar* draw_vscroll = vscroll[1];
+	uint max = min(draw_vscroll->GetPosition() + draw_vscroll->GetCapacity(), this->templates.Length());
+	const TemplateVehicle* tv;
+	for ( uint i = draw_vscroll->GetPosition(); i<max; ++i)
+	{
+		tv = (this->templates)[i];
+
+		/* Fill the background of the current cell in a darker tone for the currently selected template */
+		if ( this->index_selected_template == (int32)i ) {
+			GfxFillRect(left, y, right, y+this->line_height, _colour_gradient[COLOUR_GREY][3]);
+		}
+
+		/* Draw a notification string for chains that are not runnable */
+		if ( tv->IsFreeWagonChain() ) {
+			DrawString(left, right-2, y+this->line_height-FONT_HEIGHT_SMALL-WD_FRAMERECT_BOTTOM - 2, STR_TBTR_WARNING_FREE_WAGON, TC_RED, SA_RIGHT);
+		}
+
+		/* Draw the template's length in tile-units */
+		SetDParam(0, tv->GetRealLength());
+		SetDParam(1, 1);
+		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
+
+		/* Draw the template */
+		tv->Draw(left+50, right, y);
+
+		/* Buying cost */
+		SetDParam(0, tv->CalculateCost());
+		DrawString(left+35, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_OVR_VALUE_notinyfont, TC_BLUE, SA_LEFT);
+
+		/* Index of current template vehicle in the list of all templates for its company */
+		SetDParam(0, i);
+		DrawString(left+5, left+25, y + this->line_height/2, STR_BLACK_INT, TC_BLACK, SA_RIGHT);
+
+		/* Draw whether the current template is in use by any group */
+		int n_groups = tv->CountGroups();
+		if ( n_groups > 0 )
+		{
+			SetDParam(0, n_groups);
+			DrawString(left+200, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
+		}
+
+		/* Draw information about template configuration settings */
+		TextColour color;
+		if ( tv->IsSetReuseDepotVehicles() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+200, right, y+2, STR_TBTR_CONFIG_USEDEPOT, color, SA_LEFT);
+		if ( tv->IsSetKeepRemainingVehicles() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+275, right, y+2, STR_TBTR_CONFIG_KEEPREMAINDERS, color, SA_LEFT);
+		if ( tv->IsSetRefitAsTemplate() ) color = TC_LIGHT_BLUE;
+		else color = TC_GREY;
+		DrawString(left+350, right, y+2, STR_TBTR_CONFIG_REFIT, color, SA_LEFT);
+
+		y += this->line_height;
 	}
 }
 
@@ -339,7 +397,9 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 		return false;
 
 	TemplateVehicle* tv  = new TemplateVehicle();
-	tv->CloneFromTrain(static_cast<const Train*>(v));
+	const Train* clicked = static_cast<const Train*>(v);
+	tv->CloneFromTrain(clicked);
+	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
     BuildTemplateList(_local_company);
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
@@ -352,7 +412,7 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 /*
  * Show the TBTR Gui
  */
-void ShowTbtrGui()
+void ShowTbtrGui(uint16 line_height)
 {
-	new TbtrGui(&_tbtr_gui_desc);
+	new TbtrGui(&_tbtr_gui_desc, line_height);
 }

@@ -18,12 +18,14 @@
 #include "core/pool_type.hpp"
 
 #include "company_func.h"
+#include "group.h"
 #include "newgrf_spritegroup.h"
 #include "train.h"
 #include "vehicle_base.h"
 #include "vehicle_func.h"
 
-typedef uint32 TemplateID;
+typedef int16 TemplateID;
+#define INVALID_TEMPLATE -1
 
 class TemplateVehicle;
 
@@ -33,8 +35,6 @@ class TemplateVehicle;
 /** A pool allowing to store up to ~64k templates */
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
-
-#define NO_TEMPLATE 0;
 
 /** Main Template Vehicle class
  *
@@ -56,11 +56,12 @@ public:
 
 	/** essential template info */
 	Owner owner;                        ///< template owner
+	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
     byte subtype;                       ///< The vehicle subtype
-	RailTypeByte railtype;                  ///< The railtype of this vehicle
+	RailTypeByte railtype;              ///< The railtype of this vehicle
 	uint16 max_speed;
 	uint16 power;
 	uint16 weight;
@@ -86,13 +87,22 @@ public:
 public:
 	inline TemplateVehicle* Next() const {return this->next;}
 
+	inline uint16 GetRealLength() const {return real_length;}
     inline bool HasOwner(Owner owner) const {return this->owner == owner;}
     inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
     inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
+	inline bool IsSetReuseDepotVehicles() const {return reuse_depot_vehicles;}
+	inline bool IsSetKeepRemainingVehicles() const {return keep_remaining_vehicles;}
+	inline bool IsSetRefitAsTemplate() const {return refit_as_template;}
 
+	Money CalculateCost() const;
     bool CloneFromTrain(const Train*);
     bool ContainsRailType(RailType) const;
+	/* Count the number of groups which use this template vehicle */
+	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
+
+	void Draw(int, int, int) const;
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);

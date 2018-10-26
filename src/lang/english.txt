@@ -338,8 +338,8 @@ STR_TBTR_TEMPLATE_OVR_VALUE_notinyfont							:{BLACK}Buying Cost: {GOLD}{CURRENC
 STR_TBTR_TEMPLATE_OVR_VALUE_notinyfontandblack					:Buying Cost: {GOLD}{CURRENCY_LONG}
 STR_TBTR_WARNING_FREE_WAGON										:{RED}Free Chain: not runnable!
 STR_TBTR_TEST													:{ORANGE}Test String: {RAW_STRING} {RAW_STRING}
-STR_TBTR_GROUP_USES_TEMPLATE									:{BLACK}Template in use: {NUM}
-STR_TMP_TEMPLATE_IN_USE											:Template is in use
+STR_TBTR_TEMPLATE_USED_BY_GROUP									:{BLACK}Template in use: {NUM}
+STR_TBTR_TEMPLATE_IN_USE										:Template in use (#groups: {NUM})
 STR_TBTR_GROUP_NUM_TRAINS										:{BLACK}{NUM}
 STR_TBTR_CREATEGUI_TITLE										:{WHITE}Create/Edit Template Vehicle
 STR_TBTR_MAINGUI_DEFINEDGROUPS									:{BLACK}Defined Groups for Company

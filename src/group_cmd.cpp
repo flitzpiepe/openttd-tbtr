@@ -259,7 +259,7 @@ static inline void UpdateNumEngineGroup(const Vehicle *v, GroupID old_g, GroupID
 Group::Group(Owner owner)
 {
 	this->owner = owner;
-	this->template_id = NO_TEMPLATE;
+	this->template_id = INVALID_TEMPLATE;
 }
 
 Group::~Group()

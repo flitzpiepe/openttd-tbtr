@@ -31,7 +31,7 @@ typedef GUIList<const TemplateVehicle*> GUITemplateList;
  */
 class TbtrGui : public Window {
 public:
-	TbtrGui(WindowDesc*);
+	TbtrGui(WindowDesc*, uint16);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 	virtual void DrawWidget(const Rect&, int) const;
     virtual void OnClick(Point, int, int);
@@ -42,16 +42,18 @@ public:
 private:
 	void BuildGroupList(Owner);
 	void BuildTemplateList(Owner);
-	void DrawGroups(int, const Rect&) const;
+	void DrawGroups(const Rect&) const;
+	void DrawTemplates(const Rect&) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
-	int line_height = 12;               ///< step size for the matrix widgets
+	uint16 line_height = 26;               ///< step size for the matrix widgets
 	int index_selected_group = -1;
+	int index_selected_template = -1;
 	GUIGroupList groups;                ///< List of groups
     GUITemplateList templates;
     RailType railtype;
 };
 
-void ShowTbtrGui();
+void ShowTbtrGui(uint16);
 
 #endif /* !TBTR_GUI_H */

@@ -831,7 +831,7 @@ public:
 
 				switch (index) {
 					case ADI_TBTR:    // Template Replacement window
-						ShowTbtrGui();
+						ShowTbtrGui(this->resize.step_height);
 						break;
 					case ADI_REPLACE: // Replace window
 						ShowReplaceGroupVehicleWindow(this->vli.index, this->vli.vtype);
