@@ -352,8 +352,30 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             }
             break;
         }
-    }
-    this->SetDirty();
+		case TRW_WIDGET_TOP_MATRIX:
+		{
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll[0]->GetPosition();
+			if ( index_new >= this->groups.Length() )
+				this->index_selected_group = -1;
+			else if ( this->index_selected_group == index_new )
+				this->index_selected_group = -1;
+			else
+				this->index_selected_group = index_new;
+			break;
+		}
+		case TRW_WIDGET_BOTTOM_MATRIX:
+		{
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_BOTTOM_MATRIX]->pos_y) / this->line_height ) + this->vscroll[1]->GetPosition();
+			if ( index_new >= this->templates.Length() )
+				this->index_selected_template = -1;
+			else if ( this->index_selected_template == index_new )
+				this->index_selected_template = -1;
+			else
+				this->index_selected_template = index_new;
+			break;
+		}
+	}
+	this->SetDirty();
 }
 
 /*
