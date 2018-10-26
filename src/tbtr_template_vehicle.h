@@ -95,6 +95,7 @@ public:
 	inline bool IsSetKeepRemainingVehicles() const {return keep_remaining_vehicles;}
 	inline bool IsSetRefitAsTemplate() const {return refit_as_template;}
 
+	Money CalculateCost() const;
     bool CloneFromTrain(const Train*);
     bool ContainsRailType(RailType) const;
 	/* Count the number of groups which use this template vehicle */

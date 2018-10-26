@@ -49,6 +49,15 @@ void TemplateVehicle::Init(EngineID eid)
 	this->refit_as_template = true;
 }
 
+Money TemplateVehicle::CalculateCost() const
+{
+	Money val = 0;
+	const TemplateVehicle* tv = this;
+	for (; tv; tv=tv->Next())
+		val += (Engine::Get(tv->engine_type))->GetCost();
+	return val;
+}
+
 /**
  * Make this template vehicle match a train. This assumes that this template is not yet part
  * of any chain.

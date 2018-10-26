@@ -313,8 +313,9 @@ void TbtrGui::DrawTemplates(int line_height, const Rect& r) const
 		/* Draw the template */
 		tv->Draw(left+50, right, y);
 
-		// TODO
 		/* Buying cost */
+		SetDParam(0, tv->CalculateCost());
+		DrawString(left+35, right, y + line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_OVR_VALUE_notinyfont, TC_BLUE, SA_LEFT);
 
 		/* Index of current template vehicle in the list of all templates for its company */
 		SetDParam(0, i);
