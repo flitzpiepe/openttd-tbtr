@@ -18,15 +18,18 @@
 const SaveLoad* GTD() {
 
 	static const SaveLoad _template_vehicle_desc[] = {
-		SLE_VAR(TemplateVehicle, index,                     SLE_UINT32),
+		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
-		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
 
+		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
 		SLE_VAR(TemplateVehicle, engine_type,               SLE_UINT16),
 		SLE_VAR(TemplateVehicle, max_speed,                 SLE_UINT16),
-		SLE_VAR(TemplateVehicle, power,                     SLE_UINT32),
-		SLE_VAR(TemplateVehicle, weight,                    SLE_UINT32),
-		SLE_VAR(TemplateVehicle, max_te,                    SLE_UINT32),
+
+		// TODO invalid entry
+		//SLE_VAR(TemplateVehicle, power,                     SLE_UINT32),
+		//SLE_VAR(TemplateVehicle, weight,                    SLE_UINT32),
+		//SLE_VAR(TemplateVehicle, max_te,                    SLE_UINT32),
+
 		SLE_VAR(TemplateVehicle, cargo_type,                SLE_UINT8),
 		SLE_VAR(TemplateVehicle, cargo_cap,                 SLE_UINT16),
 		SLE_VAR(TemplateVehicle, cargo_subtype,             SLE_UINT8),
