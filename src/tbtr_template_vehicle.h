@@ -56,7 +56,6 @@ public:
 
 	/** essential template info */
 	Owner owner;                        ///< template owner
-	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
@@ -72,6 +71,7 @@ public:
 	byte cargo_subtype;                 ///< cargo subtype
 
 	/** Vehicle drawing information */
+	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
 	byte spritenum;                     ///< used for drawing in a GUI
 	SpriteID cur_image;                 ///< used for drawing in a GUI
 	uint32 image_width;                 ///< used for drawing in a GUI

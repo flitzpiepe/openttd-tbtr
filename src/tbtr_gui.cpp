@@ -141,6 +141,8 @@ TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(
 	this->BuildGroupList(_local_company);
 	// TODO impl sorting
 	//this->groups.Sort(&GroupNameSorter);
+
+    BuildTemplateList(_local_company);
 }
 
 /*
