@@ -20,31 +20,28 @@ const SaveLoad* GTD() {
 	static const SaveLoad _template_vehicle_desc[] = {
 		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
-
 		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
+
 		SLE_VAR(TemplateVehicle, engine_type,               SLE_UINT16),
 		SLE_VAR(TemplateVehicle, max_speed,                 SLE_UINT16),
-
-		// TODO invalid entry
-		//SLE_VAR(TemplateVehicle, power,                     SLE_UINT32),
-		//SLE_VAR(TemplateVehicle, weight,                    SLE_UINT32),
-		//SLE_VAR(TemplateVehicle, max_te,                    SLE_UINT32),
+		SLE_VAR(TemplateVehicle, power,                     SLE_UINT16),
+		SLE_VAR(TemplateVehicle, weight,                    SLE_UINT16),
+		SLE_VAR(TemplateVehicle, max_te,                    SLE_UINT16),
 
 		SLE_VAR(TemplateVehicle, cargo_type,                SLE_UINT8),
 		SLE_VAR(TemplateVehicle, cargo_cap,                 SLE_UINT16),
 		SLE_VAR(TemplateVehicle, cargo_subtype,             SLE_UINT8),
-
 		SLE_VAR(TemplateVehicle, subtype,                   SLE_UINT8),
 		SLE_VAR(TemplateVehicle, railtype,                  SLE_UINT8),
-
-		SLE_VAR(TemplateVehicle, reuse_depot_vehicles,      SLE_UINT8),
-		SLE_VAR(TemplateVehicle, keep_remaining_vehicles,   SLE_UINT8),
-		SLE_VAR(TemplateVehicle, refit_as_template,         SLE_UINT8),
 
 		SLE_VAR(TemplateVehicle, real_length,               SLE_UINT16),
 		SLE_VAR(TemplateVehicle, spritenum,                 SLE_UINT8),
 		SLE_VAR(TemplateVehicle, cur_image,                 SLE_UINT32),
 		SLE_VAR(TemplateVehicle, image_width,               SLE_UINT32),
+
+		SLE_VAR(TemplateVehicle, reuse_depot_vehicles,      SLE_UINT8),
+		SLE_VAR(TemplateVehicle, keep_remaining_vehicles,   SLE_UINT8),
+		SLE_VAR(TemplateVehicle, refit_as_template,         SLE_UINT8),
 
 		SLE_END()
 	};

@@ -43,7 +43,6 @@
 #include "../string_func.h"
 #include "../fios.h"
 #include "../error.h"
-// TODO needed?
 #include "../tbtr_template_vehicle.h"
 
 #include "table/strings.h"
