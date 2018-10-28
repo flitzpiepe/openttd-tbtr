@@ -396,6 +396,14 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
+		case TRW_WIDGET_STOP:
+		{
+			if ( this->index_selected_group>=0 )
+			{
+				Group::Get(this->index_selected_group)->template_id = INVALID_TEMPLATE;
+			}
+			break;
+		}
 	}
 	this->SetDirty();
 }
