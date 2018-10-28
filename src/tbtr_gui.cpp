@@ -243,13 +243,16 @@ void TbtrGui::DrawGroups(const Rect& r) const
 			GfxFillRect(left, y, right, y+(this->line_height)/2, _colour_gradient[COLOUR_GREY][3]);
 		}
 
+		/* Draw the group name */
 		SetDParam(0, g_id);
 		StringID str = STR_GROUP_NAME;
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
+		/* Draw the index of the selected template for this group
+		 * Note, that this is the index into the group list, not the template's ID. */
 		if (g->template_id >= 0)
 		{
-			SetDParam(0, g->template_id);
+			SetDParam(0, FindTemplateInGuiList(g->template_id));
 			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
 		}
 
@@ -336,6 +339,14 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	}
 }
 
+int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
+{
+	for ( uint i=0; i<templates.Length(); ++i )
+		if ( templates[i]->index == tid )
+			return i;
+	return -1;
+}
+
 /*
  * Handle mouse clicks on the GUI
  */
@@ -378,7 +389,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_START:
 		{
-			if (this->index_selected_group>=0 && this->index_selected_template>=0)
+			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
 			{
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
 				Group::Get(this->index_selected_group)->template_id = tv->index;
