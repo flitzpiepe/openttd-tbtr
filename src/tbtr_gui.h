@@ -44,6 +44,7 @@ private:
 	void BuildTemplateList(Owner);
 	void DrawGroups(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
+	int FindTemplateInGuiList(TemplateID) const;
 
 	Scrollbar* vscroll[2];              ///< Scrollbars for the matrix widgets
 	uint16 line_height = 26;               ///< step size for the matrix widgets

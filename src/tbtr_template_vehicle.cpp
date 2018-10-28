@@ -36,7 +36,7 @@ void TemplateVehicle::Init(EngineID eid)
 {
 	this->next = NULL;
 	this->prev = NULL;
-	this->first = this;
+	this->first = NULL;
 
 	this->engine_type = eid;
 	this->owner = _current_company;
@@ -64,7 +64,7 @@ Money TemplateVehicle::CalculateCost() const
  *
  * @param train:  the (first vehicle of the) train which acts as preimage for the template
  */
-bool TemplateVehicle::CloneFromTrain(const Train* train)
+bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainHead)
 {
 	Train* clicked = Train::Get(train->index);
 	if ( !clicked )
@@ -95,8 +95,11 @@ bool TemplateVehicle::CloneFromTrain(const Train* train)
 	if ( train->GetNextVehicle() )
 	{
 		TemplateVehicle* tv = new TemplateVehicle();
-		tv->CloneFromTrain(train->Next());
-		next = tv;
+		if ( chainHead == NULL )
+			chainHead = this;
+		tv->first = chainHead;
+		tv->CloneFromTrain(train->Next(), chainHead);
+		this->next = tv;
 	}
 
 	return true;
