@@ -20,6 +20,7 @@ const SaveLoad* GTD() {
 	static const SaveLoad _template_vehicle_desc[] = {
 		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
+		SLE_REF(TemplateVehicle, first,                     REF_TEMPLATE_VEHICLE),
 		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
 
 		SLE_VAR(TemplateVehicle, engine_type,               SLE_UINT16),
@@ -78,25 +79,6 @@ static void Ptrs_TMPLS()
 	TemplateVehicle *tv;
 	FOR_ALL_TEMPLATES(tv) {
 		SlObject(tv, GTD());
-	}
-}
-
-void AfterLoadTemplateVehicles()
-{
-	TemplateVehicle *tv;
-
-	FOR_ALL_TEMPLATES(tv) {
-		/* Reinstate the previous pointer */
-		if (tv->next != NULL) tv->next->prev = tv;
-		tv->first =NULL;
-	}
-	FOR_ALL_TEMPLATES(tv) {
-		/* Fill the first pointers */
-		if (tv->prev == NULL) {
-			for (TemplateVehicle *u = tv; u != NULL; u = u->Next()) {
-				u->first = tv;
-			}
-		}
 	}
 }
 

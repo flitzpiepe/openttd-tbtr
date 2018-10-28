@@ -430,7 +430,7 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 
 	TemplateVehicle* tv  = new TemplateVehicle();
 	const Train* clicked = static_cast<const Train*>(v);
-	tv->CloneFromTrain(clicked);
+	tv->CloneFromTrain(clicked, NULL);
 	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
     BuildTemplateList(_local_company);

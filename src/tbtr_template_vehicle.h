@@ -96,7 +96,7 @@ public:
 	inline bool IsSetRefitAsTemplate() const {return refit_as_template;}
 
 	Money CalculateCost() const;
-    bool CloneFromTrain(const Train*);
+    bool CloneFromTrain(const Train*, TemplateVehicle*);
     bool ContainsRailType(RailType) const;
 	/* Count the number of groups which use this template vehicle */
 	int CountGroups() const;
