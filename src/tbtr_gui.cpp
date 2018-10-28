@@ -380,7 +380,8 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		{
 			if (this->index_selected_group>=0 && this->index_selected_template>=0)
 			{
-				Group::Get(this->index_selected_group)->template_id = this->index_selected_template;
+				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
+				Group::Get(this->index_selected_group)->template_id = tv->index;
 			}
 			break;
 		}
