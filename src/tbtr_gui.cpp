@@ -404,6 +404,28 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
+		{
+			TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
+			if ( tv != NULL )
+				tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
+			break;
+		}
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP:
+		{
+			TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
+			if ( tv != NULL )
+				tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
+			break;
+		}
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT:
+		{
+			TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
+			if ( tv != NULL )
+				tv->refit_as_template = !tv->refit_as_template;
+			break;
+		}
+
 	}
 	this->SetDirty();
 }
