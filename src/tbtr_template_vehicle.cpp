@@ -106,6 +106,19 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 }
 
 /**
+ * Perform the actual template replacement, or just simulate it. Return the overall cost for the whole replacement in any case.
+ *
+ * @param tile:     the tile of the incoming train
+ * @param flags:    command flags
+ * @param p1:       first parameter list
+ * @param p2:       second parameter list
+ * @param msg:      command message
+ */
+CommandCost CmdTemplateReplacement(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+}
+
+/**
  * Check if this template vehicle contains any locos or wagons of the given rail type.
  *
  * @param railtype: the rail type to check for

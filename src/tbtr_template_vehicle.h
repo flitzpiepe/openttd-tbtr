@@ -103,8 +103,13 @@ public:
 	TemplateVehicle* GetNextUnit() const;
 
 	void Draw(int, int, int) const;
+
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
+
+
+	/* Command functions */
+	CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 
 #endif /* !TBTR_TEMPLATE_VEHICLE_H */
