@@ -40,8 +40,8 @@ public:
     virtual bool OnVehicleSelect(const Vehicle*);
 
 private:
-	void BuildGroupList(Owner);
-	void BuildTemplateList(Owner);
+	void BuildGroupList();
+	void BuildTemplateList();
 	void DrawGroups(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
 	int FindTemplateInGuiList(TemplateID) const;
