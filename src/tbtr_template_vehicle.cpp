@@ -1,4 +1,11 @@
 #include "tbtr_template_vehicle.h"
+// TODO maybe move these to a different file, together with the command-specific functions defined at the end
+// of this file
+#include "autoreplace_func.h"
+#include "train.h"
+#include "command_type.h"
+#include "command_func.h"
+CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text);
 
 TemplatePool _template_pool("Template");
 INSTANTIATE_POOL_METHODS(Template)
@@ -106,6 +113,95 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 }
 
 /**
+ * Check if this template vehicle contains any locos or wagons of the given rail type.
+ *
+ * @param railtype: the rail type to check for
+ * @return:         true, if there is a unit of the given rail type in this template
+ */
+bool TemplateVehicle::ContainsRailType(RailType railtype) const
+{
+	const TemplateVehicle* tv = this;
+	/* For non-electrified rail engines, the whole chain must not contain any electrified engines or wagons */
+	if ( railtype == RAILTYPE_BEGIN || railtype == RAILTYPE_RAIL ) {
+		while ( tv ) {
+		if ( tv->railtype != railtype )
+			return false;
+		tv = tv->GetNextUnit();
+		}
+		return true;
+	}
+	/* For electrified rail engines, non-electrified engines or wagons are also allowed */
+	while ( tv ) {
+		if ( tv->railtype == railtype )
+			return true;
+		tv = tv->GetNextUnit();
+	}
+	return false;
+}
+
+int TemplateVehicle::CountGroups() const
+{
+	int count = 0;
+	Group* g;
+	FOR_ALL_GROUPS(g)
+	{
+		if (g->owner == this->owner && g->template_id == this->index)
+			++count;
+	}
+	return count;
+}
+
+void TemplateVehicle::Draw(int left, int right, int y) const
+{
+	int offset = left;
+	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
+	DrawSprite(this->cur_image, pal, offset, y+12);
+
+	if (this->next)
+		this->next->Draw(offset+this->image_width, right, y);
+}
+
+/*
+ * Return the next 'real' unit following this template, i.e. disregarding articulated parts.
+ *
+ * @return:    the next template vehicle following *this in the consist.
+ */
+TemplateVehicle* TemplateVehicle::GetNextUnit() const
+{
+	TemplateVehicle* tv = this->next;
+	while ( tv && HasBit(tv->subtype, GVSF_ARTICULATED_PART) ) tv = tv->next;
+	if ( tv && HasBit(tv->subtype, GVSF_MULTIHEADED) && !HasBit(tv->subtype, GVSF_ENGINE) )
+		tv = tv->next;
+	return tv;
+}
+
+// TODO stubs to be implemented later
+TemplateVehicle* GetTemplateVehicleByGroupID(GroupID gid)
+{}
+void RefitTrainFromTemplate(Train* t, TemplateVehicle* tv)
+{}
+void TransferCargoForTrain(Train* o, Train* n)
+{}
+void BreakUpRemainders(Train* t)
+{}
+Train* DepotContainsEngine(TileIndex tile, EngineID engine, Train* t=0)
+{}
+void NeutralizeStatus(Train* t)
+{}
+bool ChainContainsVehicle(Train *t, Train* m)
+{}
+Train* ChainContainsEngine(Train *t, EngineID eid)
+{}
+CommandCost CopyHeadSpecificThings(Vehicle *old_head, Vehicle *new_head, DoCommandFlag flags)
+{}
+bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
+{}
+bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
+{}
+CommandCost TestBuyAllTemplateVehiclesInChain(TemplateVehicle *tv, TileIndex tile)
+{}
+
+/**
  * Perform the actual template replacement, or just simulate it. Return the overall cost for the whole replacement in any case.
  *
  * @param tile:     the tile of the incoming train
@@ -114,7 +210,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
  * @param p2:       second parameter list
  * @param msg:      command message
  */
-CommandCost CmdTemplateReplacement(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
 	// TODO
 	// if param == simulate:
@@ -292,67 +388,4 @@ CommandCost CmdTemplateReplacement(TileIndex tile, DoCommandFlag flags, uint32 p
 		buy.AddCost(DoCommand(tile, remainder_chain->index | (1<<20), 0, flags, CMD_SELL_VEHICLE));
 	}
 	return buy;
-}
-
-/**
- * Check if this template vehicle contains any locos or wagons of the given rail type.
- *
- * @param railtype: the rail type to check for
- * @return:         true, if there is a unit of the given rail type in this template
- */
-bool TemplateVehicle::ContainsRailType(RailType railtype) const
-{
-	const TemplateVehicle* tv = this;
-	/* For non-electrified rail engines, the whole chain must not contain any electrified engines or wagons */
-	if ( railtype == RAILTYPE_BEGIN || railtype == RAILTYPE_RAIL ) {
-		while ( tv ) {
-		if ( tv->railtype != railtype )
-			return false;
-		tv = tv->GetNextUnit();
-		}
-		return true;
-	}
-	/* For electrified rail engines, non-electrified engines or wagons are also allowed */
-	while ( tv ) {
-		if ( tv->railtype == railtype )
-			return true;
-		tv = tv->GetNextUnit();
-	}
-	return false;
-}
-
-int TemplateVehicle::CountGroups() const
-{
-	int count = 0;
-	Group* g;
-	FOR_ALL_GROUPS(g)
-	{
-		if (g->owner == this->owner && g->template_id == this->index)
-			++count;
-	}
-	return count;
-}
-
-void TemplateVehicle::Draw(int left, int right, int y) const
-{
-	int offset = left;
-	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
-	DrawSprite(this->cur_image, pal, offset, y+12);
-
-	if (this->next)
-		this->next->Draw(offset+this->image_width, right, y);
-}
-
-/*
- * Return the next 'real' unit following this template, i.e. disregarding articulated parts.
- *
- * @return:    the next template vehicle following *this in the consist.
- */
-TemplateVehicle* TemplateVehicle::GetNextUnit() const
-{
-	TemplateVehicle* tv = this->next;
-	while ( tv && HasBit(tv->subtype, GVSF_ARTICULATED_PART) ) tv = tv->next;
-	if ( tv && HasBit(tv->subtype, GVSF_MULTIHEADED) && !HasBit(tv->subtype, GVSF_ENGINE) )
-		tv = tv->next;
-	return tv;
 }
