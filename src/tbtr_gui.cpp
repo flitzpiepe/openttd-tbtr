@@ -365,6 +365,16 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             }
             break;
         }
+        case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
+			const TemplateVehicle* todel = this->templates[this->index_selected_template];
+			TemplateVehicle* tv = TemplateVehicle::Get(todel->index);
+			delete tv;
+
+			BuildTemplateList(this->owner);
+			this->index_selected_template = -1;
+
+            break;
+        }
 		case TRW_WIDGET_TOP_MATRIX:
 		{
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll[0]->GetPosition();
