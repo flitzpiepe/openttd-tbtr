@@ -26,8 +26,7 @@ TemplateVehicle::~TemplateVehicle()
 {
 	TemplateVehicle* tv = this->next;
 	this->next = NULL;
-	if ( tv != NULL )
-		delete tv;
+	delete tv;
 }
 
 /**
