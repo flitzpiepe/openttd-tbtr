@@ -366,12 +366,19 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             break;
         }
         case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
-			const TemplateVehicle* todel = this->templates[this->index_selected_template];
-			TemplateVehicle* tv = TemplateVehicle::Get(todel->index);
+			TemplateID del_id = this->templates[this->index_selected_template]->index;
+			TemplateVehicle* tv = TemplateVehicle::Get(del_id);
+			Group* g;
+			FOR_ALL_GROUPS(g)
+			{
+				if ( g->template_id == del_id )
+					g->template_id = INVALID_TEMPLATE;
+			}
 			delete tv;
 
-			BuildTemplateList(this->owner);
 			this->index_selected_template = -1;
+			BuildTemplateList(this->owner);
+			BuildGroupList(this->owner);
 
             break;
         }
