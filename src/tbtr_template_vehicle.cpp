@@ -207,8 +207,6 @@ bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
 {}
 bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
 {}
-CommandCost TestBuyAllTemplateVehiclesInChain(TemplateVehicle *tv, TileIndex tile)
-{}
 
 /**
  * Perform the actual template replacement, or just simulate it. Return the overall cost for the whole replacement in any case.
@@ -238,7 +236,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	CommandCost tmp_result(EXPENSES_NEW_VEHICLES);
 
 	/* first some tests on necessity and sanity */
-	if ( !tv )
+	if ( tv == NULL )
 		return buy;
 
 	/*
@@ -267,12 +265,6 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	if ( !need_replacement ) {
 		if ( !need_refit || !use_refit ) {
 			/* before returning, release incoming train first if 2nd param says so */
-			if ( !stayInDepot ) incoming->vehstatus &= ~VS_STOPPED;
-			return buy;
-		}
-	} else {
-		CommandCost buyCost = TestBuyAllTemplateVehiclesInChain(tv, tile);
-		if ( !buyCost.Succeeded() || !CheckCompanyHasMoney(buyCost) ) {
 			if ( !stayInDepot ) incoming->vehstatus &= ~VS_STOPPED;
 			return buy;
 		}
