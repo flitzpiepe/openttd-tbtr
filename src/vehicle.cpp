@@ -904,10 +904,11 @@ void VehicleEnteredDepotThisTick(Vehicle *v)
 {
 	/* Template Replacement Setup stuff */
 	bool stayInDepot = v->current_order.GetDepotActionType();
-	TemplateVehicle* tv = TemplateVehicle::Get(Group::Get(v->group_id)->template_id);
+	Train* t = static_cast<Train*>(v);
+	TemplateVehicle* tv = GetTemplateForTrain(t);
 	if ( tv != NULL ) {
-		if ( stayInDepot )	_vehicles_to_templatereplace[(Train*)v] = true;
-		else				_vehicles_to_templatereplace[(Train*)v] = false;
+		if ( stayInDepot ) _vehicles_to_templatereplace[t] = true;
+		else               _vehicles_to_templatereplace[t] = false;
 	}
 	/* Moved the assignment for auto replacement here to prevent auto replacement
 	 * from happening if template replacement is also scheduled */

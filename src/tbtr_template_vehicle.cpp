@@ -175,9 +175,18 @@ TemplateVehicle* TemplateVehicle::GetNextUnit() const
 	return tv;
 }
 
+/**
+ * Return the template vehicle that is assigned to a train's group.
+ *
+ * @param t:	the train
+ */
+TemplateVehicle* GetTemplateForTrain(Train* t)
+{
+	return TemplateVehicle::Get(Group::Get(t->group_id)->template_id);
+}
+
 // TODO stubs to be implemented later
-TemplateVehicle* GetTemplateVehicleByGroupID(GroupID gid)
-{}
+
 void RefitTrainFromTemplate(Train* t, TemplateVehicle* tv)
 {}
 void TransferCargoForTrain(Train* o, Train* n)
@@ -225,7 +234,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			*remainder_chain=0,
 			*tmp_chain=0;
 	TileIndex tile = incoming->tile;
-	TemplateVehicle *tv = GetTemplateVehicleByGroupID(incoming->group_id);
+	TemplateVehicle *tv = GetTemplateForTrain(incoming);
 	EngineID eid = tv->engine_type;
 
 	CommandCost buy(EXPENSES_NEW_VEHICLES);
