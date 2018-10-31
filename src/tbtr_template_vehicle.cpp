@@ -221,10 +221,6 @@ CommandCost TestBuyAllTemplateVehiclesInChain(TemplateVehicle *tv, TileIndex til
  */
 CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
-	// TODO
-	// if param == simulate:
-	// 		add array with length of incoming train to remember already used chain parts 
-
 	VehicleID id_inc = GB(p1, 0, 20);
 	// TODO check if null
 	Train* incoming = Train::GetIfValid(id_inc);
@@ -241,10 +237,19 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	CommandCost move_cost(EXPENSES_NEW_VEHICLES);
 	CommandCost tmp_result(EXPENSES_NEW_VEHICLES);
 
-
 	/* first some tests on necessity and sanity */
 	if ( !tv )
 		return buy;
+
+	/*
+	 * An array of already used vehicle IDs
+	 *
+	 * This is used during a simulate-only run of this function because we need to keep track of the
+	 * train parts that have already been used to create the new chain. */
+	// TODO if param == simu
+	// TODO set with the length of the incoming train
+	VehicleID simulateUsedTrainParts[99];
+
 	bool need_replacement = !TrainMatchesTemplate(incoming, tv);
 	bool need_refit = !TrainMatchesTemplateRefit(incoming, tv);
 	bool use_refit = tv->refit_as_template;
