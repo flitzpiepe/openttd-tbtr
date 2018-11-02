@@ -222,8 +222,6 @@ enum Commands {
 	CMD_FORCE_TRAIN_PROCEED,          ///< proceed a train to pass a red signal
 	CMD_REVERSE_TRAIN_DIRECTION,      ///< turn a train around
 
-	CMD_TEMPLATE_REPLACE_VEHICLE,     ///< execute a template replacement on a train
-
 	CMD_CLEAR_ORDER_BACKUP,           ///< clear the order backup of a given user/tile
 	CMD_MODIFY_ORDER,                 ///< modify an order (like set full-load)
 	CMD_SKIP_TO_ORDER,                ///< skip an order to the next of specific one
@@ -332,6 +330,8 @@ enum Commands {
 	CMD_SET_TIMETABLE_START,          ///< set the date that a timetable should start
 
 	CMD_OPEN_CLOSE_AIRPORT,           ///< open/close an airport to incoming aircraft
+
+	CMD_TEMPLATE_REPLACE_VEHICLE,     ///< execute a template replacement on a train
 
 	CMD_END,                          ///< Must ALWAYS be on the end of this list!! (period)
 };
