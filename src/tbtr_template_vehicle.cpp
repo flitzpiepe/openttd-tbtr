@@ -244,9 +244,15 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	 *
 	 * This is used during a simulate-only run of this function because we need to keep track of the
 	 * train parts that have already been used to create the new chain. */
-	// TODO if param == simu
-	// TODO set with the length of the incoming train
-	VehicleID simulateUsedTrainParts[99];
+	VehicleID* simuTrainParts[128];
+	uint simuIndex = 0;
+
+	bool simulate = true;
+
+
+	return buy;
+
+	// TODO review and adapt and remove later
 
 	bool need_replacement = !TrainMatchesTemplate(incoming, tv);
 	bool need_refit = !TrainMatchesTemplateRefit(incoming, tv);
