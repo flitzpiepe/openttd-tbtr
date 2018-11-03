@@ -182,7 +182,15 @@ TemplateVehicle* TemplateVehicle::GetNextUnit() const
  */
 TemplateVehicle* GetTemplateForTrain(Train* t)
 {
-	return TemplateVehicle::Get(Group::Get(t->group_id)->template_id);
+	GroupID gid = t->group_id;
+	if ( gid == DEFAULT_GROUP )
+		return NULL;
+
+	TemplateID tid = Group::Get(gid)->template_id;
+	if ( tid == INVALID_TEMPLATE )
+		return NULL;
+
+	return TemplateVehicle::Get(tid);
 }
 
 // TODO stubs to be implemented later
