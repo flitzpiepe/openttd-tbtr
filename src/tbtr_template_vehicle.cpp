@@ -1,10 +1,12 @@
-#include "tbtr_template_vehicle.h"
-// TODO maybe move these to a different file, together with the command-specific functions defined at the end
-// of this file
+
+#include "stdafx.h"
+
 #include "autoreplace_func.h"
-#include "train.h"
-#include "command_type.h"
 #include "command_func.h"
+
+#include "tbtr_template_vehicle.h"
+
+// TODO rm later
 CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text);
 
 TemplatePool _template_pool("Template");
@@ -193,8 +195,7 @@ TemplateVehicle* GetTemplateForTrain(Train* t)
 	return TemplateVehicle::Get(tid);
 }
 
-// TODO stubs to be implemented later
-
+// TODO old functions
 void RefitTrainFromTemplate(Train* t, TemplateVehicle* tv)
 {}
 void TransferCargoForTrain(Train* o, Train* n)
@@ -209,11 +210,20 @@ bool ChainContainsVehicle(Train *t, Train* m)
 {}
 Train* ChainContainsEngine(Train *t, EngineID eid)
 {}
-CommandCost CopyHeadSpecificThings(Vehicle *old_head, Vehicle *new_head, DoCommandFlag flags)
-{}
 bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
 {}
 bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
+{}
+
+// TODO helper functions
+Train* FindMatchingTrainInChain(TemplateVehicle* tmpl, Train*, train)
+{
+}
+Train* FindMatchingTrainInDepot(TemplateVehicle*, TileIndex tile)
+{}
+CommandCost NeutralizeRemainderChain(Train* t)
+{}
+CommandCost TransferCargo(Train* from, Train* to)
 {}
 
 /**
@@ -232,19 +242,22 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	Train* incoming = Train::GetIfValid(id_inc);
 	bool stayInDepot = p2;
 
+	// TODO review what is needed
 	Train	*new_chain=0,
 			*remainder_chain=0,
 			*tmp_chain=0;
 	TileIndex tile = incoming->tile;
-	TemplateVehicle *tv = GetTemplateForTrain(incoming);
-	EngineID eid = tv->engine_type;
+	TemplateVehicle *template_vehicle = GetTemplateForTrain(incoming);
+	TemplateVehicle *tv ;
+	EngineID eid = template_vehicle->engine_type;
 
+	// TODO review what is needed
 	CommandCost buy(EXPENSES_NEW_VEHICLES);
 	CommandCost move_cost(EXPENSES_NEW_VEHICLES);
 	CommandCost tmp_result(EXPENSES_NEW_VEHICLES);
 
 	/* first some tests on necessity and sanity */
-	if ( tv == NULL )
+	if ( template_vehicle == NULL )
 		return buy;
 
 	/*
@@ -257,6 +270,57 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	bool simulate = true;
 
+	// TODO
+	//
+	//
+	//- procedure
+	//	- for each template
+	//		- find matching vehicle in incoming
+	//			- must match engine_id
+	//			- try to find one with matching refit
+	//			- of those, choose the one with the max. #cargo
+	//		- move to new chain
+	//		- OR get it from somewhere else
+	//			* depot
+	//			* buy
+	//		- sell the remainders
+	//		- OR neutralize the remainders
+	//			- sell remaining cargo
+	//
+
+	// TODO steps for incoming head
+	// TODO last param?
+	//CopyHeadSpecificThings(train_found, new_chain, 0)
+
+	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
+	{
+		Train* found = NULL;
+		if ( (found=FindMatchingTrainInChain(cur_tmpl,incoming)) != NULL )
+		{
+			// TODO use vehicle from incoming chain
+		}
+		else if ( (found=FindMatchingTrainInDepot(cur_tmpl, tile)) != NULL )
+		{
+			// TODO use vehicle from depot
+		}
+		else
+		{
+			// TODO buy new vehicle
+		}
+	}
+
+	// TODO (should be dealt with by copyheadspecthings)
+	//		- copy all settings from old primary to new
+	//			* group
+	//			* orders
+	//			* launch maybe
+
+	NeutralizeRemainderChain(incoming);
+
+	// TODO
+	TransferCargo(incoming, new_chain);
+
+	// TODO maybe sell stuff
 
 	return buy;
 
