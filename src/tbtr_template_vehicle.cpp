@@ -251,8 +251,30 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 	return found;
 }
 
-Train* FindMatchingTrainInDepot(TemplateVehicle*, TileIndex tile)
-{}
+/*
+ * Check, if any train in a given Depot contains a given EngineID
+ * @param tile:     the tile of the depot
+ * @param eid:      the EngineID to look up
+ * @param not_in    this Train will be ignored during the check
+ */
+Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_in)
+{
+	// TODO select also based on cargo type and current amount
+	Train *train;
+	FOR_ALL_TRAINS(train) {
+		// conditions: v is stopped in the given depot, has the right engine and if 'not_in' is given v must not be contained within 'not_in'
+		// if 'not_in' is NULL, no check is needed
+		if ( train->tile == tile
+				// If the veh belongs to a chain, wagons will not return true on IsStoppedInDepot(), only primary vehicles will
+				// in case of t not a primary veh, we demand it to be a free wagon to consider it for replacement
+				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
+				&& train->engine_type == tv->engine_type
+				&& (not_in==0 || ChainContainsVehicle(not_in, train)==0))
+			return train;
+	}
+	return NULL;
+}
+
 CommandCost NeutralizeRemainderChain(Train* t)
 {}
 CommandCost TransferCargo(Train* from, Train* to)
@@ -331,7 +353,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			// TODO use vehicle from incoming chain
 		}
-		else if ( (found=FindMatchingTrainInDepot(cur_tmpl, tile)) != NULL )
+		else if ( (found=FindMatchingTrainInDepot(cur_tmpl, tile, incoming)) != NULL )
 		{
 			// TODO use vehicle from depot
 		}
