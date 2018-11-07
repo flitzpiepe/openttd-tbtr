@@ -225,13 +225,17 @@ bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
  * @param train:	the train we are looking in
  * @return:			the train we found, may be null
  */
+// TODO bad scenario
+// 	all vehicles have 0 cargo
+// 	one is selected because of correct engine type
+// 	later veh also fits AND has matching refit, too
+// 		--> but will not be selected because its cargo isn't greater than that of the original one
 Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 {
 	//			- must match engine_id
 	//			- try to find one with matching refit
 	//			- of those, choose the one with the max. #cargo
 	Train* found = NULL;
-	uint16 cargo_amount = 0;
 	for ( Train* tmp=train; tmp!=NULL; tmp=tmp->GetNextUnit() )
 	{
 		if ( tmp->engine_type == tv->engine_type )
@@ -251,16 +255,22 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 	return found;
 }
 
-/*
+/**
+ * TODO adapt this text
  * Check, if any train in a given Depot contains a given EngineID
  * @param tile:     the tile of the depot
  * @param eid:      the EngineID to look up
  * @param not_in    this Train will be ignored during the check
  */
+// TODO bad scenario
+// 	all vehicles have 0 cargo
+// 	one is selected because of correct engine type
+// 	later veh also fits AND has matching refit, too
+// 		--> but will not be selected because its cargo isn't greater than that of the original one
 Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_in)
 {
-	// TODO select also based on cargo type and current amount
-	Train *train;
+	Train* found = NULL;
+	Train* train;
 	FOR_ALL_TRAINS(train) {
 		// conditions: v is stopped in the given depot, has the right engine and if 'not_in' is given v must not be contained within 'not_in'
 		// if 'not_in' is NULL, no check is needed
@@ -270,15 +280,25 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
 				&& (not_in==0 || ChainContainsVehicle(not_in, train)==0))
-			return train;
+			// already found a matching vehicle, keep checking for matching refit + cargo amount
+			if ( found != NULL )
+				if ( found->cargo_type==tv->cargo_type && found->cargo_subtype==tv->cargo_subtype )
+					// find something with a minimal amount of cargo, so that we can transfer more from the
+					// original chain into it later
+					if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
+						found = train;
+			else
+				found = train;
 	}
-	return NULL;
+	return found;
 }
 
 CommandCost NeutralizeRemainderChain(Train* t)
 {}
 CommandCost TransferCargo(Train* from, Train* to)
 {}
+
+// TODO check all loops and ifs in this file for {} convention ... -.-
 
 /**
  * Perform the actual template replacement, or just simulate it. Return the overall cost for the whole replacement in any case.
@@ -379,6 +399,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	return buy;
 
 	// TODO review and adapt and remove later
+	// TODO after removing this, check which helper functions are still needed
 
 	bool need_replacement = !TrainMatchesTemplate(incoming, tv);
 	bool need_refit = !TrainMatchesTemplateRefit(incoming, tv);
