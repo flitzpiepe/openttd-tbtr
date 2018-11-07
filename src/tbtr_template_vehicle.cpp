@@ -215,10 +215,42 @@ bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
 bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
 {}
 
-// TODO helper functions
-Train* FindMatchingTrainInChain(TemplateVehicle* tmpl, Train*, train)
+/**
+ * Find the first,best matching vehicle of a train for a given template vehicle.
+ *
+ * In any case the train must match the template's engine type. Among all of those we select the one
+ * that also matches the refit and among those the one with the maximum amount of cargo.
+ *
+ * @param tv:		the template we are looking for
+ * @param train:	the train we are looking in
+ * @return:			the train we found, may be null
+ */
+Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 {
+	//			- must match engine_id
+	//			- try to find one with matching refit
+	//			- of those, choose the one with the max. #cargo
+	Train* found = NULL;
+	uint16 cargo_amount = 0;
+	for ( Train* tmp=train; tmp!=NULL; tmp=tmp->GetNextUnit() )
+	{
+		if ( tmp->engine_type == tv->engine_type )
+		{
+			// first vehicle we found, take it!
+			if ( found == NULL )
+				found = tmp;
+			// otherwise also compare refit and carried cargo
+			// we want one with matching refit, and among those the one with
+			// the maximum current cargo
+			else
+				if ( tmp->cargo_type==tv->cargo_type && tmp->cargo_subtype == tv->cargo_subtype )
+					if ( tmp->cargo.StoredCount() > found->cargo.StoredCount() )
+						found = tmp;
+		}
+	}
+	return found;
 }
+
 Train* FindMatchingTrainInDepot(TemplateVehicle*, TileIndex tile)
 {}
 CommandCost NeutralizeRemainderChain(Train* t)
