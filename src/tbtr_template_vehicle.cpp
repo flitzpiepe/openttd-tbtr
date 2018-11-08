@@ -282,11 +282,13 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 				&& (not_in==0 || ChainContainsVehicle(not_in, train)==0))
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
 			if ( found != NULL )
-				if ( found->cargo_type==tv->cargo_type && found->cargo_subtype==tv->cargo_subtype )
+			{
+				if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
 					// find something with a minimal amount of cargo, so that we can transfer more from the
 					// original chain into it later
 					if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
 						found = train;
+			}
 			else
 				found = train;
 	}
@@ -361,6 +363,18 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	//		- OR neutralize the remainders
 	//			- sell remaining cargo
 	//
+	//	TODO handling of the chain head
+	//	  remember original head
+	//	  copyheadspecificthings(orighead, newhead)
+	//	  	if (same) return
+	//	OR (separate treatment of head and tail)
+	//	  check if original head has correct engine_type
+	//	  maybe just keep the orighead
+	//
+	//	? unit number might change, but shouldn't
+	//	   new_chain should have the unitnumber of incoming in any case
+	//	   incoming (if it's different from new_chain) should get a new unitnumber via GetFreeUnitNumber
+	//
 
 	// TODO steps for incoming head
 	// TODO last param?
@@ -369,17 +383,48 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
 		Train* found = NULL;
+		// TODO merge ifs
+		// TODO if the refit of the found vehicle doesn't fit, it must be refitted
 		if ( (found=FindMatchingTrainInChain(cur_tmpl,incoming)) != NULL )
 		{
-			// TODO use vehicle from incoming chain
+			if ( new_chain == NULL )
+			{
+				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				new_chain = found;
+			}
+			else
+			{
+				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+			}
 		}
 		else if ( (found=FindMatchingTrainInDepot(cur_tmpl, tile, incoming)) != NULL )
 		{
-			// TODO use vehicle from depot
+			if ( new_chain == NULL )
+			{
+				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				new_chain = found;
+			}
+			else
+			{
+				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+			}
 		}
 		else
 		{
-			// TODO buy new vehicle
+			CommandCost cc = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
+			buy.AddCost(cc);
+			Train* new_rail_vehicle = Train::Get(_new_vehicle_id);
+			if ( new_chain == NULL )
+			{
+				new_chain = new_rail_vehicle;
+				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+			}
+			else
+			{
+				// TODO why is the success of the move command always false even though the vehicle was moved
+				CommandCost ccMove = DoCommand(tile, new_rail_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				//buy.AddCost(ccMove);
+			}
 		}
 	}
 
@@ -387,7 +432,9 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	//		- copy all settings from old primary to new
 	//			* group
 	//			* orders
+	//			* unitnumber must be the same
 	//			* launch maybe
+	// CopyHeadSpecificThings(...)
 
 	NeutralizeRemainderChain(incoming);
 
