@@ -376,28 +376,12 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	//	   incoming (if it's different from new_chain) should get a new unitnumber via GetFreeUnitNumber
 	//
 
-	// TODO steps for incoming head
-	// TODO last param?
-	//CopyHeadSpecificThings(train_found, new_chain, 0)
-
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
-		Train* found = NULL;
-		// TODO merge ifs
-		// TODO if the refit of the found vehicle doesn't fit, it must be refitted
-		if ( (found=FindMatchingTrainInChain(cur_tmpl,incoming)) != NULL )
-		{
-			if ( new_chain == NULL )
-			{
-				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
-				new_chain = found;
-			}
-			else
-			{
-				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
-			}
-		}
-		else if ( (found=FindMatchingTrainInDepot(cur_tmpl, tile, incoming)) != NULL )
+		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
+		if ( found == NULL )
+			found = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
+		if ( found != NULL )
 		{
 			if ( new_chain == NULL )
 			{
@@ -421,11 +405,10 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			}
 			else
 			{
-				// TODO why is the success of the move command always false even though the vehicle was moved
 				CommandCost ccMove = DoCommand(tile, new_rail_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
-				//buy.AddCost(ccMove);
 			}
 		}
+		// TODO refit the vehicle if necessary
 	}
 
 	// TODO (should be dealt with by copyheadspecthings)
