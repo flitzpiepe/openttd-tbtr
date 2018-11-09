@@ -4,6 +4,7 @@
 #include "autoreplace_func.h"
 #include "command_func.h"
 
+#include "tbtr_debug.h"
 #include "tbtr_template_vehicle.h"
 
 // TODO rm later
@@ -230,6 +231,7 @@ bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
 // 	one is selected because of correct engine type
 // 	later veh also fits AND has matching refit, too
 // 		--> but will not be selected because its cargo isn't greater than that of the original one
+// TODO should we prefer vehicles with 0 cargo? who knows whether it will fit the vehicle's current orders ...
 Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 {
 	//			- must match engine_id
@@ -267,6 +269,7 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 // 	one is selected because of correct engine type
 // 	later veh also fits AND has matching refit, too
 // 		--> but will not be selected because its cargo isn't greater than that of the original one
+// TODO should we prefer vehicles with 0 cargo? who knows whether it will fit the vehicle's current orders ...
 Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_in)
 {
 	Train* found = NULL;
@@ -359,9 +362,10 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	//		- OR get it from somewhere else
 	//			* depot
 	//			* buy
-	//		- sell the remainders
-	//		- OR neutralize the remainders
-	//			- sell remaining cargo
+	//		- refit
+	//	- transfer cargo as far as possible
+	//	- sell the remainders
+	//	- OR neutralize the remainders
 	//
 	//	TODO handling of the chain head
 	//	  remember original head
@@ -417,7 +421,13 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	//			* orders
 	//			* unitnumber must be the same
 	//			* launch maybe
-	// CopyHeadSpecificThings(...)
+	// TODO during the flags==DC_NONE run, the incoming->unitnumber==3
+	// 		during the flags==DC_EXEC run, it is ==1
+	CommandCost ccCopy = CopyHeadSpecificThings(incoming, new_chain, flags);
+	if ( flags == DC_EXEC && incoming != new_chain )
+	{
+		incoming->unitnumber = GetFreeUnitNumber(incoming->type);
+	}
 
 	NeutralizeRemainderChain(incoming);
 
