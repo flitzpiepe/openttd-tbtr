@@ -203,9 +203,55 @@ void TransferCargoForTrain(Train* o, Train* n)
 {}
 void BreakUpRemainders(Train* t)
 {}
+
+/**
+ * Neutralize a train's status (group, orders, etc).
+ * @param train:	the train to be neutralized
+ */
+CommandCost NeutralizeStatus(Train* train)
+{
+	CommandCost cc = CommandCost();
+
+	/* remove from current group */
+	cc.AddCost(DoCommand(train->tile, DEFAULT_GROUP, train->index, DC_EXEC, CMD_ADD_VEHICLE_GROUP));
+
+	/* reset orders for this vehicle */
+	train->current_order = INVALID_ORDER;
+	/* unshare and delete */
+	cc.AddCost(DoCommand(train->tile, train->index, -1, DC_EXEC, CMD_DELETE_ORDER));
+
+	/* make sure the vehicle is stopped */
+	train->vehstatus |= VS_STOPPED;
+
+	return cc;
+}
+
+/**
+ * Break up a train into neutral chains inside the depot
+ *
+ * Engines are moved onto a new line each while the wagons will from a FreeWagonChain.
+ * Orders and group assignment will be removed from the primary vehicles and it is ensured that they are
+ * stopped in the depot.
+ *
+ * @param train:	the chain to be processed
+ */
+CommandCost NeutralizeRemainderChain(Train *train) {
+	CommandCost cc = CommandCost();
+	Train* nextVeh = train->GetNextUnit();
+	while ( train != NULL )
+	{
+		if ( HasBit(train->subtype, GVSF_ENGINE) )
+		{
+			cc.AddCost(DoCommand(train->tile, train->index, INVALID_VEHICLE, DC_EXEC, CMD_MOVE_RAIL_VEHICLE));
+			NeutralizeStatus(train);
+		}
+		train = nextVeh;
+		if (nextVeh != NULL)
+			nextVeh = nextVeh->GetNextUnit();
+	}
+	return cc;
+}
 Train* DepotContainsEngine(TileIndex tile, EngineID engine, Train* t=0)
-{}
-void NeutralizeStatus(Train* t)
 {}
 bool ChainContainsVehicle(Train *t, Train* m)
 {}
@@ -298,8 +344,6 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 	return found;
 }
 
-CommandCost NeutralizeRemainderChain(Train* t)
-{}
 CommandCost TransferCargo(Train* from, Train* to)
 {}
 
@@ -349,39 +393,10 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	bool simulate = true;
 
-	// TODO
-	//
-	//
-	//- procedure
-	//	- for each template
-	//		- find matching vehicle in incoming
-	//			- must match engine_id
-	//			- try to find one with matching refit
-	//			- of those, choose the one with the max. #cargo
-	//		- move to new chain
-	//		- OR get it from somewhere else
-	//			* depot
-	//			* buy
-	//		- refit
-	//	- transfer cargo as far as possible
-	//	- sell the remainders
-	//	- OR neutralize the remainders
-	//
-	//	TODO handling of the chain head
-	//	  remember original head
-	//	  copyheadspecificthings(orighead, newhead)
-	//	  	if (same) return
-	//	OR (separate treatment of head and tail)
-	//	  check if original head has correct engine_type
-	//	  maybe just keep the orighead
-	//
-	//	? unit number might change, but shouldn't
-	//	   new_chain should have the unitnumber of incoming in any case
-	//	   incoming (if it's different from new_chain) should get a new unitnumber via GetFreeUnitNumber
-	//
-
+	// TODO comment
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
+		// TODO use from depot should be optional
 		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
 		if ( found == NULL )
 			found = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
@@ -415,28 +430,25 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		// TODO refit the vehicle if necessary
 	}
 
-	// TODO (should be dealt with by copyheadspecthings)
-	//		- copy all settings from old primary to new
-	//			* group
-	//			* orders
-	//			* unitnumber must be the same
-	//			* launch maybe
-	// TODO during the flags==DC_NONE run, the incoming->unitnumber==3
-	// 		during the flags==DC_EXEC run, it is ==1
-	CommandCost ccCopy = CopyHeadSpecificThings(incoming, new_chain, flags);
-	if ( flags == DC_EXEC && incoming != new_chain )
+	if ( flags == DC_EXEC )
 	{
-		incoming->unitnumber = GetFreeUnitNumber(incoming->type);
+		CommandCost ccCopy = CopyHeadSpecificThings(incoming, new_chain, flags);
+
+		// TODO
+		TransferCargo(incoming, new_chain);
+
+		if ( incoming != new_chain )
+			incoming->unitnumber = GetFreeUnitNumber(incoming->type);
+		NeutralizeRemainderChain(incoming);
+
+		// TODO maybe sell stuff
+		// TODO test relaunch of new chain
 	}
 
-	NeutralizeRemainderChain(incoming);
-
-	// TODO
-	TransferCargo(incoming, new_chain);
-
-	// TODO maybe sell stuff
-
 	return buy;
+
+
+
 
 	// TODO review and adapt and remove later
 	// TODO after removing this, check which helper functions are still needed
