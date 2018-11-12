@@ -482,7 +482,9 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			NeutralizeRemainderChain(incoming);
 		}
 
-		// TODO test relaunch of new chain
+		// TODO test
+		if ( !stayInDepot )
+			new_chain &= ~VS_STOPPED;
 	}
 
 	if ( sellRemainders )
