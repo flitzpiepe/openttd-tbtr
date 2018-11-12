@@ -450,6 +450,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 		}
+		/* ... otherwise buy a new one */
 		else
 		{
 			CommandCost cc = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
@@ -482,9 +483,8 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			NeutralizeRemainderChain(incoming);
 		}
 
-		// TODO test
 		if ( !stayInDepot )
-			new_chain &= ~VS_STOPPED;
+			new_chain->vehstatus &= ~VS_STOPPED;
 	}
 
 	if ( sellRemainders )
