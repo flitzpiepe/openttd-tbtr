@@ -84,6 +84,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	if ( !TemplateVehicle::CanAllocateItem(len) )
 		return false;
 
+	this->first = chainHead ? chainHead : this;
 	this->engine_type = clicked->engine_type;
 	this->subtype = clicked->subtype;
 	this->railtype = clicked->railtype;
@@ -107,7 +108,6 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 		TemplateVehicle* tv = new TemplateVehicle();
 		if ( chainHead == NULL )
 			chainHead = this;
-		tv->first = chainHead;
 		tv->CloneFromTrain(train->Next(), chainHead);
 		this->next = tv;
 	}
