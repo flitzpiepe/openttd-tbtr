@@ -324,10 +324,13 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 	//			- try to find one with matching refit
 	//			- of those, choose the one with the max. #cargo
 	Train* found = NULL;
+	bool check_refit = tv->first->refit_as_template;
 	for ( Train* tmp=train; tmp!=NULL; tmp=tmp->GetNextUnit() )
 	{
 		if ( tmp->engine_type == tv->engine_type )
 		{
+			if ( check_refit == false )
+				return found;
 			// first vehicle we found, take it!
 			if ( found == NULL )
 				found = tmp;
@@ -360,6 +363,7 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 {
 	Train* found = NULL;
 	Train* train;
+	bool check_refit = tv->first->refit_as_template;
 	FOR_ALL_TRAINS(train) {
 		// conditions: v is stopped in the given depot, has the right engine and if 'not_in' is given v must not be contained within 'not_in'
 		// if 'not_in' is NULL, no check is needed
@@ -372,11 +376,14 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
 			if ( found != NULL )
 			{
-				if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
-					// find something with a minimal amount of cargo, so that we can transfer more from the
-					// original chain into it later
-					if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
-						found = train;
+				if ( check_refit == true )
+				{
+					if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
+						// find something with a minimal amount of cargo, so that we can transfer more from the
+						// original chain into it later
+						if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
+							found = train;
+				}
 			}
 			else
 				found = train;
@@ -411,6 +418,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	TemplateVehicle *tv ;
 	EngineID eid = template_vehicle->engine_type;
 	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
+	bool refit_train = template_vehicle->refit_as_template;
 
 	// TODO review what is needed
 	CommandCost buy(EXPENSES_NEW_VEHICLES);
@@ -434,10 +442,11 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	// TODO comment
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
-		// TODO use from depot should be optional
 		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
-		if ( found == NULL )
+		/* maybe try to find a matching vehicle in the depot */
+		if ( found == NULL && tv->reuse_depot_vehicles )
 			found = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
+		/* found a matching vehicle somewhere: use it ... */
 		if ( found != NULL )
 		{
 			if ( new_chain == NULL )
@@ -466,8 +475,12 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 				CommandCost ccMove = DoCommand(tile, new_rail_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 		}
-		// TODO refit the vehicle if necessary
-		// refit either like incoming or like template, depending on the template option
+
+		if ( refit_train )
+		{
+			// TODO refit the vehicle if necessary
+			// refit either like incoming or like template, depending on the template option
+		}
 	}
 
 	if ( flags == DC_EXEC )
