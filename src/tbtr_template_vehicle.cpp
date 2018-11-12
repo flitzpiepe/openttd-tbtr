@@ -373,6 +373,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	TemplateVehicle *template_vehicle = GetTemplateForTrain(incoming);
 	TemplateVehicle *tv ;
 	EngineID eid = template_vehicle->engine_type;
+	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
 
 	// TODO review what is needed
 	CommandCost buy(EXPENSES_NEW_VEHICLES);
@@ -437,13 +438,18 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		// TODO
 		TransferCargo(incoming, new_chain);
 
-		if ( incoming != new_chain )
-			incoming->unitnumber = GetFreeUnitNumber(incoming->type);
-		NeutralizeRemainderChain(incoming);
+		if ( !sellRemainders )
+		{
+			if ( incoming != new_chain )
+				incoming->unitnumber = GetFreeUnitNumber(incoming->type);
+			NeutralizeRemainderChain(incoming);
+		}
 
-		// TODO maybe sell stuff
 		// TODO test relaunch of new chain
 	}
+
+	if ( sellRemainders )
+		buy.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
 
 	return buy;
 
