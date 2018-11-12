@@ -199,9 +199,9 @@ TemplateVehicle* GetTemplateForTrain(Train* t)
 // TODO old functions
 void RefitTrainFromTemplate(Train* t, TemplateVehicle* tv)
 {}
-void TransferCargoForTrain(Train* o, Train* n)
-{}
 void BreakUpRemainders(Train* t)
+{}
+void TransferCargoForTrain(Train* t1, Train* t2)
 {}
 
 /**
@@ -261,6 +261,46 @@ bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
 {}
 bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
 {}
+/** Transfer as much cargo from a given (single train) vehicle onto a chain of vehicles.
+ *  I.e., iterate over the chain from head to tail and use all available cargo capacity (w.r.t. cargo type of course)
+ *  to store the cargo from the given single vehicle.
+ *  @param old_veh:		ptr to the single vehicle, which's cargo shall be moved
+ *  @param new_head:	ptr to the head of the chain, which shall obtain old_veh's cargo
+ *  @return:			amount of moved cargo
+ */
+void TransferCargo(Train *old_veh, Train *new_head)
+{
+	assert(new_head->IsPrimaryVehicle());
+
+	CargoID _cargo_type = old_veh->cargo_type;
+	byte _cargo_subtype = old_veh->cargo_subtype;
+
+	// how much cargo has to be moved (if possible)
+	uint remainingAmount = old_veh->cargo.TotalCount();
+	// each vehicle in the new chain shall be given as much of the old cargo as possible, until none is left
+	for (Train *tmp=new_head; tmp!=NULL && remainingAmount>0; tmp=tmp->GetNextUnit())
+	{
+		if (tmp->cargo_type == _cargo_type && tmp->cargo_subtype == _cargo_subtype)
+		{
+			// calculate the free space for new cargo on the current vehicle
+			uint curCap = tmp->cargo_cap - tmp->cargo.TotalCount();
+			uint moveAmount = std::min(remainingAmount, curCap);
+			// move (parts of) the old vehicle's cargo onto the current vehicle of the new chain
+			if (moveAmount > 0)
+			{
+				old_veh->cargo.Shift(moveAmount, &tmp->cargo);
+				remainingAmount -= moveAmount;
+			}
+		}
+	}
+
+	// from autoreplace_cmd.cpp : 121
+	/* Any left-overs will be thrown away, but not their feeder share. */
+	//if (src->cargo_cap < src->cargo.TotalCount()) src->cargo.Truncate(src->cargo.TotalCount() - src->cargo_cap);
+
+	/* Update train weight etc., the old vehicle will be sold anyway */
+	new_head->ConsistChanged(ConsistChangeFlags::CCF_LOADUNLOAD);
+}
 
 /**
  * Find the first,best matching vehicle of a train for a given template vehicle.
@@ -344,9 +384,6 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 	return found;
 }
 
-CommandCost TransferCargo(Train* from, Train* to)
-{}
-
 // TODO check all loops and ifs in this file for {} convention ... -.-
 
 /**
@@ -429,13 +466,13 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			}
 		}
 		// TODO refit the vehicle if necessary
+		// refit either like incoming or like template, depending on the template option
 	}
 
 	if ( flags == DC_EXEC )
 	{
 		CommandCost ccCopy = CopyHeadSpecificThings(incoming, new_chain, flags);
 
-		// TODO
 		TransferCargo(incoming, new_chain);
 
 		if ( !sellRemainders )
