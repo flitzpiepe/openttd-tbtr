@@ -449,15 +449,12 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		/* found a matching vehicle somewhere: use it ... */
 		if ( found != NULL )
 		{
+			/* find the first vehicle in incoming, which is != found */
+			incoming = (found == incoming) ? incoming->GetNextUnit() : incoming;
+			/* move the vehicle from the old chain to the new */
+			CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 			if ( new_chain == NULL )
-			{
-				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 				new_chain = found;
-			}
-			else
-			{
-				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
-			}
 		}
 		/* ... otherwise buy a new one */
 		else
