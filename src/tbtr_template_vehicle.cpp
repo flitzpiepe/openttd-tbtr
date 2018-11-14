@@ -415,7 +415,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			*tmp_chain=0;
 	TileIndex tile = incoming->tile;
 	TemplateVehicle *template_vehicle = GetTemplateForTrain(incoming);
-	TemplateVehicle *tv ;
+	TemplateVehicle *tv = template_vehicle;
 	EngineID eid = template_vehicle->engine_type;
 	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
 	bool refit_train = template_vehicle->refit_as_template;
@@ -439,9 +439,13 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	bool simulate = true;
 
+	// remember for CopyHeadSpecificThings()
+	Train* old_head = incoming;
+
 	// TODO comment
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
+		// TODO rename (is always set to the new vehicle later)
 		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
 		/* maybe try to find a matching vehicle in the depot */
 		if ( found == NULL && tv->reuse_depot_vehicles )
@@ -451,25 +455,32 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			/* find the first vehicle in incoming, which is != found */
 			incoming = (found == incoming) ? incoming->GetNextUnit() : incoming;
-			/* move the vehicle from the old chain to the new */
-			CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+
 			if ( new_chain == NULL )
+			{
+				/* move the vehicle from the old chain to the new */
+				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 				new_chain = found;
+			 }
+			 else
+			 {
+				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+			 }
 		}
 		/* ... otherwise buy a new one */
 		else
 		{
 			CommandCost cc = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
 			buy.AddCost(cc);
-			Train* new_rail_vehicle = Train::Get(_new_vehicle_id);
+			found = Train::Get(_new_vehicle_id);
 			if ( new_chain == NULL )
 			{
-				new_chain = new_rail_vehicle;
+				new_chain = found;
 				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 			else
 			{
-				CommandCost ccMove = DoCommand(tile, new_rail_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 		}
 
@@ -477,20 +488,35 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			// TODO refit the vehicle if necessary
 			// refit either like incoming or like template, depending on the template option
+
+			// refit done by autoreplace
+			//cost.AddCost(DoCommand(0, new_veh->index, refit_cargo | (subtype << 8), DC_EXEC, GetCmdRefitVeh(new_veh)));
+			// refit done by old tbtr
+			//DoCommandP(tmp_chain->tile, tmp_chain->index, cur_tmpl->cargo_type | cur_tmpl->cargo_subtype << 8 | 1 << 16 , cb);
+
+			// TODO func from autoreplace
+			//CargoID refit_cargo = GetNewCargoTypeForReplace(old_veh, e, part_of_chain);
+			byte subtype = cur_tmpl->subtype;
+			CargoID cargo_type = cur_tmpl->cargo_type;
+			DoCommand(0, found->index, cargo_type | (subtype << 8), flags, GetCmdRefitVeh(found));
+			//assert(cost.Succeeded()); // This should be ensured by GetNewCargoTypeForReplace()
+
 		}
 	}
 
 	if ( flags == DC_EXEC )
 	{
-		CommandCost ccCopy = CopyHeadSpecificThings(incoming, new_chain, flags);
+		CommandCost ccCopy = CopyHeadSpecificThings(old_head, new_chain, flags);
 
-		TransferCargo(incoming, new_chain);
+		if ( incoming )
+			TransferCargo(incoming, new_chain);
 
 		if ( !sellRemainders )
 		{
-			if ( incoming != new_chain )
+			if ( incoming && incoming != new_chain )
 				incoming->unitnumber = GetFreeUnitNumber(incoming->type);
-			NeutralizeRemainderChain(incoming);
+			if ( incoming )
+				NeutralizeRemainderChain(incoming);
 		}
 
 		if ( !stayInDepot )
