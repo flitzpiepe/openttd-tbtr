@@ -447,6 +447,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	// TODO comment
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
+		bool vehicle_from_incoming = false;		///< used later during the refit decision
 		// TODO rename (is always set to the new vehicle later)
 		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
 		/* maybe try to find a matching vehicle in the depot */
@@ -455,6 +456,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		/* found a matching vehicle somewhere: use it ... */
 		if ( found != NULL )
 		{
+			vehicle_from_incoming = true;
 			/* find the first vehicle in incoming, which is != found */
 			incoming = (found == incoming) ? incoming->GetNextUnit() : incoming;
 
@@ -486,14 +488,17 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			}
 		}
 
+		/* maybe refit as template */
 		if ( refit_train )
 		{
-			// TODO refit the vehicle if necessary
-			// refit either like incoming or like template, depending on the template option
 			CargoID cargo_type = cur_tmpl->cargo_type;
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
-			// TODO ensure success of the command
-			DoCommand(0, found->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(found));
+			buy.AddCost(DoCommand(0, found->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(found)));
+		}
+		/* or maybe refit as current vehicle, in case of newly bought vehicle */
+		else if ( vehicle_from_incoming )
+		{
+			// TODO
 		}
 	}
 
