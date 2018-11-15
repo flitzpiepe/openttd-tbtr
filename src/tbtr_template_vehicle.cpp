@@ -498,7 +498,8 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			//CargoID refit_cargo = GetNewCargoTypeForReplace(old_veh, e, part_of_chain);
 			byte subtype = cur_tmpl->subtype;
 			CargoID cargo_type = cur_tmpl->cargo_type;
-			DoCommand(0, found->index, cargo_type | (subtype << 8), flags, GetCmdRefitVeh(found));
+			byte cargo_subtype = cur_tmpl->cargo_subtype;
+			DoCommand(0, found->index, cargo_type | (cargo_subtype << 8), flags, GetCmdRefitVeh(found));
 			//assert(cost.Succeeded()); // This should be ensured by GetNewCargoTypeForReplace()
 
 		}
