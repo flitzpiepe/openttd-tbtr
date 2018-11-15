@@ -490,20 +490,10 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			// TODO refit the vehicle if necessary
 			// refit either like incoming or like template, depending on the template option
-
-			// refit done by autoreplace
-			//cost.AddCost(DoCommand(0, new_veh->index, refit_cargo | (subtype << 8), DC_EXEC, GetCmdRefitVeh(new_veh)));
-			// refit done by old tbtr
-			//DoCommandP(tmp_chain->tile, tmp_chain->index, cur_tmpl->cargo_type | cur_tmpl->cargo_subtype << 8 | 1 << 16 , cb);
-
-			// TODO func from autoreplace
-			//CargoID refit_cargo = GetNewCargoTypeForReplace(old_veh, e, part_of_chain);
-			byte subtype = cur_tmpl->subtype;
 			CargoID cargo_type = cur_tmpl->cargo_type;
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
-			DoCommand(0, found->index, cargo_type | (cargo_subtype << 8), flags, GetCmdRefitVeh(found));
-			//assert(cost.Succeeded()); // This should be ensured by GetNewCargoTypeForReplace()
-
+			// TODO ensure success of the command
+			DoCommand(0, found->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(found));
 		}
 	}
 
