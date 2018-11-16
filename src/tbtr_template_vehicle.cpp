@@ -492,7 +492,8 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			CargoID cargo_type = cur_tmpl->cargo_type;
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
 			CommandCost ccRefit = DoCommand(0, found->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(found));
-			//buy.AddCost(ccRefit);
+			if ( flags==DC_EXEC )
+				buy.AddCost(ccRefit);
 		}
 	}
 
