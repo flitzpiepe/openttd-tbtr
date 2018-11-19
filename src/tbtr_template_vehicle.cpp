@@ -348,40 +348,37 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
  *
  * In any case the train must match the template's engine type. Among all of those we select the one
  * that also matches the refit and among those the one with the maximum amount of cargo.
+ * Only trains which are not in a specific group will be considered.
  *
  * @param tv:     the template vehicle which's configuration we are looking for
  * @param tile:   the tile of the depot
- * @param not_in: this Train will be ignored during the check
  * @return:       pointer to the train we found, may be null
  */
-Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_in)
+Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile)
 {
 	Train* found = NULL;
 	Train* train;
 	bool check_refit = tv->first->refit_as_template;
 	FOR_ALL_TRAINS(train) {
-		// conditions: v is stopped in the given depot, has the right engine and if 'not_in' is given v must not be contained within 'not_in'
-		// if 'not_in' is NULL, no check is needed
 		if ( train->tile == tile
 				// If the veh belongs to a chain, wagons will not return true on IsStoppedInDepot(), only primary vehicles will
 				// in case of t not a primary veh, we demand it to be a free wagon to consider it for replacement
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
-				&& not_in==0 )
+				&& train->group_id == DEFAULT_GROUP )
+		{
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
-			if ( found != NULL )
+			if ( found != NULL && check_refit == true)
 			{
-				if ( check_refit == true )
-				{
-					if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
-						// find something with a minimal amount of cargo, so that we can transfer more from the
-						// original chain into it later
-						if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
-							found = train;
-				}
+				if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
+					// find something with a minimal amount of cargo, so that we can transfer more from the
+					// original chain into it later
+					if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
+						found = train;
 			}
 			else
 				found = train;
+		}
 	}
 	return found;
 }
@@ -434,7 +431,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 		/* nothing found -> try to find a matching vehicle in the depot */
 		if ( new_vehicle == NULL && template_vehicle->reuse_depot_vehicles )
-			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
+			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile);
 
 		/* found a matching vehicle somewhere: use it ... */
 		if ( new_vehicle != NULL )
