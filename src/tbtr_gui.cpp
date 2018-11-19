@@ -234,7 +234,7 @@ void TbtrGui::DrawGroups(const Rect& r) const
 
 	/* Then treat all groups defined by/for the current company */
 	for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
-		const Group *g = (this->groups)[i];
+		const Group* g = (this->groups)[i];
 		// TODO rename g_id
 		short g_id = g->index;
 
@@ -445,12 +445,12 @@ void TbtrGui::OnPaint()
 void TbtrGui::OnResize()
 {
     /* Top Matrix */
-    NWidgetCore *nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
+    NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
     this->vscroll[0]->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
     nwi->widget_data = (this->vscroll[0]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
     /* Bottom Matrix */
-    NWidgetCore *nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
+    NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
     this->vscroll[1]->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
     nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }

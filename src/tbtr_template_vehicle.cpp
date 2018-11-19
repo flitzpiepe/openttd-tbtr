@@ -8,7 +8,7 @@
 #include "tbtr_template_vehicle.h"
 
 // TODO rm later
-CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char *text);
+CommandCost CmdMoveRailVehicle(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, const char* text);
 
 TemplatePool _template_pool("Template");
 INSTANTIATE_POOL_METHODS(Template)
@@ -91,7 +91,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	this->cargo_type = clicked->cargo_type;
 	this->cargo_subtype = clicked->cargo_subtype;
 	this->cargo_cap = clicked->cargo_cap;
-	const GroundVehicleCache *gcache = clicked->GetGroundVehicleCache();
+	const GroundVehicleCache* gcache = clicked->GetGroundVehicleCache();
 	this->max_speed = clicked->GetDisplayMaxSpeed();
 	this->power = gcache->cached_power;
 	this->weight = gcache->cached_weight;
@@ -100,7 +100,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	VehicleSpriteSeq seq;
 	clicked->GetImage(DIR_W, EIT_PURCHASE, &seq);
 	this->cur_image = seq.seq[0].sprite;
-	Point *p = new Point();
+	Point* p = new Point();
 	this->image_width = clicked->GetDisplayImageWidth(p);
 
 	if ( train->GetNextVehicle() )
@@ -235,7 +235,7 @@ CommandCost NeutralizeStatus(Train* train)
  *
  * @param train:	the chain to be processed
  */
-CommandCost NeutralizeRemainderChain(Train *train) {
+CommandCost NeutralizeRemainderChain(Train* train) {
 	CommandCost cc = CommandCost();
 	Train* nextVeh = train->GetNextUnit();
 	while ( train != NULL )
@@ -253,13 +253,13 @@ CommandCost NeutralizeRemainderChain(Train *train) {
 }
 Train* DepotContainsEngine(TileIndex tile, EngineID engine, Train* t=0)
 {}
-bool ChainContainsVehicle(Train *t, Train* m)
+bool ChainContainsVehicle(Train* t, Train* m)
 {}
-Train* ChainContainsEngine(Train *t, EngineID eid)
+Train* ChainContainsEngine(Train* t, EngineID eid)
 {}
-bool TrainMatchesTemplate(const Train *t, TemplateVehicle *tv)
+bool TrainMatchesTemplate(const Train* t, TemplateVehicle* tv)
 {}
-bool TrainMatchesTemplateRefit(const Train *t, TemplateVehicle *tv)
+bool TrainMatchesTemplateRefit(const Train* t, TemplateVehicle* tv)
 {}
 /**
  * Transfer as much cargo from a given train onto another train.
@@ -416,8 +416,8 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			*remainder_chain=0,
 			*tmp_chain=0;
 	TileIndex tile = incoming->tile;
-	TemplateVehicle *template_vehicle = GetTemplateForTrain(incoming);
-	TemplateVehicle *tv = template_vehicle;
+	TemplateVehicle* template_vehicle = GetTemplateForTrain(incoming);
+	TemplateVehicle* tv = template_vehicle;
 	EngineID eid = template_vehicle->engine_type;
 	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
 	bool refit_train = template_vehicle->refit_as_template;
@@ -534,7 +534,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	short store_refit_csubt = 0;
 	// if a train shall keep its old refit, store the refit setting of its first vehicle
 	if ( !use_refit ) {
-		for ( Train *getc=incoming; getc; getc=getc->GetNextUnit() )
+		for ( Train* getc=incoming; getc; getc=getc->GetNextUnit() )
 			if ( getc->cargo_type != CT_INVALID ) {
 				store_refit_ct = getc->cargo_type;
 				break;
@@ -608,8 +608,8 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 				// 1. needed engine might be within remainder_chain already
 				// 2. needed engine might be orphaned within the depot (copy status)
 				// 3. we need to buy (again)						   (copy status)
-		TemplateVehicle *cur_tmpl = tv->GetNextUnit();
-		Train *last_veh = new_chain;
+		TemplateVehicle* cur_tmpl = tv->GetNextUnit();
+		Train* last_veh = new_chain;
 		while (cur_tmpl) {
 			// 1. engine contained in remainder chain
 			if ( (tmp_chain = ChainContainsEngine(remainder_chain, cur_tmpl->engine_type)) && tmp_chain!=NULL )	{
@@ -659,7 +659,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	}
 
 	if ( new_chain && remainder_chain )
-		for ( Train *ct=remainder_chain; ct; ct=ct->GetNextUnit() )
+		for ( Train* ct=remainder_chain; ct; ct=ct->GetNextUnit() )
 			TransferCargoForTrain(ct, new_chain);
 
 	// point incoming to the newly created train so that starting/stopping from the calling function can be done
