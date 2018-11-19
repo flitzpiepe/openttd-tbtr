@@ -241,10 +241,6 @@ CommandCost NeutralizeRemainderChain(Train* train) {
 	return cc;
 }
 
-// TODO impl, but why did it work without this so far?
-bool ChainContainsVehicle(Train* t, Train* m)
-{}
-
 /**
  * Transfer as much cargo from a given train onto another train.
  *
@@ -350,7 +346,7 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 				// in case of t not a primary veh, we demand it to be a free wagon to consider it for replacement
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
-				&& (not_in==0 || ChainContainsVehicle(not_in, train)==0))
+				&& not_in==0 )
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
 			if ( found != NULL )
 			{
