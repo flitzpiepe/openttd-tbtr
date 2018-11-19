@@ -289,21 +289,15 @@ void TransferCargo(Train* src, Train* dest)
 }
 
 /**
- * Find the first,best matching vehicle of a train for a given template vehicle.
+ * Find the first, best matching vehicle of a train for a given template vehicle.
  *
  * In any case the train must match the template's engine type. Among all of those we select the one
  * that also matches the refit and among those the one with the maximum amount of cargo.
  *
- * @param tv:		the template we are looking for
- * @param train:	the train we are looking in
- * @return:			the train we found, may be null
+ * @param tv:     the template we are looking for
+ * @param train:  the train we are looking in
+ * @return:       pointer to the train we found, may be null
  */
-// TODO bad scenario
-// 	all vehicles have 0 cargo
-// 	one is selected because of correct engine type
-// 	later veh also fits AND has matching refit, too
-// 		--> but will not be selected because its cargo isn't greater than that of the original one
-// TODO should we prefer vehicles with 0 cargo? who knows whether it will fit the vehicle's current orders ...
 Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 {
 	//			- must match engine_id
@@ -333,18 +327,16 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 }
 
 /**
- * TODO adapt this text
- * Check, if any train in a given Depot contains a given EngineID
- * @param tile:     the tile of the depot
- * @param eid:      the EngineID to look up
- * @param not_in    this Train will be ignored during the check
+ * Find the first, best matching vehicle inside a depot for a given template vehicle.
+ *
+ * In any case the train must match the template's engine type. Among all of those we select the one
+ * that also matches the refit and among those the one with the maximum amount of cargo.
+ *
+ * @param tv:     the template vehicle which's configuration we are looking for
+ * @param tile:   the tile of the depot
+ * @param not_in: this Train will be ignored during the check
+ * @return:       pointer to the train we found, may be null
  */
-// TODO bad scenario
-// 	all vehicles have 0 cargo
-// 	one is selected because of correct engine type
-// 	later veh also fits AND has matching refit, too
-// 		--> but will not be selected because its cargo isn't greater than that of the original one
-// TODO should we prefer vehicles with 0 cargo? who knows whether it will fit the vehicle's current orders ...
 Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_in)
 {
 	Train* found = NULL;
@@ -377,8 +369,6 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 	return found;
 }
 
-// TODO check all loops and ifs in this file for {} convention ... -.-
-
 /**
  * Perform the actual template replacement, or just simulate it. Return the overall cost for the whole replacement in any case.
  *
@@ -391,66 +381,59 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
 	VehicleID id_inc = GB(p1, 0, 20);
-	// TODO check if null
 	Train* incoming = Train::GetIfValid(id_inc);
-	bool stayInDepot = p2;
-
-	// TODO review what is needed
-	Train	*new_chain=0,
-			*remainder_chain=0,
-			*tmp_chain=0;
+	if ( incoming == NULL )
+		return CommandCost();
+	Train *new_chain=0;
 	TileIndex tile = incoming->tile;
 	TemplateVehicle* template_vehicle = GetTemplateForTrain(incoming);
-	TemplateVehicle* tv = template_vehicle;
-	EngineID eid = template_vehicle->engine_type;
+	CommandCost buy(EXPENSES_NEW_VEHICLES);
+
+	bool stayInDepot = p2;
 	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
 	bool refit_train = template_vehicle->refit_as_template;
-
-	// TODO review what is needed
-	CommandCost buy(EXPENSES_NEW_VEHICLES);
-	CommandCost move_cost(EXPENSES_NEW_VEHICLES);
-	CommandCost tmp_result(EXPENSES_NEW_VEHICLES);
 
 	/* first some tests on necessity and sanity */
 	if ( template_vehicle == NULL )
 		return buy;
 
-	/*
-	 * An array of already used vehicle IDs
-	 *
-	 * This is used during a simulate-only run of this function because we need to keep track of the
-	 * train parts that have already been used to create the new chain. */
-	VehicleID* simuTrainParts[128];
-	uint simuIndex = 0;
-
-	bool simulate = true;
-
 	// remember for CopyHeadSpecificThings()
 	Train* old_head = incoming;
 
-	// TODO comment
+	/*
+	 * Procedure
+	 *
+	 * For each vehicle in the template, create a matching train part.
+	 * The new vehicle may be obtained by:
+	 * 		- finding a matching one in the incoming train
+	 * 		- finding a matching one in the depot (if the template says so)
+	 * 		- buying a new one
+	 * The new vehicle is refitted as the template (if the template says so).
+	 */
 	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
 	{
-		// TODO rename (is always set to the new vehicle later)
-		Train* found = FindMatchingTrainInChain(cur_tmpl, incoming);
-		/* maybe try to find a matching vehicle in the depot */
-		if ( found == NULL && tv->reuse_depot_vehicles )
-			found = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
+		/* try to find a matching vehicle in the incoming train */
+		Train* new_vehicle = FindMatchingTrainInChain(cur_tmpl, incoming);
+
+		/* nothing found -> try to find a matching vehicle in the depot */
+		if ( new_vehicle == NULL && template_vehicle->reuse_depot_vehicles )
+			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile, incoming);
+
 		/* found a matching vehicle somewhere: use it ... */
-		if ( found != NULL )
+		if ( new_vehicle != NULL )
 		{
-			/* find the first vehicle in incoming, which is != found */
-			incoming = (found == incoming) ? incoming->GetNextUnit() : incoming;
+			/* find the first vehicle in incoming, which is != new_vehicle */
+			incoming = (new_vehicle == incoming) ? incoming->GetNextUnit() : incoming;
 
 			if ( new_chain == NULL )
 			{
 				/* move the vehicle from the old chain to the new */
-				CommandCost ccMove = DoCommand(tile, found->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
-				new_chain = found;
+				CommandCost ccMove = DoCommand(tile, new_vehicle->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				new_chain = new_vehicle;
 			 }
 			 else
 			 {
-				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			 }
 		}
 		/* ... otherwise buy a new one */
@@ -458,15 +441,18 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			CommandCost cc = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
 			buy.AddCost(cc);
-			found = Train::Get(_new_vehicle_id);
+			new_vehicle = Train::Get(_new_vehicle_id);
+
+			/* form the new chain */
 			if ( new_chain == NULL )
 			{
-				new_chain = found;
+				new_chain = new_vehicle;
 				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
+			/* or just append to it, if it already exists */
 			else
 			{
-				CommandCost ccMove = DoCommand(tile, found->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 		}
 
@@ -475,19 +461,23 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		{
 			CargoID cargo_type = cur_tmpl->cargo_type;
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
-			CommandCost ccRefit = DoCommand(0, found->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(found));
+			CommandCost ccRefit = DoCommand(0, new_vehicle->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(new_vehicle));
 			if ( flags==DC_EXEC )
 				buy.AddCost(ccRefit);
 		}
 	}
 
+	/* some postprocessing steps */
 	if ( flags == DC_EXEC )
 	{
+		/* train orders, group, etc. */
 		CommandCost ccCopy = CopyHeadSpecificThings(old_head, new_chain, flags);
 
+		/* cargo */
 		if ( incoming )
 			TransferCargo(incoming, new_chain);
 
+		/* make the remainders sit peacefully in the depot */
 		if ( !sellRemainders )
 		{
 			if ( incoming && incoming != new_chain )
@@ -496,10 +486,12 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 				NeutralizeRemainderChain(incoming);
 		}
 
+		/* launch new chain */
 		if ( !stayInDepot )
 			new_chain->vehstatus &= ~VS_STOPPED;
 	}
 
+	/* sell remainders */
 	if ( sellRemainders )
 		buy.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
 
