@@ -20,6 +20,8 @@ TemplateVehicle::TemplateVehicle()
 
 /*
  * CTOR: initialize this template vehicle with a given engine id
+ *
+ * @param eid: the engine id for this template
  */
 TemplateVehicle::TemplateVehicle(EngineID eid)
 {
@@ -38,6 +40,8 @@ TemplateVehicle::~TemplateVehicle()
 
 /**
  * Initialize this template vehicle with default values.
+ *
+ * @param eid: the engine id for this template
  */
 void TemplateVehicle::Init(EngineID eid)
 {
@@ -56,6 +60,11 @@ void TemplateVehicle::Init(EngineID eid)
 	this->refit_as_template = true;
 }
 
+/**
+ * Calculate the total cost of buying all vehicles in this template.
+ *
+ * @return: the money value of the calculated cost
+ */
 Money TemplateVehicle::CalculateCost() const
 {
 	Money val = 0;
@@ -139,6 +148,11 @@ bool TemplateVehicle::ContainsRailType(RailType railtype) const
 	return false;
 }
 
+/**
+ * Count all groups that are using this template.
+ *
+ * @return: the count
+ */
 int TemplateVehicle::CountGroups() const
 {
 	int count = 0;
@@ -151,6 +165,13 @@ int TemplateVehicle::CountGroups() const
 	return count;
 }
 
+/**
+ * Draw a template
+ *
+ * @param left:  left border of the bounding box
+ * @param right: right border of the bounding box
+ * @param y:     y-coordinate of the bounding box
+ */
 void TemplateVehicle::Draw(int left, int right, int y) const
 {
 	int offset = left;
