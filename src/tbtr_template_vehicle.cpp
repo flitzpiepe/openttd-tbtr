@@ -263,6 +263,24 @@ CommandCost NeutralizeRemainderChain(Train* train) {
 }
 
 /**
+ * Ensure that a train is not part of another given chain.
+ *
+ * @param t:     the train
+ * @param chain: the chain that must not include t
+ * @return:      true if t is NOT a part of chain
+ */
+bool NotInChain(const Train* t, const Train* chain)
+{
+	while ( chain )
+	{
+		if ( t == chain )
+			return false;
+		chain = chain->GetNextUnit();
+	}
+	return true;
+}
+
+/**
  * Transfer as much cargo from a given train onto another train.
  *
  * The cargo shall be moved as far as it fits onto the new train.
@@ -352,9 +370,10 @@ Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
  *
  * @param tv:     the template vehicle which's configuration we are looking for
  * @param tile:   the tile of the depot
+ * @param ignore: vehicle must not be in this chain, default is NULL
  * @return:       pointer to the train we found, may be null
  */
-Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile)
+Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* ignore=NULL)
 {
 	Train* found = NULL;
 	Train* train;
@@ -365,7 +384,8 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile)
 				// in case of t not a primary veh, we demand it to be a free wagon to consider it for replacement
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
-				&& train->group_id == DEFAULT_GROUP )
+				&& train->group_id == DEFAULT_GROUP
+				&& (ignore==NULL || NotInChain(train, ignore)) )
 		{
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
 			if ( found != NULL && check_refit == true)
@@ -431,7 +451,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 		/* nothing found -> try to find a matching vehicle in the depot */
 		if ( new_vehicle == NULL && template_vehicle->reuse_depot_vehicles )
-			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile);
+			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile, new_chain);
 
 		/* found a matching vehicle somewhere: use it ... */
 		if ( new_vehicle != NULL )
