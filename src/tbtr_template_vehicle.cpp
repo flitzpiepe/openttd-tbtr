@@ -368,6 +368,7 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
 				&& not_in==0 )
+		{
 			// already found a matching vehicle, keep checking for matching refit + cargo amount
 			if ( found != NULL )
 			{
@@ -382,6 +383,7 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* not_
 			}
 			else
 				found = train;
+		}
 	}
 	return found;
 }
@@ -404,7 +406,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	Train *new_chain=0;
 	TileIndex tile = incoming->tile;
 	TemplateVehicle* template_vehicle = GetTemplateForTrain(incoming);
-	CommandCost buy(EXPENSES_NEW_VEHICLES);
+	CommandCost cc(EXPENSES_NEW_VEHICLES);
 
 	bool stayInDepot = p2;
 	bool sellRemainders = !template_vehicle->keep_remaining_vehicles;
@@ -412,7 +414,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	/* first some tests on necessity and sanity */
 	if ( template_vehicle == NULL )
-		return buy;
+		return cc;
 
 	// remember for CopyHeadSpecificThings()
 	Train* old_head = incoming;
@@ -446,18 +448,22 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			{
 				/* move the vehicle from the old chain to the new */
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				if ( flags == DC_EXEC )
+					cc.AddCost(ccMove);
 				new_chain = new_vehicle;
 			 }
 			 else
 			 {
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				if ( flags == DC_EXEC )
+					cc.AddCost(ccMove);
 			 }
 		}
 		/* ... otherwise buy a new one */
 		else
 		{
-			CommandCost cc = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
-			buy.AddCost(cc);
+			CommandCost ccBuild = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
+			cc.AddCost(ccBuild);
 			new_vehicle = Train::Get(_new_vehicle_id);
 
 			/* form the new chain */
@@ -465,11 +471,15 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			{
 				new_chain = new_vehicle;
 				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				if ( flags == DC_EXEC )
+					cc.AddCost(ccMove);
 			}
 			/* or just append to it, if it already exists */
 			else
 			{
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				if ( flags == DC_EXEC )
+					cc.AddCost(ccMove);
 			}
 		}
 
@@ -480,7 +490,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
 			CommandCost ccRefit = DoCommand(0, new_vehicle->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(new_vehicle));
 			if ( flags==DC_EXEC )
-				buy.AddCost(ccRefit);
+				cc.AddCost(ccRefit);
 		}
 	}
 
@@ -489,6 +499,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	{
 		/* train orders, group, etc. */
 		CommandCost ccCopy = CopyHeadSpecificThings(old_head, new_chain, flags);
+		cc.AddCost(ccCopy);
 
 		/* cargo */
 		if ( incoming )
@@ -510,7 +521,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	/* sell remainders */
 	if ( sellRemainders )
-		buy.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
+		cc.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
 
-	return buy;
+	return cc;
 }
