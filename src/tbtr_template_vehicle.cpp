@@ -467,7 +467,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			 }
 			 else
 			 {
-				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->Last()->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			 }
 		}
 		/* ... otherwise buy a new one */
@@ -481,12 +481,12 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			if ( new_chain == NULL )
 			{
 				new_chain = new_vehicle;
-				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_chain->Last()->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 			/* or just append to it, if it already exists */
 			else
 			{
-				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->index, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->Last()->index, flags, CMD_MOVE_RAIL_VEHICLE);
 			}
 		}
 
