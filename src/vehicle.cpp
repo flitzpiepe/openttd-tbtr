@@ -1100,21 +1100,19 @@ void CallVehicleTicks()
 	for (TemplateReplacementMap::iterator it = _vehicles_to_templatereplace.Begin(); it != _vehicles_to_templatereplace.End(); it++) {
 
 		Train *t = it->first;
+		bool stayInDepot = it->second;
 
 		tmpl_cur_company.Change(t->owner);
 
-		bool stayInDepot = it->second;
-
-		VehStatus vs = it->first->vehstatus;
-		it->first->vehstatus |= VS_STOPPED;
+		t->vehstatus |= VS_STOPPED;
 		// TODO
 		// 1. run the replacement command as simulate
 		// 2. check the returned cost against the company's money
 		// 3. MAYBE run the real replacement command
 		CommandCost cc = DoCommand(0, t->index, stayInDepot, DC_EXEC, CMD_TEMPLATE_REPLACE_VEHICLE);
 		/* if the replacement failed, the vehicle would not be launched from within the replacement function */
-		if ( !cc.Succeeded() )
-			if->first->vehstatus = vs;
+		if ( !cc.Succeeded() && !stayInDepot )
+			t->vehstatus &= ~VS_STOPPED;
 		/* Redraw main gui for changed statistics */
 		SetWindowClassesDirty(WC_TBTR_GUI);
 	}
