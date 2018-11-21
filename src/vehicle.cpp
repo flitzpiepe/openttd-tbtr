@@ -1105,12 +1105,16 @@ void CallVehicleTicks()
 
 		bool stayInDepot = it->second;
 
+		VehStatus vs = it->first->vehstatus;
 		it->first->vehstatus |= VS_STOPPED;
 		// TODO
 		// 1. run the replacement command as simulate
 		// 2. check the returned cost against the company's money
 		// 3. MAYBE run the real replacement command
-		DoCommand(0, t->index, stayInDepot, DC_EXEC, CMD_TEMPLATE_REPLACE_VEHICLE);
+		CommandCost cc = DoCommand(0, t->index, stayInDepot, DC_EXEC, CMD_TEMPLATE_REPLACE_VEHICLE);
+		/* if the replacement failed, the vehicle would not be launched from within the replacement function */
+		if ( !cc.Succeeded() )
+			if->first->vehstatus = vs;
 		/* Redraw main gui for changed statistics */
 		SetWindowClassesDirty(WC_TBTR_GUI);
 	}
