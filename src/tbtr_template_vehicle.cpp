@@ -535,7 +535,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	}
 
 	/* sell remainders */
-	if ( sellRemainders )
+	if ( sellRemainders && incoming!=NULL )
 		cc.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
 
 	return cc;
