@@ -251,8 +251,18 @@ CommandCost NeutralizeStatus(Train* train)
 	/* remove from current group */
 	cc.AddCost(DoCommand(train->tile, DEFAULT_GROUP, train->index, DC_EXEC, CMD_ADD_VEHICLE_GROUP));
 
-	/* reset orders for this vehicle */
+	/* reset orders and statistics and such for the train */
 	train->current_order = INVALID_ORDER;
+	train->current_order_time = 0;
+	train->lateness_counter = 0;
+	train->timetable_start = 0;
+	train->service_interval = 0;
+	train->cur_real_order_index = INVALID_VEH_ORDER_ID ;
+	train->cur_implicit_order_index = INVALID_VEH_ORDER_ID;
+	train->vehicle_flags = 0;
+	train->profit_this_year = 0;
+	train->profit_last_year = 0;
+
 	/* unshare and delete */
 	cc.AddCost(DoCommand(train->tile, train->index, -1, DC_EXEC, CMD_DELETE_ORDER));
 
