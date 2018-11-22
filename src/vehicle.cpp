@@ -906,7 +906,7 @@ void VehicleEnteredDepotThisTick(Vehicle *v)
 	bool stayInDepot = v->current_order.GetDepotActionType();
 	Train* t = static_cast<Train*>(v);
 	TemplateVehicle* tv = GetTemplateForTrain(t);
-	if ( tv != NULL ) {
+	if ( tv != NULL && tv->TrainNeedsReplacement(t) ) {
 		if ( stayInDepot ) _vehicles_to_templatereplace[t] = true;
 		else               _vehicles_to_templatereplace[t] = false;
 	}

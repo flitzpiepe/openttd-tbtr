@@ -215,6 +215,32 @@ TemplateVehicle* GetTemplateForTrain(Train* t)
 }
 
 /**
+ * Return whether a given train will be treated by template replacement.
+ *
+ * @t:      the train to check
+ * @return: true, if it will be considered for template replacement
+ */
+bool TemplateVehicle::TrainNeedsReplacement(Train* t)
+{
+	TemplateVehicle* tv = this;
+	while ( tv && t )
+	{
+		if ( t->engine_type != tv->engine_type )
+			return true;
+		if ( t->subtype != tv->subtype )
+			return true;
+		if ( t->cargo_type != tv->cargo_type )
+			return true;
+		if ( t->cargo_subtype != tv->cargo_subtype )
+			return true;
+		tv = tv->GetNextUnit();
+		t = t->GetNextUnit();
+	}
+	/* check if one chain ended before the other */
+	return (!tv && t) || (tv && !t);
+}
+
+/**
  * Neutralize a train's status (group, orders, etc).
  * @param train:	the train to be neutralized
  */

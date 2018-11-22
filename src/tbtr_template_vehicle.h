@@ -104,6 +104,7 @@ public:
 
 	void Draw(int, int, int) const;
 
+	bool TrainNeedsReplacement(Train*);
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
