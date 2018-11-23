@@ -360,6 +360,18 @@ void TransferCargo(Train* src, Train* dest)
 }
 
 /**
+ * Check if a TemplateVehicle and a Train share the same refit settings.
+ *
+ * @param tv: the TemplateVehicle
+ * @param t:  the Train
+ * @return:   true if all refit related settings are the same, false otherwise
+ */
+bool CheckRefit(const TemplateVehicle* tv, const Train* t)
+{
+	return tv->cargo_type==t->cargo_type && tv->cargo_subtype==t->cargo_subtype;
+}
+
+/**
  * Find the first, best matching vehicle of a train for a given template vehicle.
  *
  * In any case the train must match the template's engine type. Among all of those we select the one
@@ -371,27 +383,25 @@ void TransferCargo(Train* src, Train* dest)
  */
 Train* FindMatchingTrainInChain(TemplateVehicle* tv, Train* train)
 {
-	//			- must match engine_id
-	//			- try to find one with matching refit
-	//			- of those, choose the one with the max. #cargo
 	Train* found = NULL;
 	bool check_refit = tv->first->refit_as_template;
-	for ( Train* tmp=train; tmp!=NULL; tmp=tmp->GetNextUnit() )
-	{
-		if ( tmp->engine_type == tv->engine_type )
-		{
-			if ( check_refit == false )
-				return found;
-			// first vehicle we found, take it!
+	for ( Train* tmp=train; tmp!=NULL; tmp=tmp->GetNextUnit() ) {
+		/* minimal matching condition: by engine_type */
+		if ( tmp->engine_type == tv->engine_type ) {
+			/* first matching engine_type we take! */
 			if ( found == NULL )
 				found = tmp;
-			// otherwise also compare refit and carried cargo
-			// we want one with matching refit, and among those the one with
-			// the maximum current cargo
-			else
-				if ( tmp->cargo_type==tv->cargo_type && tmp->cargo_subtype == tv->cargo_subtype )
-					if ( tmp->cargo.StoredCount() > found->cargo.StoredCount() )
-						found = tmp;
+			/* in case we're also interested in the refit setting */
+			if ( check_refit && CheckRefit(tv,tmp)==true ) {
+				/* the previously selected train had the wrong refit so this one is definitely better */
+				if ( CheckRefit(tv,found) == false ) {
+					found = tmp;
+				}
+				/* or both refits match but the current one has more cargo */
+				else if ( tmp->cargo.StoredCount() > found->cargo.StoredCount() ) {
+					found = tmp;
+				}
+			}
 		}
 	}
 	return found;
