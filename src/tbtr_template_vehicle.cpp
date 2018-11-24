@@ -39,28 +39,6 @@ TemplateVehicle::~TemplateVehicle()
 }
 
 /**
- * Initialize this template vehicle with default values.
- *
- * @param eid: the engine id for this template
- */
-void TemplateVehicle::Init(EngineID eid)
-{
-	this->next = NULL;
-	this->prev = NULL;
-	this->first = NULL;
-
-	this->engine_type = eid;
-	this->owner = _current_company;
-	this->real_length = 0;
-
-	this->cur_image = SPR_IMG_QUERY;
-
-	this->reuse_depot_vehicles = true;
-	this->keep_remaining_vehicles = true;
-	this->refit_as_template = true;
-}
-
-/**
  * Calculate the total cost of buying all vehicles in this template.
  *
  * @return: the money value of the calculated cost
@@ -197,21 +175,25 @@ TemplateVehicle* TemplateVehicle::GetNextUnit() const
 }
 
 /**
- * Return the template vehicle that is assigned to a train's group.
+ * Initialize this template vehicle with default values.
  *
- * @param t:	the train
+ * @param eid: the engine id for this template
  */
-TemplateVehicle* GetTemplateForTrain(Train* t)
+void TemplateVehicle::Init(EngineID eid)
 {
-	GroupID gid = t->group_id;
-	if ( gid == DEFAULT_GROUP )
-		return NULL;
+	this->next = NULL;
+	this->prev = NULL;
+	this->first = NULL;
 
-	TemplateID tid = Group::Get(gid)->template_id;
-	if ( tid == INVALID_TEMPLATE )
-		return NULL;
+	this->engine_type = eid;
+	this->owner = _current_company;
+	this->real_length = 0;
 
-	return TemplateVehicle::Get(tid);
+	this->cur_image = SPR_IMG_QUERY;
+
+	this->reuse_depot_vehicles = true;
+	this->keep_remaining_vehicles = true;
+	this->refit_as_template = true;
 }
 
 /**
@@ -238,6 +220,36 @@ bool TemplateVehicle::TrainNeedsReplacement(Train* t)
 	}
 	/* check if one chain ended before the other */
 	return (!tv && t) || (tv && !t);
+}
+
+/**
+ * Check if a TemplateVehicle and a Train share the same refit settings.
+ *
+ * @param tv: the TemplateVehicle
+ * @param t:  the Train
+ * @return:   true if all refit related settings are the same, false otherwise
+ */
+bool CheckRefit(const TemplateVehicle* tv, const Train* t)
+{
+	return tv->cargo_type==t->cargo_type && tv->cargo_subtype==t->cargo_subtype;
+}
+
+/**
+ * Return the template vehicle that is assigned to a train's group.
+ *
+ * @param t:	the train
+ */
+TemplateVehicle* GetTemplateForTrain(Train* t)
+{
+	GroupID gid = t->group_id;
+	if ( gid == DEFAULT_GROUP )
+		return NULL;
+
+	TemplateID tid = Group::Get(gid)->template_id;
+	if ( tid == INVALID_TEMPLATE )
+		return NULL;
+
+	return TemplateVehicle::Get(tid);
 }
 
 /**
@@ -357,18 +369,6 @@ void TransferCargo(Train* src, Train* dest)
 
 	/* Update train weight etc */
 	dest->ConsistChanged(ConsistChangeFlags::CCF_LOADUNLOAD);
-}
-
-/**
- * Check if a TemplateVehicle and a Train share the same refit settings.
- *
- * @param tv: the TemplateVehicle
- * @param t:  the Train
- * @return:   true if all refit related settings are the same, false otherwise
- */
-bool CheckRefit(const TemplateVehicle* tv, const Train* t)
-{
-	return tv->cargo_type==t->cargo_type && tv->cargo_subtype==t->cargo_subtype;
 }
 
 /**
