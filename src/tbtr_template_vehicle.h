@@ -75,7 +75,7 @@ public:
 	byte spritenum;                     ///< used for drawing in a GUI
 	SpriteID cur_image;                 ///< used for drawing in a GUI
 	uint32 image_width;                 ///< used for drawing in a GUI
-	const SpriteGroup *sgroup;          ///< used for drawing in a GUI
+	const SpriteGroup* sgroup;          ///< used for drawing in a GUI
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot
@@ -103,8 +103,17 @@ public:
 	TemplateVehicle* GetNextUnit() const;
 
 	void Draw(int, int, int) const;
+
+	bool TrainNeedsReplacement(Train*);
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
+
+
+	/* Command functions */
+	CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
+
+TemplateVehicle* GetTemplateForTrain(Train*);
+
 
 #endif /* !TBTR_TEMPLATE_VEHICLE_H */
