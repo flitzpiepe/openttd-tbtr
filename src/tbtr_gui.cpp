@@ -259,9 +259,8 @@ void TbtrGui::DrawGroups(const Rect& r) const
 
 	/* Then treat all groups defined by/for the current company */
 	for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
-		const Group* g = (this->groups)[i];
-		// TODO rename g_id
-		short g_id = g->index;
+		const Group* group = (this->groups)[i];
+		short group_id = group->index;
 
 		/* Fill the background of the current cell in a darker tone for the currently selected group */
 		if ( this->index_selected_group == i ) {
@@ -269,22 +268,22 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		}
 
 		/* Draw the group name */
-		SetDParam(0, g_id);
+		SetDParam(0, group_id);
 		StringID str = STR_GROUP_NAME;
 		DrawString(left+30, right, y+2, str, TC_BLACK);
 
 		/* Draw the index of the selected template for this group
 		 * Note, that this is the index into the group list, not the template's ID. */
-		if (g->template_id >= 0)
+		if (group->template_id >= 0)
 		{
-			SetDParam(0, FindTemplateInGuiList(g->template_id));
+			SetDParam(0, FindTemplateInGuiList(group->template_id));
 			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
 		}
 
 		///* Draw the number of trains that still need to be treated by the currently selected template replacement */
 		//if ( tr ) {
 		//	TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
-		//	int num_trains = 0;//NumTrainsNeedTemplateReplacement(g_id, tv);
+		//	int num_trains = 0;//NumTrainsNeedTemplateReplacement(group_id, tv);
 		//	// Draw text
 		//	TextColour color = TC_GREY;
 		//	if ( num_trains ) color = TC_BLACK;
