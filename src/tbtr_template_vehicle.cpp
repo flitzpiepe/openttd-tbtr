@@ -346,17 +346,17 @@ void TransferCargo(Train* src, Train* dest)
 		CargoID _cargo_type = src->cargo_type;
 		byte _cargo_subtype = src->cargo_subtype;
 
-		// how much cargo has to be moved (if possible)
+		/* how much cargo has to be moved (if possible) */
 		uint remainingAmount = src->cargo.TotalCount();
-		// each vehicle in the new chain shall be given as much of the old cargo as possible, until none is left
+		/* each vehicle in the new chain shall be given as much of the old cargo as possible, until none is left */
 		for (Train* tmp=dest; tmp!=NULL && remainingAmount>0; tmp=tmp->GetNextUnit())
 		{
 			if (tmp->cargo_type == _cargo_type && tmp->cargo_subtype == _cargo_subtype)
 			{
-				// calculate the free space for new cargo on the current vehicle
+				/* calculate the free space for new cargo on the current vehicle */
 				uint curCap = tmp->cargo_cap - tmp->cargo.TotalCount();
 				uint moveAmount = std::min(remainingAmount, curCap);
-				// move (parts of) the old vehicle's cargo onto the current vehicle of the new chain
+				/* move (parts of) the old vehicle's cargo onto the current vehicle of the new chain */
 				if (moveAmount > 0)
 				{
 					src->cargo.Shift(moveAmount, &tmp->cargo);
@@ -425,20 +425,21 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* igno
 	Train* train;
 	bool check_refit = tv->first->refit_as_template;
 	FOR_ALL_TRAINS(train) {
+		/* If the veh belongs to a chain, wagons will not return true on IsStoppedInDepot(),
+		 * only primary vehicles will in case of t not a primary veh, we demand it to be a
+		 * free wagon to consider it for replacement */
 		if ( train->tile == tile
-				// If the veh belongs to a chain, wagons will not return true on IsStoppedInDepot(), only primary vehicles will
-				// in case of t not a primary veh, we demand it to be a free wagon to consider it for replacement
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
 				&& train->group_id == DEFAULT_GROUP
 				&& (ignore==NULL || NotInChain(train, ignore)) )
 		{
-			// already found a matching vehicle, keep checking for matching refit + cargo amount
+			/* already found a matching vehicle, keep checking for matching refit + cargo amount */
 			if ( found != NULL && check_refit == true)
 			{
 				if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
-					// find something with a minimal amount of cargo, so that we can transfer more from the
-					// original chain into it later
+					/* find something with a minimal amount of cargo, so that we can transfer more
+					 * from the original chain into it later */
 					if ( train->cargo.StoredCount() < found->cargo.StoredCount() )
 						found = train;
 			}
@@ -477,7 +478,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	if ( template_vehicle == NULL )
 		return cc;
 
-	// remember for CopyHeadSpecificThings()
+	/* remember for CopyHeadSpecificThings() */
 	Train* old_head = incoming;
 
 	/*

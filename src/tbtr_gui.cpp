@@ -56,14 +56,14 @@ enum TemplateReplaceWindowWidgets {
 };
 
 static const NWidgetPart _widgets[] = {
-	// Title bar
+	/* Title bar */
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
 		NWidget(WWT_CAPTION, COLOUR_GREY, TRW_CAPTION), SetDataTip(STR_TBTR_RPL_TITLE, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
-	//Top Matrix
+	/*Top Matrix */
 	NWidget(NWID_VERTICAL),
 		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_GROUPS), SetMinimalSize(216,12), SetDataTip(STR_TBTR_MAINGUI_DEFINEDGROUPS, STR_TBTR_MAINGUI_DEFINEDGROUPS), SetResize(1, 0), EndContainer(),
 		NWidget(NWID_HORIZONTAL),
@@ -71,7 +71,7 @@ static const NWidgetPart _widgets[] = {
 			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_TOP_SCROLLBAR),
 		EndContainer(),
 	EndContainer(),
-	// Template Display
+	/* Template Display */
 	NWidget(NWID_VERTICAL),
 		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_TEMPLATES), SetMinimalSize(216,12), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), SetResize(1, 0), EndContainer(),
 		NWidget(NWID_HORIZONTAL),
@@ -79,23 +79,23 @@ static const NWidgetPart _widgets[] = {
 			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_BOTTOM_SCROLLBAR),
 		EndContainer(),
 	EndContainer(),
-	// Info Area
+	/* Info Area */
 	NWidget(NWID_VERTICAL),
 		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_INSET), SetMinimalSize(216,12), SetResize(1,0), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), EndContainer(),
 		NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_PANEL), SetMinimalSize(216,50), SetResize(1,0), EndContainer(),
 	EndContainer(),
-	// Control Area
+	/* Control Area */
 	NWidget(NWID_VERTICAL),
-		// Spacing
+		/* Spacing */
 		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_PRE_BUTTON_FLUFF), SetMinimalSize(139, 12), SetResize(1,0), EndContainer(),
-		// Config buttons
+		/* Config buttons */
 		NWidget(NWID_HORIZONTAL),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_USEDEPOT, STR_TBTR_SET_USEDEPOT_TIP),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_KEEPREMAINDERS, STR_TBTR_SET_KEEPREMAINDERS_TIP),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_REFIT, STR_TBTR_SET_REFIT_TIP),
 			NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIG_RIGHTPANEL), SetMinimalSize(12,12), SetResize(1,0), EndContainer(),
 		EndContainer(),
-		// Edit buttons
+		/* Edit buttons */
 		NWidget(NWID_HORIZONTAL),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DEFINE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DEFINE_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
 			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_EDIT), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_EDIT_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
@@ -105,7 +105,7 @@ static const NWidgetPart _widgets[] = {
 			NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_EDIT_RIGHTPANEL), SetMinimalSize(50,12), SetResize(1,0), EndContainer(),
 		EndContainer(),
 	EndContainer(),
-	// Start/Stop buttons
+	/* Start/Stop buttons */
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_START), SetMinimalSize(150, 12), SetDataTip(STR_TBTR_RPL_START, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
 		NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TRAIN_FLUFF_LEFT), SetMinimalSize(15, 12), EndContainer(),
@@ -121,7 +121,7 @@ static WindowDesc _tbtr_gui_desc(
 	"TBTR Gui",
 	456, 156,
 	WC_TBTR_GUI,
-	WC_NONE,					// parent window class
+	WC_NONE,
 	WDF_CONSTRUCTION,
 	_widgets, lengthof(_widgets)
 );
@@ -143,7 +143,6 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
         SetDParam(0, (*b)->index);
         GetString(last_name[1], STR_GROUP_NAME, lastof(last_name[1]));
     }
-
     int r = strnatcmp(last_name[0], last_name[1]); // Sort by name (natural sorting).
     if (r == 0) return (*a)->index - (*b)->index;
     return r;
