@@ -33,9 +33,9 @@ TemplateVehicle::TemplateVehicle(EngineID eid)
  */
 TemplateVehicle::~TemplateVehicle()
 {
-	//TemplateVehicle* tv = this->next;
-	//this->next = nullptr;
-	//delete tv;
+	TemplateVehicle* tv = this->next;
+	this->next = NULL;
+	delete tv;
 }
 
 /**

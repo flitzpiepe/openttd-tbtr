@@ -159,14 +159,22 @@ TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(
 	this->vscroll_templates = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
 	this->vscroll_groups->SetStepSize(line_height / 2);
 	this->vscroll_templates->SetStepSize(line_height);
+	/* VEH_TRAIN should be 0; we want only 1 instance of this GUI to be present at the same time anyway, so
+	 * this should be ok */
 	FinishInitNested(VEH_TRAIN);
+
+	/* will be used to build the internal group and template lists
+	 *
+	 * NOTE: has to be set after FinishInitNested(...) because this function will set the owner back to
+	 * INVALID_OWNER again */
+	this->owner = _local_company;
 
 	this->groups.ForceRebuild();
 	this->groups.NeedResort();
-	this->BuildGroupList(_local_company);
+	this->BuildGroupList();
 	this->groups.Sort(&GroupNameSorter);
 
-    BuildTemplateList(_local_company);
+    BuildTemplateList();
 }
 
 /*
@@ -191,7 +199,7 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
  * Update the list of groups to display for a given owner.
  * @param owner:  the owner of the groups to display, should the current company when the GUI is opened
  */
-void TbtrGui::BuildGroupList(Owner owner)
+void TbtrGui::BuildGroupList()
 {
 	if (!this->groups.NeedRebuild()) {
 		return;
@@ -200,7 +208,7 @@ void TbtrGui::BuildGroupList(Owner owner)
 	this->groups.Clear();
 	const Group *g;
 	FOR_ALL_GROUPS(g) {
-		if (g->owner == owner) {
+		if (g->owner == this->owner) {
 			*(this->groups).Append() = g;
 		}
 	}
@@ -215,13 +223,13 @@ void TbtrGui::BuildGroupList(Owner owner)
  *
  * @param owner
  */
-void TbtrGui::BuildTemplateList(Owner owner)
+void TbtrGui::BuildTemplateList()
 {
 	this->templates.Clear();
 	const TemplateVehicle *tv;
 
 	FOR_ALL_TEMPLATES(tv) {
-		if (tv->HasOwner(owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
+		if (tv->HasOwner(this->owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
 			*(this->templates.Append()) = tv;
 
 	}
@@ -387,6 +395,23 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             }
             break;
         }
+        case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
+			TemplateID del_id = this->templates[this->index_selected_template]->index;
+			TemplateVehicle* tv = TemplateVehicle::Get(del_id);
+			Group* g;
+			FOR_ALL_GROUPS(g)
+			{
+				if ( g->template_id == del_id )
+					g->template_id = INVALID_TEMPLATE;
+			}
+			delete tv;
+
+			this->index_selected_template = -1;
+			BuildTemplateList();
+			BuildGroupList();
+
+            break;
+        }
 		case TRW_WIDGET_TOP_MATRIX:
 		{
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
@@ -457,7 +482,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
  */
 void TbtrGui::OnPaint()
 {
-	BuildGroupList(_local_company);
+	BuildGroupList();
 	DrawWidgets();
 }
 
@@ -497,7 +522,7 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	tv->CloneFromTrain(clicked, NULL);
 	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
-    BuildTemplateList(_local_company);
+    BuildTemplateList();
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
     ResetObjectToPlace();
     this->SetDirty();
