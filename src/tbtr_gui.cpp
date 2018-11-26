@@ -155,10 +155,10 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(height)
 {
 	CreateNestedTree(wdesc);
-	this->vscroll[0] = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
-	this->vscroll[1] = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
-	this->vscroll[0]->SetStepSize(line_height / 2);
-	this->vscroll[1]->SetStepSize(line_height);
+	this->vscroll_groups = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
+	this->vscroll_templates = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
+	this->vscroll_groups->SetStepSize(line_height / 2);
+	this->vscroll_templates->SetStepSize(line_height);
 	FinishInitNested(VEH_TRAIN);
 
 	this->groups.ForceRebuild();
@@ -227,7 +227,7 @@ void TbtrGui::BuildTemplateList(Owner owner)
 	}
 
 	this->templates.RebuildDone();
-	this->vscroll[1]->SetCount(this->templates.Length());
+	this->vscroll_templates->SetCount(this->templates.Length());
 }
 
 /*
@@ -255,10 +255,10 @@ void TbtrGui::DrawGroups(const Rect& r) const
 	int left = r.left + WD_MATRIX_LEFT;
 	int right = r.right - WD_MATRIX_RIGHT;
 	int y = r.top;
-	int max = min(this->vscroll[0]->GetPosition() + this->vscroll[0]->GetCapacity(), this->groups.Length());
+	int max = min(this->vscroll_groups->GetPosition() + this->vscroll_groups->GetCapacity(), this->groups.Length());
 
 	/* Then treat all groups defined by/for the current company */
-	for ( int i=this->vscroll[0]->GetPosition(); i<max; ++i ) {
+	for ( int i=this->vscroll_groups->GetPosition(); i<max; ++i ) {
 		const Group* group = (this->groups)[i];
 		short group_id = group->index;
 
@@ -305,11 +305,9 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	int right = r.right;
 	int y = r.top;
 
-	// TODO rename
-	Scrollbar* draw_vscroll = vscroll[1];
-	uint max = min(draw_vscroll->GetPosition() + draw_vscroll->GetCapacity(), this->templates.Length());
+	uint max = min(vscroll_templates->GetPosition() + vscroll_templates->GetCapacity(), this->templates.Length());
 	const TemplateVehicle* tv;
-	for ( uint i = draw_vscroll->GetPosition(); i<max; ++i)
+	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i)
 	{
 		tv = (this->templates)[i];
 
@@ -391,7 +389,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
         }
 		case TRW_WIDGET_TOP_MATRIX:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll[0]->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
 			if ( index_new >= this->groups.Length() )
 				this->index_selected_group = -1;
 			else if ( this->index_selected_group == index_new )
@@ -402,7 +400,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_BOTTOM_MATRIX:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_BOTTOM_MATRIX]->pos_y) / this->line_height ) + this->vscroll[1]->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_BOTTOM_MATRIX]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
 			if ( index_new >= this->templates.Length() )
 				this->index_selected_template = -1;
 			else if ( this->index_selected_template == index_new )
@@ -470,13 +468,13 @@ void TbtrGui::OnResize()
 {
     /* Top Matrix */
     NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
-    this->vscroll[0]->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
-    nwi->widget_data = (this->vscroll[0]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+    this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
+    nwi->widget_data = (this->vscroll_groups->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
     /* Bottom Matrix */
     NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
-    this->vscroll[1]->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
-    nwi2->widget_data = (this->vscroll[1]->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+    this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
+    nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
 /*
