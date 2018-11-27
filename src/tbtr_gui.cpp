@@ -215,6 +215,7 @@ void TbtrGui::BuildGroupList()
 	this->groups.Compact();
     this->groups.Sort(&GroupNameSorter);
 	this->groups.RebuildDone();
+	this->index_selected_group = -1;
 }
 
 /*
@@ -407,7 +408,6 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			this->index_selected_template = -1;
 			BuildTemplateList();
-			BuildGroupList();
 
             break;
         }
@@ -482,13 +482,22 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 	this->SetDirty();
 }
 
+/**
+ * Extra actions when the window needs to be redrawn
+ */
+void TbtrGui::OnInvalidateData(int data = 0, bool gui_scope = true)
+{
+	this->groups.ForceRebuild();
+	this->templates.ForceRebuild();
+}
+
 /*
  * Draw this GUI
  */
 void TbtrGui::OnPaint()
 {
-	BuildGroupList();
-	DrawWidgets();
+	this->BuildGroupList();
+	this->DrawWidgets();
 }
 
 /*

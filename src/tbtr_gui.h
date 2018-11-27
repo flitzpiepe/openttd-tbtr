@@ -38,6 +38,7 @@ public:
 	virtual void OnPaint();
     virtual void OnResize();
     virtual bool OnVehicleSelect(const Vehicle*);
+	virtual void OnInvalidateData(int, bool);
 
 private:
 	void BuildGroupList();
