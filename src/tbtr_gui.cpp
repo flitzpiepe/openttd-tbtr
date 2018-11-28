@@ -288,19 +288,27 @@ void TbtrGui::DrawGroups(const Rect& r) const
 			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
 		}
 
-		///* Draw the number of trains that still need to be treated by the currently selected template replacement */
+		/* Draw the number of trains that still need to be treated */
+		// bool TemplateVehicle::TrainNeedsReplacement(Train* t)
+		int num_trains = 0;
+		TemplateVehicle* tv = TemplateVehicle::Get(group->template_id);
+		Train* t;
+		FOR_ALL_TRAINS(t) {
+			if ( tv && tv->TrainNeedsReplacement(t) )
+				++num_trains;
+		}
 		//if ( tr ) {
-		//	TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
-		//	int num_trains = 0;//NumTrainsNeedTemplateReplacement(group_id, tv);
-		//	// Draw text
-		//	TextColour color = TC_GREY;
-		//	if ( num_trains ) color = TC_BLACK;
-		//	DrawString(left, right-16, y+2, STR_TBTR_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
-		//	// Draw number
-		//	if ( num_trains ) color = TC_ORANGE;
-		//	else color = TC_GREY;
-		//	SetDParam(0, num_trains);
-		//	DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
+			//TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
+			//int num_trains = 0;//NumTrainsNeedTemplateReplacement(group_id, tv);
+			// Draw text
+			TextColour color = TC_GREY;
+			if ( num_trains ) color = TC_BLACK;
+			DrawString(left, right-16, y+2, STR_TBTR_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
+			// Draw number
+			if ( num_trains ) color = TC_ORANGE;
+			else color = TC_GREY;
+			SetDParam(0, num_trains);
+			DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 		//}
 
 		y += this->line_height / 2;
