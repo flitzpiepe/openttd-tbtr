@@ -294,7 +294,7 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		TemplateVehicle* tv = TemplateVehicle::Get(group->template_id);
 		Train* t;
 		FOR_ALL_TRAINS(t) {
-			if ( tv && tv->TrainNeedsReplacement(t) )
+			if ( t->IsPrimaryVehicle() && t->group_id == group->index && tv && tv->TrainNeedsReplacement(t) )
 				++num_trains;
 		}
 		//if ( tr ) {
