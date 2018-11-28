@@ -47,7 +47,7 @@ Money TemplateVehicle::CalculateCost() const
 {
 	Money val = 0;
 	const TemplateVehicle* tv = this;
-	for (; tv; tv=tv->Next())
+	for (; tv; tv=tv->GetNextUnit())
 		val += (Engine::Get(tv->engine_type))->GetCost();
 	return val;
 }
