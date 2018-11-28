@@ -289,27 +289,16 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		}
 
 		/* Draw the number of trains that still need to be treated */
-		// bool TemplateVehicle::TrainNeedsReplacement(Train* t)
-		int num_trains = 0;
-		TemplateVehicle* tv = TemplateVehicle::Get(group->template_id);
-		Train* t;
-		FOR_ALL_TRAINS(t) {
-			if ( t->IsPrimaryVehicle() && t->group_id == group->index && tv && tv->TrainNeedsReplacement(t) )
-				++num_trains;
-		}
-		//if ( tr ) {
-			//TemplateVehicle *tv = TemplateVehicle::Get(tr->template_id);
-			//int num_trains = 0;//NumTrainsNeedTemplateReplacement(group_id, tv);
-			// Draw text
-			TextColour color = TC_GREY;
-			if ( num_trains ) color = TC_BLACK;
-			DrawString(left, right-16, y+2, STR_TBTR_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
-			// Draw number
-			if ( num_trains ) color = TC_ORANGE;
-			else color = TC_GREY;
-			SetDParam(0, num_trains);
-			DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
-		//}
+		int num_trains = CountTrainsToReplace(group);
+		/* Draw text */
+		TextColour color = TC_GREY;
+		if ( num_trains ) color = TC_BLACK;
+		DrawString(left, right-16, y+2, STR_TBTR_NUM_TRAINS_NEED_RPL, color, SA_RIGHT);
+		/* Draw number */
+		if ( num_trains ) color = TC_ORANGE;
+		else color = TC_GREY;
+		SetDParam(0, num_trains);
+		DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 
 		y += this->line_height / 2;
 	}
@@ -558,4 +547,22 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 void ShowTbtrGui(uint16 line_height)
 {
 	new TbtrGui(&_tbtr_gui_desc, line_height);
+}
+
+/**
+ * Count the number of trains (chains) that need to be treated for a given group
+ *
+ * @param group:	the group for which we want the count
+ * @return:			int, number of chains to be treated, i.e. not the invidual vehicles
+ */
+int CountTrainsToReplace(const Group* group)
+{
+	int count = 0;
+	TemplateVehicle* tv = TemplateVehicle::Get(group->template_id);
+	Train* t;
+	FOR_ALL_TRAINS(t) {
+		if ( t->IsPrimaryVehicle() && t->group_id == group->index && tv && tv->TrainNeedsReplacement(t) )
+			++count;
+	}
+	return count;
 }
