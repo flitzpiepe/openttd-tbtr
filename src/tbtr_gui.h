@@ -59,4 +59,6 @@ private:
 
 void ShowTbtrGui(uint16);
 
+int CountTrainsToReplace(const Group*);
+
 #endif /* !TBTR_GUI_H */
