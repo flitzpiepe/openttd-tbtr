@@ -558,6 +558,8 @@ void ShowTbtrGui(uint16 line_height)
 int CountTrainsToReplace(const Group* group)
 {
 	int count = 0;
+	if ( group->template_id == INVALID_TEMPLATE )
+		return count;
 	TemplateVehicle* tv = TemplateVehicle::Get(group->template_id);
 	Train* t;
 	FOR_ALL_TRAINS(t) {
