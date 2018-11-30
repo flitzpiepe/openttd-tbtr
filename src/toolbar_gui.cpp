@@ -47,6 +47,7 @@
 #include "goal_base.h"
 #include "story_base.h"
 #include "toolbar_gui.h"
+#include "tbtr_gui.h"
 #include "framerate_type.h"
 
 #include "widgets/toolbar_widget.h"
@@ -1953,6 +1954,7 @@ enum MainToolbarHotkeys {
 	MTHK_LEAGUE,
 	MTHK_INDUSTRIES,
 	MTHK_TRAIN_LIST,
+	MTHK_TBTR_GUI,
 	MTHK_ROADVEH_LIST,
 	MTHK_SHIP_LIST,
 	MTHK_AIRCRAFT_LIST,
@@ -2044,6 +2046,7 @@ struct MainToolbarWindow : Window {
 			case MTHK_LEAGUE: ShowCompanyLeagueTable(); break;
 			case MTHK_INDUSTRIES: ShowBuildIndustryWindow(); break;
 			case MTHK_TRAIN_LIST: ShowVehicleListWindow(_local_company, VEH_TRAIN); break;
+			case MTHK_TBTR_GUI: ShowTbtrGui(14); break;
 			case MTHK_ROADVEH_LIST: ShowVehicleListWindow(_local_company, VEH_ROAD); break;
 			case MTHK_SHIP_LIST: ShowVehicleListWindow(_local_company, VEH_SHIP); break;
 			case MTHK_AIRCRAFT_LIST: ShowVehicleListWindow(_local_company, VEH_AIRCRAFT); break;
@@ -2170,6 +2173,7 @@ static Hotkey maintoolbar_hotkeys[] = {
 	Hotkey(WKC_CTRL  | 'P', "zoomedin_screenshot", MTHK_ZOOMEDIN_SCREENSHOT),
 	Hotkey(WKC_CTRL  | 'D', "defaultzoom_screenshot", MTHK_DEFAULTZOOM_SCREENSHOT),
 	Hotkey((uint16)0, "giant_screenshot", MTHK_GIANT_SCREENSHOT),
+	Hotkey('T', "Tbtr gui", MTHK_TBTR_GUI),
 	Hotkey(WKC_CTRL | WKC_ALT | 'C', "cheats", MTHK_CHEATS),
 	Hotkey('L', "terraform", MTHK_TERRAFORM),
 	Hotkey('V', "extra_viewport", MTHK_EXTRA_VIEWPORT),
@@ -2507,6 +2511,7 @@ static Hotkey scenedit_maintoolbar_hotkeys[] = {
 	Hotkey(WKC_CTRL  | 'P', "zoomedin_screenshot", MTEHK_ZOOMEDIN_SCREENSHOT),
 	Hotkey(WKC_CTRL  | 'D', "defaultzoom_screenshot", MTEHK_DEFAULTZOOM_SCREENSHOT),
 	Hotkey((uint16)0, "giant_screenshot", MTEHK_GIANT_SCREENSHOT),
+	Hotkey('T', "Tbtr gui", MTHK_TBTR_GUI),
 	Hotkey(_maintoolbar_zoomin_keys, "zoomin", MTEHK_ZOOM_IN),
 	Hotkey(_maintoolbar_zoomout_keys, "zoomout", MTEHK_ZOOM_OUT),
 	Hotkey('L', "terraform", MTEHK_TERRAFORM),
