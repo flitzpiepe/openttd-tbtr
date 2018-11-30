@@ -463,8 +463,11 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 {
 	VehicleID id_inc = GB(p1, 0, 20);
 	Train* incoming = Train::GetIfValid(id_inc);
-	if ( incoming == NULL )
-		return CommandCost();
+	if ( incoming == NULL ) return CommandCost();
+
+	CommandCost ret = CheckOwnership(incoming->owner);
+	if ( ret.Failed() ) return ret;
+
 	Train *new_chain=0;
 	TileIndex tile = incoming->tile;
 	TemplateVehicle* template_vehicle = GetTemplateForTrain(incoming);
