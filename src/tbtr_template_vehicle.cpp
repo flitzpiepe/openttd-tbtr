@@ -3,6 +3,7 @@
 
 #include "autoreplace_func.h"
 #include "command_func.h"
+#include "core/random_func.hpp"
 
 #include "tbtr_debug.h"
 #include "tbtr_template_vehicle.h"
@@ -484,6 +485,14 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	/* remember for CopyHeadSpecificThings() */
 	Train* old_head = incoming;
 
+	/* taken from autoreplace_cmd.cpp:
+	 *
+	 * We have to construct the new vehicle chain to test whether it is valid.
+	 * Vehicle construction needs random bits, so we have to save the random seeds
+	 * to prevent desyncs and to replay newgrf callbacks during DC_EXEC */
+	SavedRandomSeeds saved_seeds;
+	SaveRandomSeeds(&saved_seeds);
+
 	/*
 	 * Procedure
 	 *
@@ -557,6 +566,9 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			if ( flags==DC_EXEC )
 				cc.AddCost(ccRefit);
 		}
+
+		/* restore seeds from before the replacement */
+		RestoreRandomSeeds(saved_seeds);
 	}
 
 	/* some postprocessing steps */
