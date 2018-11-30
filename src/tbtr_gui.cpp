@@ -252,6 +252,10 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 			this->DrawTemplates(r);
 			break;
 		}
+		case TRW_WIDGET_TMPL_INFO_PANEL: {
+			DrawTemplateInfo(r);
+			break;
+		}
 	}
 }
 
@@ -301,6 +305,49 @@ void TbtrGui::DrawGroups(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_JUST_INT, color, SA_RIGHT);
 
 		y += this->line_height / 2;
+	}
+}
+
+/**
+ * Draw template info, like cost, length, etc.
+ */
+void TbtrGui::DrawTemplateInfo(const Rect &r) const
+{
+	if ( this->index_selected_template == -1 || (short)this->templates.Length() <= this->index_selected_template )
+		return;
+
+	const TemplateVehicle *tmp = this->templates[this->index_selected_template];
+
+	/* Draw vehicle performance info */
+	SetDParam(2, tmp->max_speed);
+	SetDParam(1, tmp->power);
+	SetDParam(0, tmp->weight);
+	SetDParam(3, tmp->max_te);
+	DrawString(r.left+8, r.right, r.top+4, STR_VEHICLE_INFO_WEIGHT_POWER_MAX_SPEED_MAX_TE);
+
+	/* Draw cargo summary */
+	short top = r.top + 24;
+	short left = r.left + 8;
+	short count_rows = 0;
+	short max_rows = 2;
+
+	CargoArray cargo_caps;
+	for ( ; tmp; tmp=tmp->Next() )
+		cargo_caps[tmp->cargo_type] += tmp->cargo_cap;
+	int y = top;
+	for (CargoID i = 0; i < NUM_CARGO; ++i) {
+		if ( cargo_caps[i] > 0 ) {
+			count_rows++;
+			SetDParam(0, i);
+			SetDParam(1, cargo_caps[i]);
+			SetDParam(2, _settings_game.vehicle.freight_trains);
+			DrawString(left, r.right, y, FreightWagonMult(i) > 1 ? STR_TBTR_CARGO_SUMMARY_MULTI : STR_TBTR_CARGO_SUMMARY, TC_WHITE, SA_LEFT);
+			y += this->line_height/2;
+			if ( count_rows % max_rows == 0 ) {
+				y = top;
+				left += 150;
+			}
+		}
 	}
 }
 

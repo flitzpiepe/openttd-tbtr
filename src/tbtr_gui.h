@@ -44,6 +44,7 @@ private:
 	void BuildGroupList();
 	void BuildTemplateList();
 	void DrawGroups(const Rect&) const;
+	void DrawTemplateInfo(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
 	int FindTemplateInGuiList(TemplateID) const;
 
