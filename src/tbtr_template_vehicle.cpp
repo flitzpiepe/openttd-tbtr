@@ -603,13 +603,21 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	return cc;
 }
 
-CommandCost CmdStartTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+CommandCost CmdStartStopTbtr(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
 	GroupID gid = (GroupID)p1;
-	TemplateID tid = (TemplateID)p2;
 	Group* g = Group::Get(gid);
 	if ( g == NULL )
 		return CMD_ERROR;
-	g->template_id = tid;
+
+	bool start_replacement = HasBit(p1, 16);
+
+	if ( start_replacement ) {
+		TemplateID tid = (TemplateID)p2;
+		g->template_id = tid;
+	}
+	else {
+		g->template_id = INVALID_TEMPLATE;
+	}
 	return CommandCost();
 }

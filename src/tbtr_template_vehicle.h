@@ -112,7 +112,7 @@ TemplateID FindTemplateIndexForGroup(GroupID);
 
 /* Command functions */
 CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
-CommandCost CmdStartTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
+CommandCost CmdStartStopTbtr(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 
 TemplateVehicle* GetTemplateForTrain(Train*);
 

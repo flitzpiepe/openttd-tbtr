@@ -436,7 +436,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
 			{
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
-				DoCommandP(0, this->index_selected_group, tv->index, CMD_START_TEMPLATE_REPLACEMENT);
+				DoCommandP(0, this->index_selected_group | (1 << 16), tv->index, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
@@ -444,7 +444,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		{
 			if ( this->index_selected_group>=0 )
 			{
-				Group::Get(this->index_selected_group)->template_id = INVALID_TEMPLATE;
+				DoCommandP(0, this->index_selected_group, 0, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
