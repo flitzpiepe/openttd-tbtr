@@ -332,6 +332,7 @@ enum Commands {
 	CMD_OPEN_CLOSE_AIRPORT,           ///< open/close an airport to incoming aircraft
 
 	CMD_TEMPLATE_REPLACE_VEHICLE,     ///< execute a template replacement on a train
+	CMD_START_TEMPLATE_REPLACEMENT,   ///< setup template replacement for a given train group
 
 	CMD_END,                          ///< Must ALWAYS be on the end of this list!! (period)
 };

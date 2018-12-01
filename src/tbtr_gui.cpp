@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "string_func.h"
 #include "tbtr_gui.h"
+#include "command_func.h"
 
 enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
@@ -435,7 +436,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
 			{
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
-				Group::Get(this->index_selected_group)->template_id = tv->index;
+				DoCommandP(0, this->index_selected_group, tv->index, CMD_START_TEMPLATE_REPLACEMENT);
 			}
 			break;
 		}

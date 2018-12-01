@@ -602,3 +602,14 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	return cc;
 }
+
+CommandCost CmdStartTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	GroupID gid = (GroupID)p1;
+	TemplateID tid = (TemplateID)p2;
+	Group* g = Group::Get(gid);
+	if ( g == NULL )
+		return CMD_ERROR;
+	g->template_id = tid;
+	return CommandCost();
+}
