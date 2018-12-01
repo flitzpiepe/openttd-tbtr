@@ -451,27 +451,23 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_REUSE_DEPOT_VEHICLES, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP: {
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_KEEP_REMAINDERS, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->refit_as_template = !tv->refit_as_template;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_REFIT_VEHICLE, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}

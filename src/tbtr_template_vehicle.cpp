@@ -621,3 +621,31 @@ CommandCost CmdStartStopTbtr(TileIndex ti, DoCommandFlag flags, uint32 p1, uint3
 	}
 	return CommandCost();
 }
+
+CommandCost CmdToggleTemplateOption(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateVehicle* tv = TemplateVehicle::Get(p1);
+	if ( tv == NULL )
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC ) {
+		switch (p2) {
+			case TBTR_OPT_KEEP_REMAINDERS:
+			{
+				tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
+				break;
+			}
+			case TBTR_OPT_REFIT_VEHICLE:
+			{
+				tv->refit_as_template = !tv->refit_as_template;
+				break;
+			}
+			case TBTR_OPT_REUSE_DEPOT_VEHICLES:
+			{
+				tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
+				break;
+			}
+		}
+	}
+	return CommandCost();
+}
