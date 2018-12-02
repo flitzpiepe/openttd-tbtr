@@ -649,3 +649,46 @@ CommandCost CmdToggleTemplateOption(TileIndex ti, DoCommandFlag flags, uint32 p1
 	}
 	return CommandCost();
 }
+
+/**
+ * Clone a template vehicle from an existing train
+ */
+CommandCost CmdCloneTemplateFromTrain(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	Train* train = Train::Get(p1);
+	if ( train == NULL )
+		return CMD_ERROR;
+
+	if (!TemplateVehicle::CanAllocateItem())
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC )
+	{
+		TemplateVehicle* tv  = new TemplateVehicle();
+		tv->CloneFromTrain(train, NULL);
+		tv->real_length = CeilDiv(train->gcache.cached_total_length * 10, TILE_SIZE);
+	}
+
+	return CommandCost();
+}
+
+CommandCost CmdDeleteTemplate(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateID tid = p1;
+	TemplateVehicle* tv = TemplateVehicle::Get(tid);
+	if ( tv == NULL )
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC )
+	{
+		Group* g;
+		FOR_ALL_GROUPS(g)
+		{
+			if ( g->template_id == tid )
+				g->template_id = INVALID_TEMPLATE;
+		}
+		delete tv;
+	}
+
+	return CommandCost();
+}

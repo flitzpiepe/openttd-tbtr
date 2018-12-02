@@ -394,15 +394,8 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             break;
         }
         case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
-			TemplateID del_id = this->templates[this->index_selected_template]->index;
-			TemplateVehicle* tv = TemplateVehicle::Get(del_id);
-			Group* g;
-			FOR_ALL_GROUPS(g)
-			{
-				if ( g->template_id == del_id )
-					g->template_id = INVALID_TEMPLATE;
-			}
-			delete tv;
+			TemplateID tid = this->templates[this->index_selected_template]->index;
+			DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
 
 			this->index_selected_template = -1;
 			BuildTemplateList();
@@ -522,13 +515,9 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	if (v->type != VEH_TRAIN)
 		return false;
 
-	if (!TemplateVehicle::CanAllocateItem())
-		return false;
+	// TODO return type should depend on the success of this command
+	DoCommandP(0, v->index, 0, CMD_CLONE_TEMPLATE_FROM_TRAIN);
 
-	TemplateVehicle* tv  = new TemplateVehicle();
-	const Train* clicked = static_cast<const Train*>(v);
-	tv->CloneFromTrain(clicked, NULL);
-	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
     BuildTemplateList();
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
