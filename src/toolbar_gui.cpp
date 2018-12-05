@@ -2064,7 +2064,7 @@ struct MainToolbarWindow : Window {
 			case MTHK_GIANT_SCREENSHOT: MenuClickLargeWorldScreenshot(SC_WORLD); break;
 			case MTHK_CHEATS: if (!_networking) ShowCheatWindow(); break;
 			case MTHK_TERRAFORM: ShowTerraformToolbar(); break;
-			case MTHK_TBTR_GUI: ShowTbtrGui(14); break;
+			case MTHK_TBTR_GUI: ShowTbtrGui(26); break;
 			case MTHK_EXTRA_VIEWPORT: ShowExtraViewPortWindowForTileUnderCursor(); break;
 #ifdef ENABLE_NETWORK
 			case MTHK_CLIENT_LIST: if (_networking) ShowClientList(); break;
