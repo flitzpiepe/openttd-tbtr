@@ -2175,7 +2175,7 @@ static Hotkey maintoolbar_hotkeys[] = {
 	Hotkey((uint16)0, "giant_screenshot", MTHK_GIANT_SCREENSHOT),
 	Hotkey(WKC_CTRL | WKC_ALT | 'C', "cheats", MTHK_CHEATS),
 	Hotkey('L', "terraform", MTHK_TERRAFORM),
-	Hotkey('T', "tbtr_gui", MTHK_TBTR_GUI),
+	Hotkey(WKC_CTRL | 'E', "tbtr_gui", MTHK_TBTR_GUI),
 	Hotkey('V', "extra_viewport", MTHK_EXTRA_VIEWPORT),
 #ifdef ENABLE_NETWORK
 	Hotkey((uint16)0, "client_list", MTHK_CLIENT_LIST),
