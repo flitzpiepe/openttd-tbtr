@@ -60,32 +60,31 @@ Money TemplateVehicle::CalculateCost() const
  */
 bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainHead)
 {
-	Train* clicked = Train::Get(train->index);
-	if ( !clicked )
+	if ( !train )
 		return false;
 
-	int len = CountVehiclesInChain(clicked);
+	int len = CountVehiclesInChain(train);
 	if ( !TemplateVehicle::CanAllocateItem(len) )
 		return false;
 
 	this->first = chainHead ? chainHead : this;
-	this->engine_type = clicked->engine_type;
-	this->subtype = clicked->subtype;
-	this->railtype = clicked->railtype;
-	this->cargo_type = clicked->cargo_type;
-	this->cargo_subtype = clicked->cargo_subtype;
-	this->cargo_cap = clicked->cargo_cap;
-	const GroundVehicleCache* gcache = clicked->GetGroundVehicleCache();
-	this->max_speed = clicked->GetDisplayMaxSpeed();
+	this->engine_type = train->engine_type;
+	this->subtype = train->subtype;
+	this->railtype = train->railtype;
+	this->cargo_type = train->cargo_type;
+	this->cargo_subtype = train->cargo_subtype;
+	this->cargo_cap = train->cargo_cap;
+	const GroundVehicleCache* gcache = train->GetGroundVehicleCache();
+	this->max_speed = train->GetDisplayMaxSpeed();
 	this->power = gcache->cached_power;
 	this->weight = gcache->cached_weight;
 	this->max_te = gcache->cached_max_te / 1000;
-	this->spritenum = clicked->spritenum;
+	this->spritenum = train->spritenum;
 	VehicleSpriteSeq seq;
-	clicked->GetImage(DIR_W, EIT_PURCHASE, &seq);
+	train->GetImage(DIR_W, EIT_PURCHASE, &seq);
 	this->cur_image = seq.seq[0].sprite;
 	Point* p = new Point();
-	this->image_width = clicked->GetDisplayImageWidth(p);
+	this->image_width = train->GetDisplayImageWidth(p);
 
 	if ( train->GetNextVehicle() )
 	{
