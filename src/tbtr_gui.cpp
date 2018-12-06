@@ -395,10 +395,11 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
         }
         case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
 			TemplateID tid = this->templates[this->index_selected_template]->index;
-			DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
-
-			this->index_selected_template = -1;
-			BuildTemplateList();
+			bool template_deleted = DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
+			if ( template_deleted )
+			{
+				this->index_selected_template = -1;
+			}
 
             break;
         }
@@ -484,6 +485,7 @@ void TbtrGui::OnInvalidateData(int data = 0, bool gui_scope = true)
 void TbtrGui::OnPaint()
 {
 	this->BuildGroupList();
+	this->BuildTemplateList();
 	this->DrawWidgets();
 }
 
