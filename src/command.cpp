@@ -200,6 +200,10 @@ CommandProc CmdSetTimetableStart;
 CommandProc CmdOpenCloseAirport;
 
 CommandProc CmdTemplateReplacement;
+CommandProc CmdStartStopTbtr;
+CommandProc CmdToggleTemplateOption;
+CommandProc CmdCloneTemplateFromTrain;
+CommandProc CmdDeleteTemplate;
 
 #define DEF_CMD(proc, flags, type) {proc, #proc, (CommandFlags)flags, type}
 
@@ -360,6 +364,10 @@ static const Command _command_proc_table[] = {
 	DEF_CMD(CmdOpenCloseAirport,                               0, CMDT_ROUTE_MANAGEMENT      ), // CMD_OPEN_CLOSE_AIRPORT
 
 	DEF_CMD(CmdTemplateReplacement,                            0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_TEMPLATE_REPLACEMENT
+	DEF_CMD(CmdStartStopTbtr,                                  0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_START_STOP_TBTR
+	DEF_CMD(CmdToggleTemplateOption,                           0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_TOGGLE_TEMPLATE_OPTION
+	DEF_CMD(CmdCloneTemplateFromTrain,                         0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_CLONE_TEMPLATE_FROM_TRAIN
+	DEF_CMD(CmdDeleteTemplate,                                 0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_DELETE_TEMPLATE
 };
 
 /*!

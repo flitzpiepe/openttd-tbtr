@@ -3,6 +3,7 @@
 
 #include "autoreplace_func.h"
 #include "command_func.h"
+#include "core/random_func.hpp"
 
 #include "tbtr_debug.h"
 #include "tbtr_template_vehicle.h"
@@ -462,8 +463,11 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 {
 	VehicleID id_inc = GB(p1, 0, 20);
 	Train* incoming = Train::GetIfValid(id_inc);
-	if ( incoming == NULL )
-		return CommandCost();
+	if ( incoming == NULL ) return CommandCost();
+
+	CommandCost ret = CheckOwnership(incoming->owner);
+	if ( ret.Failed() ) return ret;
+
 	Train *new_chain=0;
 	TileIndex tile = incoming->tile;
 	TemplateVehicle* template_vehicle = GetTemplateForTrain(incoming);
@@ -479,6 +483,14 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 	/* remember for CopyHeadSpecificThings() */
 	Train* old_head = incoming;
+
+	/* taken from autoreplace_cmd.cpp:
+	 *
+	 * We have to construct the new vehicle chain to test whether it is valid.
+	 * Vehicle construction needs random bits, so we have to save the random seeds
+	 * to prevent desyncs and to replay newgrf callbacks during DC_EXEC */
+	SavedRandomSeeds saved_seeds;
+	SaveRandomSeeds(&saved_seeds);
 
 	/*
 	 * Procedure
@@ -553,6 +565,9 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			if ( flags==DC_EXEC )
 				cc.AddCost(ccRefit);
 		}
+
+		/* restore seeds from before the replacement */
+		RestoreRandomSeeds(saved_seeds);
 	}
 
 	/* some postprocessing steps */
@@ -585,4 +600,94 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		cc.AddCost(DoCommand(incoming->tile, incoming->index|(1<<20), 0, flags, CMD_SELL_VEHICLE));
 
 	return cc;
+}
+
+CommandCost CmdStartStopTbtr(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	GroupID gid = (GroupID)p1;
+	Group* g = Group::Get(gid);
+	if ( g == NULL )
+		return CMD_ERROR;
+
+	bool start_replacement = HasBit(p1, 16);
+
+	if ( start_replacement ) {
+		TemplateID tid = (TemplateID)p2;
+		g->template_id = tid;
+	}
+	else {
+		g->template_id = INVALID_TEMPLATE;
+	}
+	return CommandCost();
+}
+
+CommandCost CmdToggleTemplateOption(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateVehicle* tv = TemplateVehicle::Get(p1);
+	if ( tv == NULL )
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC ) {
+		switch (p2) {
+			case TBTR_OPT_KEEP_REMAINDERS:
+			{
+				tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
+				break;
+			}
+			case TBTR_OPT_REFIT_VEHICLE:
+			{
+				tv->refit_as_template = !tv->refit_as_template;
+				break;
+			}
+			case TBTR_OPT_REUSE_DEPOT_VEHICLES:
+			{
+				tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
+				break;
+			}
+		}
+	}
+	return CommandCost();
+}
+
+/**
+ * Clone a template vehicle from an existing train
+ */
+CommandCost CmdCloneTemplateFromTrain(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	Train* train = Train::Get(p1);
+	if ( train == NULL )
+		return CMD_ERROR;
+
+	if (!TemplateVehicle::CanAllocateItem())
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC )
+	{
+		TemplateVehicle* tv  = new TemplateVehicle();
+		tv->CloneFromTrain(train, NULL);
+		tv->real_length = CeilDiv(train->gcache.cached_total_length * 10, TILE_SIZE);
+	}
+
+	return CommandCost();
+}
+
+CommandCost CmdDeleteTemplate(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateID tid = p1;
+	TemplateVehicle* tv = TemplateVehicle::Get(tid);
+	if ( tv == NULL )
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC )
+	{
+		Group* g;
+		FOR_ALL_GROUPS(g)
+		{
+			if ( g->template_id == tid )
+				g->template_id = INVALID_TEMPLATE;
+		}
+		delete tv;
+	}
+
+	return CommandCost();
 }

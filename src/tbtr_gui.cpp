@@ -8,6 +8,7 @@
 #include "stdafx.h"
 #include "string_func.h"
 #include "tbtr_gui.h"
+#include "command_func.h"
 
 enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
@@ -440,18 +441,12 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
             break;
         }
         case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
-			TemplateID del_id = this->templates[this->index_selected_template]->index;
-			TemplateVehicle* tv = TemplateVehicle::Get(del_id);
-			Group* g;
-			FOR_ALL_GROUPS(g)
+			TemplateID tid = this->templates[this->index_selected_template]->index;
+			bool template_deleted = DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
+			if ( template_deleted )
 			{
-				if ( g->template_id == del_id )
-					g->template_id = INVALID_TEMPLATE;
+				this->index_selected_template = -1;
 			}
-			delete tv;
-
-			this->index_selected_template = -1;
-			BuildTemplateList();
 
             break;
         }
@@ -482,7 +477,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
 			{
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
-				Group::Get(this->index_selected_group)->template_id = tv->index;
+				DoCommandP(0, this->index_selected_group | (1 << 16), tv->index, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
@@ -490,34 +485,30 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		{
 			if ( this->index_selected_group>=0 )
 			{
-				Group::Get(this->index_selected_group)->template_id = INVALID_TEMPLATE;
+				DoCommandP(0, this->index_selected_group, 0, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_REUSE_DEPOT_VEHICLES, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP: {
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_KEEP_REMAINDERS, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
-				TemplateVehicle* tv = TemplateVehicle::Get(((this->templates)[index_selected_template])->index);
-				if ( tv != NULL )
-					tv->refit_as_template = !tv->refit_as_template;
+				TemplateID template_index = ((this->templates)[index_selected_template])->index;
+				DoCommandP(0, template_index, TBTR_OPT_REFIT_VEHICLE, CMD_TOGGLE_TEMPLATE_OPTION);
 			}
 			break;
 		}
@@ -541,6 +532,7 @@ void TbtrGui::OnInvalidateData(int data = 0, bool gui_scope = true)
 void TbtrGui::OnPaint()
 {
 	this->BuildGroupList();
+	this->BuildTemplateList();
 	this->DrawWidgets();
 }
 
@@ -572,13 +564,9 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	if (v->type != VEH_TRAIN)
 		return false;
 
-	if (!TemplateVehicle::CanAllocateItem())
-		return false;
+	// TODO return type should depend on the success of this command
+	DoCommandP(0, v->index, 0, CMD_CLONE_TEMPLATE_FROM_TRAIN);
 
-	TemplateVehicle* tv  = new TemplateVehicle();
-	const Train* clicked = static_cast<const Train*>(v);
-	tv->CloneFromTrain(clicked, NULL);
-	tv->real_length = CeilDiv(clicked->gcache.cached_total_length * 10, TILE_SIZE);
 
     BuildTemplateList();
     this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);

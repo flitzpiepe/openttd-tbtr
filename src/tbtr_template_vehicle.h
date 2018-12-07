@@ -36,6 +36,12 @@ class TemplateVehicle;
 typedef Pool<TemplateVehicle, TemplateID, 512, 0x10000> TemplatePool;
 extern TemplatePool _template_pool;
 
+enum TBTR_REPLACEMENT_OPTS {
+	TBTR_OPT_REUSE_DEPOT_VEHICLES,
+	TBTR_OPT_REFIT_VEHICLE,
+	TBTR_OPT_KEEP_REMAINDERS,
+};
+
 /** Main Template Vehicle class
  *
  * A template vehicle is basically like a train with a minimal set of attributes. I.e. it is a chain
@@ -110,8 +116,10 @@ public:
 TemplateID FindTemplateIndexForGroup(GroupID);
 
 
-	/* Command functions */
-	CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
+/* Command functions */
+CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
+CommandCost CmdStartStopTbtr(TileIndex, DoCommandFlag, uint32, uint32, char const*);
+CommandCost CmdCloneTemplateFromTrain(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 
 TemplateVehicle* GetTemplateForTrain(Train*);
 
