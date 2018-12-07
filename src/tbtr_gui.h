@@ -31,7 +31,7 @@ typedef GUIList<const TemplateVehicle*> GUITemplateList;
  */
 class TbtrGui : public Window {
 public:
-	TbtrGui(WindowDesc*, uint16);
+	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 	virtual void DrawWidget(const Rect&, int) const;
     virtual void OnClick(Point, int, int);
@@ -58,7 +58,7 @@ private:
     RailType railtype;
 };
 
-void ShowTbtrGui(uint16);
+void ShowTbtrGui();
 
 int CountTrainsToReplace(const Group*);
 
