@@ -152,7 +152,7 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 /**
  * Constructor, initialize GUI with a window descriptor
  */
-TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(height)
+TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
 	this->vscroll_groups = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
@@ -162,6 +162,8 @@ TbtrGui::TbtrGui(WindowDesc* wdesc, uint16 height) : Window(wdesc), line_height(
 	/* VEH_TRAIN should be 0; we want only 1 instance of this GUI to be present at the same time anyway, so
 	 * this should be ok */
 	FinishInitNested(VEH_TRAIN);
+
+	this->line_height = this->resize.step_height * 2;
 
 	/* will be used to build the internal group and template lists
 	 *
@@ -579,9 +581,9 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 /*
  * Show the TBTR Gui
  */
-void ShowTbtrGui(uint16 line_height)
+void ShowTbtrGui()
 {
-	new TbtrGui(&_tbtr_gui_desc, line_height);
+	new TbtrGui(&_tbtr_gui_desc);
 }
 
 /**
