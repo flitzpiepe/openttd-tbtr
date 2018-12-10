@@ -566,9 +566,8 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	if (v->type != VEH_TRAIN)
 		return false;
 
-	// TODO return type should depend on the success of this command
-	DoCommandP(0, v->index, 0, CMD_CLONE_TEMPLATE_FROM_TRAIN);
-
+	if ( !DoCommandP(0, v->index, 0, CMD_CLONE_TEMPLATE_FROM_TRAIN) )
+		return false;
 
 	BuildTemplateList();
 	this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
