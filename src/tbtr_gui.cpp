@@ -130,23 +130,23 @@ static WindowDesc _tbtr_gui_desc(
 /** Sort the groups by their name */
 static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 {
-    static const Group *last_group[2] = { NULL, NULL };
-    static char         last_name[2][64] = { "", "" };
+	static char         last_name[2][64] = { "", "" };
+	static const Group *last_group[2] = { NULL, NULL };
 
-    if (*a != last_group[0]) {
-        last_group[0] = *a;
-        SetDParam(0, (*a)->index);
-        GetString(last_name[0], STR_GROUP_NAME, lastof(last_name[0]));
-    }
+	if (*a != last_group[0]) {
+		last_group[0] = *a;
+		SetDParam(0, (*a)->index);
+		GetString(last_name[0], STR_GROUP_NAME, lastof(last_name[0]));
+	}
 
-    if (*b != last_group[1]) {
-        last_group[1] = *b;
-        SetDParam(0, (*b)->index);
-        GetString(last_name[1], STR_GROUP_NAME, lastof(last_name[1]));
-    }
-    int r = strnatcmp(last_name[0], last_name[1]); // Sort by name (natural sorting).
-    if (r == 0) return (*a)->index - (*b)->index;
-    return r;
+	if (*b != last_group[1]) {
+		last_group[1] = *b;
+		SetDParam(0, (*b)->index);
+		GetString(last_name[1], STR_GROUP_NAME, lastof(last_name[1]));
+	}
+	int r = strnatcmp(last_name[0], last_name[1]); // Sort by name (natural sorting).
+	if (r == 0) return (*a)->index - (*b)->index;
+	return r;
 }
 
 /**
@@ -176,7 +176,7 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->BuildGroupList();
 	this->groups.Sort(&GroupNameSorter);
 
-    BuildTemplateList();
+	BuildTemplateList();
 }
 
 /*
@@ -216,7 +216,7 @@ void TbtrGui::BuildGroupList()
 	}
 
 	this->groups.Compact();
-    this->groups.Sort(&GroupNameSorter);
+	this->groups.Sort(&GroupNameSorter);
 	this->groups.RebuildDone();
 	this->index_selected_group = -1;
 }
@@ -429,20 +429,20 @@ int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
  */
 void TbtrGui::OnClick(Point pt, int widget, int click_count)
 {
-    switch (widget) {
-        case TRW_WIDGET_TMPL_BUTTONS_CLONE: {
-            this->SetWidgetDirty(TRW_WIDGET_TMPL_BUTTONS_CLONE);
-            this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+	switch (widget) {
+		case TRW_WIDGET_TMPL_BUTTONS_CLONE: {
+			this->SetWidgetDirty(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+			this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
 
-            if (this->IsWidgetLowered(TRW_WIDGET_TMPL_BUTTONS_CLONE)) {
-                static const CursorID clone_icon =	SPR_CURSOR_CLONE_TRAIN;
-                SetObjectToPlaceWnd(clone_icon, PAL_NONE, HT_VEHICLE, this);
-            } else {
-                ResetObjectToPlace();
-            }
-            break;
-        }
-        case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
+			if (this->IsWidgetLowered(TRW_WIDGET_TMPL_BUTTONS_CLONE)) {
+				static const CursorID clone_icon =	SPR_CURSOR_CLONE_TRAIN;
+				SetObjectToPlaceWnd(clone_icon, PAL_NONE, HT_VEHICLE, this);
+			} else {
+				ResetObjectToPlace();
+			}
+			break;
+		}
+		case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
 			TemplateID tid = this->templates[this->index_selected_template]->index;
 			bool template_deleted = DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
 			if ( template_deleted )
@@ -450,8 +450,8 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_template = -1;
 			}
 
-            break;
-        }
+			break;
+		}
 		case TRW_WIDGET_TOP_MATRIX:
 		{
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
@@ -543,15 +543,15 @@ void TbtrGui::OnPaint()
  */
 void TbtrGui::OnResize()
 {
-    /* Top Matrix */
-    NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
-    this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
-    nwi->widget_data = (this->vscroll_groups->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+	/* Top Matrix */
+	NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
+	this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
+	nwi->widget_data = (this->vscroll_groups->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
-    /* Bottom Matrix */
-    NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
-    this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
-    nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+	/* Bottom Matrix */
+	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
+	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
+	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
 /*
@@ -570,12 +570,12 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	DoCommandP(0, v->index, 0, CMD_CLONE_TEMPLATE_FROM_TRAIN);
 
 
-    BuildTemplateList();
-    this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
-    ResetObjectToPlace();
-    this->SetDirty();
+	BuildTemplateList();
+	this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
+	ResetObjectToPlace();
+	this->SetDirty();
 
-    return true;
+	return true;
 }
 
 /*

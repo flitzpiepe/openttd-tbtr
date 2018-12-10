@@ -34,10 +34,10 @@ public:
 	TbtrGui(WindowDesc*);
 	virtual void UpdateWidgetSize(int, Dimension*, const Dimension&, Dimension*, Dimension*);
 	virtual void DrawWidget(const Rect&, int) const;
-    virtual void OnClick(Point, int, int);
+	virtual void OnClick(Point, int, int);
 	virtual void OnPaint();
-    virtual void OnResize();
-    virtual bool OnVehicleSelect(const Vehicle*);
+	virtual void OnResize();
+	virtual bool OnVehicleSelect(const Vehicle*);
 	virtual void OnInvalidateData(int, bool);
 
 private:
@@ -54,8 +54,8 @@ private:
 	int index_selected_group = -1;
 	int index_selected_template = -1;
 	GUIGroupList groups;                ///< List of groups
-    GUITemplateList templates;
-    RailType railtype;
+	GUITemplateList templates;
+	RailType railtype;
 };
 
 void ShowTbtrGui();

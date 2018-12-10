@@ -65,7 +65,7 @@ public:
 
 	/** Vehicle type + cargo info */
 	EngineID engine_type;               ///< The type of engine used for this vehicle.
-    byte subtype;                       ///< The vehicle subtype
+	byte subtype;                       ///< The vehicle subtype
 	RailTypeByte railtype;              ///< The railtype of this vehicle
 	uint16 max_speed;
 	uint16 power;
@@ -94,16 +94,16 @@ public:
 	inline TemplateVehicle* Next() const {return this->next;}
 
 	inline uint16 GetRealLength() const {return real_length;}
-    inline bool HasOwner(Owner owner) const {return this->owner == owner;}
-    inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
-    inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
+	inline bool HasOwner(Owner owner) const {return this->owner == owner;}
+	inline bool IsPrimaryVehicle() const {return HasBit(this->subtype, GVSF_FRONT);}
+	inline bool IsFreeWagonChain() const {return HasBit(this->subtype, GVSF_FREE_WAGON);}
 	inline bool IsSetReuseDepotVehicles() const {return reuse_depot_vehicles;}
 	inline bool IsSetKeepRemainingVehicles() const {return keep_remaining_vehicles;}
 	inline bool IsSetRefitAsTemplate() const {return refit_as_template;}
 
 	Money CalculateCost() const;
-    bool CloneFromTrain(const Train*, TemplateVehicle*);
-    bool ContainsRailType(RailType) const;
+	bool CloneFromTrain(const Train*, TemplateVehicle*);
+	bool ContainsRailType(RailType) const;
 	/* Count the number of groups which use this template vehicle */
 	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
