@@ -89,6 +89,7 @@ story.cpp
 subsidy.cpp
 tbtr_gui.cpp
 tbtr_template_vehicle.cpp
+tbtr_template_cmd.cpp
 textbuf.cpp
 texteff.cpp
 tgp.cpp
