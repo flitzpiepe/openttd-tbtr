@@ -479,7 +479,8 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
 			{
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
-				DoCommandP(0, this->index_selected_group | (1 << 16), tv->index, CMD_START_STOP_TBTR);
+				const Group* g = *(this->groups.Get(this->index_selected_group));
+				DoCommandP(0, g->index | (1 << 16), tv->index, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
