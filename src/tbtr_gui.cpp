@@ -10,7 +10,18 @@
 #include "tbtr_gui.h"
 #include "command_func.h"
 
+// TODO review what is needed
 #include "widgets/build_vehicle_widget.h"
+#include "engine_gui.h"
+#include "newgrf.h"
+#include "spritecache.h"
+#include "core/geometry_type.hpp"
+#include "zoom_func.h"
+
+
+// TODO rm
+#include <iostream>
+using namespace std;
 
 enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
@@ -384,7 +395,53 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		tv->Draw(left+50, right, y);
+		//tv->Draw(left+50, right, y);
+		const TemplateVehicle* tmp = tv;
+		int l = left;
+		while ( tmp )
+		{
+			EngineID engine = tmp->engine_type;
+			const Engine* e = Engine::Get(engine);
+			const GRFFile* grf = e->GetGRF();
+
+			DrawVehicleEngine(l+50, right, l+50, y+10, engine, GetEnginePalette(engine,_local_company), EIT_PURCHASE);
+
+			// get image width, stolen from train_cmd.cpp:435
+			//int reference_width = TRAININFO_DEFAULT_VEHICLE_WIDTH;
+			//if (e->GetGRF() != NULL && is_custom_sprite(e->u.rail.image_index)) {
+			//	reference_width = e->GetGRF()->traininfo_vehicle_width;
+			//}
+			//// adjust position of the next tv in the chain
+			//
+
+			// NOTE from DrawTrainEngine()
+			VehicleSpriteSeq seq;
+			//
+			// TODO needs to be implemented, is only declared in the fucking train_cmd.cpp
+			//GetRailIcon(engine, false, y, EIT_PURCHASE, &seq);
+
+			// TODO this is not the correct spriteid
+			seq.Set(e->u.rail.image_index);
+
+			// TODO we need the custom sprite id
+			// but for that we need an actual vehicle, which is passed into a vehicle resolver object inside GetCustomEngineSprite
+
+			Rect rect;
+			seq.GetBounds(&rect);
+			int preferred_x = Clamp(preferred_x,
+					left - UnScaleGUI(rect.left),
+					right - UnScaleGUI(rect.right));
+
+			// NOTE from GetSingleVehicleWidth()
+			int width = UnScaleGUI(rect.right - rect.left + 1);
+			cout << "e: " << e->index
+				<< ", wid: " << width
+				<< ", imix: " << (int)(e->u.rail.image_index)
+				<< endl;
+
+			l += width;
+			tmp = tmp->Next();
+		}
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
