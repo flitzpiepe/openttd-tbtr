@@ -483,11 +483,11 @@ int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
 	return -1;
 }
 
-struct BuildVehicleWindow;
-struct TmplWindow : BuildVehicleWindow
+struct TmplWindow : Window
 {
 public:
-	TmplWindow(WindowDesc* wd) : BuildVehicleWindow(wd,0,VEH_TRAIN) {}
+	TmplWindow(WindowDesc* wd) : Window(wd)
+	{}
 };
 static const NWidgetPart _nested_build_tmpl_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
