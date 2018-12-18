@@ -439,7 +439,13 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 				<< ", imix: " << (int)(e->u.rail.image_index)
 				<< endl;
 
-			l += width;
+			uint sw = 0,
+			   	sh = 0;
+			int sx = 0,
+				sy = 0;
+			GetTrainSpriteSize(engine, sw, sh, sx, sy, EIT_PURCHASE);
+
+			l += sw;
 			tmp = tmp->Next();
 		}
 
