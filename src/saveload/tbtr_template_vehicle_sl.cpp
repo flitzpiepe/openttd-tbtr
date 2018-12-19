@@ -36,8 +36,6 @@ const SaveLoad* GTD() {
 		SLE_VAR(TemplateVehicle, railtype,                  SLE_UINT8),
 
 		SLE_VAR(TemplateVehicle, real_length,               SLE_UINT16),
-		SLE_VAR(TemplateVehicle, spritenum,                 SLE_UINT8),
-		SLE_VAR(TemplateVehicle, cur_image,                 SLE_UINT32),
 		SLE_VAR(TemplateVehicle, image_width,               SLE_UINT32),
 
 		SLE_VAR(TemplateVehicle, reuse_depot_vehicles,      SLE_UINT8),

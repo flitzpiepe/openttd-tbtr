@@ -78,10 +78,7 @@ public:
 
 	/** Vehicle drawing information */
 	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
-	byte spritenum;                     ///< used for drawing in a GUI
-	SpriteID cur_image;                 ///< used for drawing in a GUI
 	uint32 image_width;                 ///< used for drawing in a GUI
-	const SpriteGroup* sgroup;          ///< used for drawing in a GUI
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot

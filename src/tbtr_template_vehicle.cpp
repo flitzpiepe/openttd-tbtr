@@ -1,7 +1,6 @@
 
 #include "stdafx.h"
 
-// TODO why does the order have to be this way
 #include "tbtr_template_vehicle.h"
 #include "engine_gui.h"
 
@@ -77,12 +76,6 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	this->power = gcache->cached_power;
 	this->weight = gcache->cached_weight;
 	this->max_te = gcache->cached_max_te / 1000;
-	this->spritenum = train->spritenum;
-	VehicleSpriteSeq seq;
-	train->GetImage(DIR_W, EIT_PURCHASE, &seq);
-	this->cur_image = seq.seq[0].sprite;
-	Point* p = new Point();
-	this->image_width = train->GetDisplayImageWidth(p);
 
 	if ( train->GetNextVehicle() )
 	{
@@ -147,11 +140,8 @@ int TemplateVehicle::CountGroups() const
  * @param right: right border of the bounding box
  * @param y:     y-coordinate of the bounding box
  */
-// TODO params
 void TemplateVehicle::Draw(int left, int right, int y) const
 {
-	// TODO what if the template is too long for the gui
-	// TODO check params
 	DrawVehicleEngine(left+50, right, left+50, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
 
 	TemplateVehicle* next = this->GetNextUnit();
@@ -192,8 +182,7 @@ void TemplateVehicle::Init(EngineID eid)
 	this->engine_type = eid;
 	this->owner = _current_company;
 	this->real_length = 0;
-
-	this->cur_image = SPR_IMG_QUERY;
+	this->image_width = 0;
 
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;
