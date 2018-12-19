@@ -1,7 +1,9 @@
 
 #include "stdafx.h"
 
+// TODO why does the order have to be this way
 #include "tbtr_template_vehicle.h"
+#include "engine_gui.h"
 
 TemplatePool _template_pool("Template");
 INSTANTIATE_POOL_METHODS(Template)
@@ -145,14 +147,21 @@ int TemplateVehicle::CountGroups() const
  * @param right: right border of the bounding box
  * @param y:     y-coordinate of the bounding box
  */
+// TODO params
 void TemplateVehicle::Draw(int left, int right, int y) const
 {
-	int offset = left;
-	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
-	DrawSprite(this->cur_image, pal, offset, y+12);
+	// TODO what if the template is too long for the gui
+	// TODO check params
+	DrawVehicleEngine(left+50, right, left+50, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
 
-	if (this->next)
-		this->next->Draw(offset+this->image_width, right, y);
+	TemplateVehicle* next = this->GetNextUnit();
+	if ( next )
+	{
+		uint spr_width = 0, spr_height = 0;
+		int sx = 0, sy = 0;
+		GetTrainSpriteSize(this->engine_type, spr_width, spr_height, sx, sy, EIT_PURCHASE);
+		next->Draw(left+spr_width, right, y);
+	}
 }
 
 /*

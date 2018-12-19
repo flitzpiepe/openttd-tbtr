@@ -10,18 +10,6 @@
 #include "tbtr_gui.h"
 #include "command_func.h"
 
-// TODO review what is needed
-#include "widgets/build_vehicle_widget.h"
-#include "engine_gui.h"
-#include "newgrf.h"
-#include "spritecache.h"
-#include "core/geometry_type.hpp"
-#include "zoom_func.h"
-
-
-// TODO rm
-#include <iostream>
-using namespace std;
 
 enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
@@ -395,59 +383,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		//tv->Draw(left+50, right, y);
-		const TemplateVehicle* tmp = tv;
-		int l = left;
-		while ( tmp )
-		{
-			EngineID engine = tmp->engine_type;
-			const Engine* e = Engine::Get(engine);
-			const GRFFile* grf = e->GetGRF();
-
-			DrawVehicleEngine(l+50, right, l+50, y+10, engine, GetEnginePalette(engine,_local_company), EIT_PURCHASE);
-
-			// get image width, stolen from train_cmd.cpp:435
-			//int reference_width = TRAININFO_DEFAULT_VEHICLE_WIDTH;
-			//if (e->GetGRF() != NULL && is_custom_sprite(e->u.rail.image_index)) {
-			//	reference_width = e->GetGRF()->traininfo_vehicle_width;
-			//}
-			//// adjust position of the next tv in the chain
-			//
-
-			// NOTE from DrawTrainEngine()
-			VehicleSpriteSeq seq;
-			//
-			// TODO needs to be implemented, is only declared in the fucking train_cmd.cpp
-			//GetRailIcon(engine, false, y, EIT_PURCHASE, &seq);
-
-			// TODO this is not the correct spriteid
-			seq.Set(e->u.rail.image_index);
-
-			// TODO we need the custom sprite id
-			// but for that we need an actual vehicle, which is passed into a vehicle resolver object inside GetCustomEngineSprite
-
-			Rect rect;
-			seq.GetBounds(&rect);
-			int preferred_x = Clamp(preferred_x,
-					left - UnScaleGUI(rect.left),
-					right - UnScaleGUI(rect.right));
-
-			// NOTE from GetSingleVehicleWidth()
-			int width = UnScaleGUI(rect.right - rect.left + 1);
-			cout << "e: " << e->index
-				<< ", wid: " << width
-				<< ", imix: " << (int)(e->u.rail.image_index)
-				<< endl;
-
-			uint sw = 0,
-			   	sh = 0;
-			int sx = 0,
-				sy = 0;
-			GetTrainSpriteSize(engine, sw, sh, sx, sy, EIT_PURCHASE);
-
-			l += sw;
-			tmp = tmp->Next();
-		}
+		tv->Draw(left+50, right, y);
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
@@ -487,60 +423,6 @@ int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
 		if ( templates[i]->index == tid )
 			return i;
 	return -1;
-}
-
-struct TmplWindow : Window
-{
-public:
-	TmplWindow(WindowDesc* wd) : Window(wd)
-	{}
-};
-static const NWidgetPart _nested_build_tmpl_widgets[] = {
-	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
-		NWidget(WWT_CAPTION, COLOUR_GREY, WID_BV_CAPTION), SetDataTip(STR_WHITE_STRING, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS),
-		NWidget(WWT_SHADEBOX, COLOUR_GREY),
-		NWidget(WWT_DEFSIZEBOX, COLOUR_GREY),
-		NWidget(WWT_STICKYBOX, COLOUR_GREY),
-	EndContainer(),
-	NWidget(WWT_PANEL, COLOUR_GREY),
-		NWidget(NWID_VERTICAL),
-			NWidget(NWID_HORIZONTAL),
-				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_BV_SORT_ASCENDING_DESCENDING), SetDataTip(STR_BUTTON_SORT_BY, STR_TOOLTIP_SORT_ORDER),
-				NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_BV_SORT_DROPDOWN), SetResize(1, 0), SetFill(1, 0), SetDataTip(STR_JUST_STRING, STR_TOOLTIP_SORT_CRITERIA),
-			EndContainer(),
-			NWidget(NWID_HORIZONTAL),
-				NWidget(WWT_TEXTBTN, COLOUR_GREY, WID_BV_SHOW_HIDDEN_ENGINES),
-				NWidget(WWT_DROPDOWN, COLOUR_GREY, WID_BV_CARGO_FILTER_DROPDOWN), SetResize(1, 0), SetFill(1, 0), SetDataTip(STR_JUST_STRING, STR_TOOLTIP_FILTER_CRITERIA),
-			EndContainer(),
-		EndContainer(),
-	EndContainer(),
-	/* Vehicle list. */
-	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_MATRIX, COLOUR_GREY, WID_BV_LIST), SetResize(1, 1), SetFill(1, 0), SetMatrixDataTip(1, 0, STR_NULL), SetScrollbar(WID_BV_SCROLLBAR),
-		NWidget(NWID_VSCROLLBAR, COLOUR_GREY, WID_BV_SCROLLBAR),
-	EndContainer(),
-	/* Panel with details. */
-	NWidget(WWT_PANEL, COLOUR_GREY, WID_BV_PANEL), SetMinimalSize(240, 122), SetResize(1, 0), EndContainer(),
-	/* Build/rename buttons, resize button. */
-	NWidget(NWID_HORIZONTAL),
-		NWidget(NWID_SELECTION, INVALID_COLOUR, WID_BV_BUILD_SEL),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_BV_BUILD), SetResize(1, 0), SetFill(1, 0),
-		EndContainer(),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_BV_SHOW_HIDE), SetResize(1, 0), SetFill(1, 0), SetDataTip(STR_JUST_STRING, STR_NULL),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, WID_BV_RENAME), SetResize(1, 0), SetFill(1, 0),
-		NWidget(WWT_RESIZEBOX, COLOUR_GREY),
-	EndContainer(),
-};
-static WindowDesc _tmpl_window_desc(
-	WDP_AUTO, "build_template", 240, 268,
-	WC_BUILD_VEHICLE, WC_NONE,
-	WDF_CONSTRUCTION,
-	_nested_build_tmpl_widgets, lengthof(_nested_build_tmpl_widgets)
-);
-void ShowTmplWindow()
-{
-	new TmplWindow(&_tmpl_window_desc);
 }
 
 /*
@@ -613,9 +495,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_DEFINE:
 		{
-			ResetObjectToPlace();
-			//ShowBuildVehicleWindow(this->window_number, VEH_TRAIN);
-			ShowTmplWindow();
+			// TODO
 			break;
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
