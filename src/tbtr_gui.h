@@ -23,8 +23,12 @@
 
 #include "tbtr_template_vehicle.h"
 
+// TODO prefix these names with TBTR or something
+//		e.g. GUIEngineList was already taken
+// TODO use a common prefix for all 3, i.e. rename GUITemplateEngineList into something else
 typedef GUIList<const Group*> GUIGroupList;
 typedef GUIList<const TemplateVehicle*> GUITemplateList;
+typedef GUIList<const Engine*> GUITemplateEngineList;
 
 /*
  * TBTR's main window - for managing templates and setting up train groups for replacement.
@@ -43,6 +47,8 @@ public:
 private:
 	void BuildGroupList();
 	void BuildTemplateList();
+	void BuildTemplateEngineList();
+	void DrawEngines(const Rect&) const;
 	void DrawGroups(const Rect&) const;
 	void DrawTemplateInfo(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
@@ -54,6 +60,7 @@ private:
 	int index_selected_group = -1;
 	int index_selected_template = -1;
 	GUIGroupList groups;                ///< List of groups
+	GUITemplateEngineList engines;              ///< List of new engines to add to the templates
 	GUITemplateList templates;
 	RailType railtype;
 };
