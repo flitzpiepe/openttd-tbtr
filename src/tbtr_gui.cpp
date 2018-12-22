@@ -59,6 +59,7 @@ enum TemplateReplaceWindowWidgets {
 
 	// new engines
 	TRW_WIDGET_NEW_ENGINES_MATRIX,
+	TRW_WIDGET_NEW_ENGINES_SCROLLBAR,
 };
 
 static const NWidgetPart _widgets[] = {
@@ -74,8 +75,9 @@ static const NWidgetPart _widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 
 		/* New engines */
-		NWidget(NWID_VERTICAL),
-			NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_NEW_ENGINES_MATRIX), SetMinimalSize(100, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0),
+		NWidget(NWID_HORIZONTAL),
+			NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_NEW_ENGINES_MATRIX), SetMinimalSize(100, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_NEW_ENGINES_SCROLLBAR),
+			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_NEW_ENGINES_SCROLLBAR),
 		EndContainer(),
 
 		/* Template Ctrl */
@@ -174,6 +176,8 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
+	this->vscroll_engines = GetScrollbar(TRW_WIDGET_NEW_ENGINES_SCROLLBAR);
+	this->vscroll_engines->SetStepSize(line_height);
 	this->vscroll_groups = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
 	this->vscroll_templates = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
 	this->vscroll_groups->SetStepSize(line_height / 2);
@@ -235,6 +239,7 @@ void TbtrGui::BuildTemplateEngineList()
 	}
 	this->engines.Compact();
 	this->engines.RebuildDone();
+	this->vscroll_engines->SetCount(this->engines.Length());
 }
 
 /*
@@ -311,11 +316,12 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
  */
 void TbtrGui::DrawEngines(const Rect& r) const
 {
-	// TODO
-	if ( this->engines.Length() > 0 )
-	{
-		const Engine* engine = (this->engines)[0];
-		DrawVehicleEngine(r.left+10, r.right, r.left, r.top+12, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
+	uint max = min(vscroll_engines->GetPosition() + vscroll_engines->GetCapacity(), this->engines.Length());
+	uint y = r.top + 12;
+	for ( uint i = vscroll_engines->GetPosition(); i<max; ++i ) {
+		const Engine* engine = (this->engines)[i];
+		DrawVehicleEngine(r.left+10, r.right, r.left, y, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
+		y += this->line_height / 2;
 	}
 }
 
@@ -619,6 +625,11 @@ void TbtrGui::OnResize()
 	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
 	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
 	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+
+	/* Engines List */
+	NWidgetCore* nwi3 = this->GetWidget<NWidgetCore>(TRW_WIDGET_NEW_ENGINES_MATRIX);
+	this->vscroll_engines->SetCapacityFromWidget(this, TRW_WIDGET_NEW_ENGINES_MATRIX);
+	nwi3->widget_data = (this->vscroll_engines->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
 /*
