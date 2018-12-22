@@ -315,7 +315,7 @@ void TbtrGui::DrawEngines(const Rect& r) const
 	if ( this->engines.Length() > 0 )
 	{
 		const Engine* engine = (this->engines)[0];
-		DrawVehicleEngine(r.left, r.right, left, r.top, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
+		DrawVehicleEngine(r.left+10, r.right, r.left, r.top+12, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
 	}
 }
 
