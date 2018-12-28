@@ -28,7 +28,7 @@
 // TODO use a common prefix for all 3, i.e. rename GUITemplateEngineList into something else
 typedef GUIList<const Group*> GUIGroupList;
 typedef GUIList<const TemplateVehicle*> GUITemplateList;
-typedef GUIList<const Engine*> GUITemplateEngineList;
+typedef GUIList<EngineID> GUITemplateEngineList;
 
 /*
  * TBTR's main window - for managing templates and setting up train groups for replacement.

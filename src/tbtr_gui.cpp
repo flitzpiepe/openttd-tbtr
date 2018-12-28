@@ -170,6 +170,38 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 	return r;
 }
 
+/* Sorting functions copied from build_vehicle_gui.cpp */
+
+/**
+ * Determines order of engines by engineID
+ * @param *a first engine to compare
+ * @param *b second engine to compare
+ * @return for descending order: returns < 0 if a < b and > 0 for a > b. Vice versa for ascending order and 0 for equal
+ */
+static int CDECL EngineNumberSorter(const EngineID *a, const EngineID *b)
+{
+	int r = Engine::Get(*a)->list_position - Engine::Get(*b)->list_position;
+
+	return _engine_sort_direction ? -r : r;
+}
+
+/**
+ * Determines order of train engines by engine / wagon
+ * @param *a first engine to compare
+ * @param *b second engine to compare
+ * @return for descending order: returns < 0 if a < b and > 0 for a > b. Vice versa for ascending order and 0 for equal
+ */
+static int CDECL TrainEnginesThenWagonsSorter(const EngineID* a, const EngineID* b)
+{
+	int val_a = (RailVehInfo(*a)->railveh_type == RAILVEH_WAGON ? 1 : 0);
+	int val_b = (RailVehInfo(*b)->railveh_type == RAILVEH_WAGON ? 1 : 0);
+	int r = val_a - val_b;
+
+	/* Use EngineID to sort instead since we want consistent sorting */
+	if (r == 0) return EngineNumberSorter(a, b);
+	return _engine_sort_direction ? -r : r;
+}
+
 /**
  * Constructor, initialize GUI with a window descriptor
  */
@@ -200,8 +232,8 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->groups.Sort(&GroupNameSorter);
 
 	BuildTemplateList();
-}
 
+}
 /*
  * Recalculate the size of the window's components
  */
@@ -234,15 +266,15 @@ void TbtrGui::BuildTemplateEngineList()
 	}
 	this->engines.Clear();
 	const Engine* e;
-	FOR_ALL_ENGINES(e) {
-		if ( e->type == VEH_TRAIN )
-			 if ( e->IsEnabled() )
-				 if ( HasBit(e->company_avail, this->owner) )
-					*(this->engines).Append() = e;
+	FOR_ALL_ENGINES_OF_TYPE(e, VEH_TRAIN) {
+		if ( e->IsEnabled() )
+			if ( HasBit(e->company_avail, this->owner) )
+				*(this->engines).Append() = e->index;
 	}
 	this->engines.Compact();
 	this->engines.RebuildDone();
 	this->vscroll_engines->SetCount(this->engines.Length());
+	this->engines.Sort(&TrainEnginesThenWagonsSorter);
 }
 
 /*
@@ -320,9 +352,10 @@ void TbtrGui::DrawWidget(const Rect& r, int widget) const
 void TbtrGui::DrawEngines(const Rect& r) const
 {
 	uint max = min(vscroll_engines->GetPosition() + vscroll_engines->GetCapacity(), this->engines.Length());
-	uint y = r.top + 12;
+	uint y = r.top + 6;
 	for ( uint i = vscroll_engines->GetPosition(); i<max; ++i ) {
-		const Engine* engine = (this->engines)[i];
+		EngineID eid = (this->engines)[i];
+		const Engine* engine = Engine::Get(eid);
 		DrawVehicleEngine(r.left+10, r.right, r.left, y, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
 		y += this->line_height / 2;
 	}
