@@ -218,13 +218,15 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 			size->height = 4 * resize->height;
 			break;
 		case TRW_WIDGET_NEW_ENGINES_MATRIX:
-			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP);
+			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
 			size->height = 4 * resize->height;
 			break;
 	}
 }
 
-// TODO comment
+/**
+ * Build the list of engines that can be selected for new or existing templates
+ */
 void TbtrGui::BuildTemplateEngineList()
 {
 	if (!this->engines.NeedRebuild()) {
@@ -233,7 +235,10 @@ void TbtrGui::BuildTemplateEngineList()
 	this->engines.Clear();
 	const Engine* e;
 	FOR_ALL_ENGINES(e) {
-		*(this->engines).Append() = e;
+		if ( e->type == VEH_TRAIN )
+			 if ( e->IsEnabled() )
+				 if ( HasBit(e->company_avail, this->owner) )
+					*(this->engines).Append() = e;
 	}
 	this->engines.Compact();
 	this->engines.RebuildDone();
