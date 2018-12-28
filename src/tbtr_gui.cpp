@@ -186,8 +186,6 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	 * this should be ok */
 	FinishInitNested(VEH_TRAIN);
 
-	this->line_height = this->resize.step_height * 2;
-
 	/* will be used to build the internal group and template lists
 	 *
 	 * NOTE: has to be set after FinishInitNested(...) because this function will set the owner back to
