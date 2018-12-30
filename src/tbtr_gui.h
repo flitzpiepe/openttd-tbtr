@@ -58,6 +58,7 @@ private:
 	Scrollbar* vscroll_groups;          ///< Scrollbar for the group list
 	Scrollbar* vscroll_templates;       ///< Scrollbar for the template list
 	uint16 line_height = 26;            ///< step size for the matrix widgets
+	int index_selected_engine = -1;
 	int index_selected_group = -1;
 	int index_selected_template = -1;
 	GUIGroupList groups;                ///< List of groups

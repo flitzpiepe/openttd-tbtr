@@ -354,6 +354,11 @@ void TbtrGui::DrawEngines(const Rect& r) const
 	uint max = min(vscroll_engines->GetPosition() + vscroll_engines->GetCapacity(), this->engines.Length());
 	uint y = r.top + 6;
 	for ( uint i = vscroll_engines->GetPosition(); i<max; ++i ) {
+		/* Fill the background of the current cell in a darker tone for the currently selected group */
+		if ( this->index_selected_engine == (int)i ) {
+			GfxFillRect(left, y-(this->line_height)/4, r.right, y+(this->line_height)/4, _colour_gradient[COLOUR_GREY][3]);
+		}
+		/* Draw the engine */
 		EngineID eid = (this->engines)[i];
 		const Engine* engine = Engine::Get(eid);
 		DrawVehicleEngine(r.left+10, r.right, r.left, y, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
@@ -553,6 +558,14 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_NEW_ENGINES_MATRIX:
 		{
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_NEW_ENGINES_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_engines->GetPosition();
+			if ( index_new >= this->engines.Length() )
+				this->index_selected_engine = -1;
+			else if ( this->index_selected_engine == index_new )
+				this->index_selected_engine = -1;
+			else
+				this->index_selected_engine = index_new;
+			break;
 		}
 		case TRW_WIDGET_TOP_MATRIX:
 		{
