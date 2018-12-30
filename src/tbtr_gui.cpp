@@ -607,7 +607,23 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_ADD:
 		{
-			// TODO
+			/* get the selected engine */
+			if ( index_selected_engine == -1 )
+				return;
+			const Engine* engine = Engine::Get(engines[index_selected_engine]);
+			if ( engine == NULL )
+				return;
+
+			/* get the currently selected template */
+			TemplateID tvid = INVALID_TEMPLATE;
+			if ( index_selected_template >= 0 )
+				tvid = TemplateVehicle::Get(templates[index_selected_template]->index)->index;
+
+			/* add the engine */
+			DoCommandP(INVALID_TILE, tvid, 0, CMD_TEMPLATE_ADD_ENGINE);
+
+			// TODO update the template list and update the gui
+
 			break;
 		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:

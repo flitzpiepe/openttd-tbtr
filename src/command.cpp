@@ -199,6 +199,7 @@ CommandProc CmdSetTimetableStart;
 
 CommandProc CmdOpenCloseAirport;
 
+CommandProc CmdTemplateAddEngine;
 CommandProc CmdTemplateReplacement;
 CommandProc CmdStartStopTbtr;
 CommandProc CmdToggleTemplateOption;
@@ -363,6 +364,7 @@ static const Command _command_proc_table[] = {
 
 	DEF_CMD(CmdOpenCloseAirport,                               0, CMDT_ROUTE_MANAGEMENT      ), // CMD_OPEN_CLOSE_AIRPORT
 
+	DEF_CMD(CmdTemplateAddEngine,                              0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_TEMPLATE_ADD_ENGINE
 	DEF_CMD(CmdTemplateReplacement,                            0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_TEMPLATE_REPLACEMENT
 	DEF_CMD(CmdStartStopTbtr,                                  0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_START_STOP_TBTR
 	DEF_CMD(CmdToggleTemplateOption,                           0, CMDT_VEHICLE_CONSTRUCTION  ), // CMD_TOGGLE_TEMPLATE_OPTION

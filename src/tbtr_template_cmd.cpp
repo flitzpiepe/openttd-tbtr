@@ -388,6 +388,24 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	return cc;
 }
 
+// TODO comment
+CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	// TODO
+
+	TemplateID tid = static_cast<TemplateID>(p1);
+	TemplateVehicle* tv = NULL;
+
+	if ( flags == DC_EXEC)
+	{
+		if ( tid == INVALID_VEHICLE )
+			tv = new TemplateVehicle();
+		else
+			tv = TemplateVehicle::Get(p1);
+	}
+	return CommandCost();
+}
+
 /**
  * Start or stop the template relacement for a given group by assigning a template to it
  *

@@ -114,6 +114,7 @@ TemplateID FindTemplateIndexForGroup(GroupID);
 
 
 /* Command functions */
+CommandCost CmdTemplateAddEngine(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdStartStopTbtr(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdCloneTemplateFromTrain(TileIndex, DoCommandFlag, uint32, uint32, char const*);
