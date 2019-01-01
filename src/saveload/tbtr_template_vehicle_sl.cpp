@@ -21,6 +21,7 @@ const SaveLoad* GTD() {
 		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
 		SLE_REF(TemplateVehicle, first,                     REF_TEMPLATE_VEHICLE),
+		SLE_REF(TemplateVehicle, last,                      REF_TEMPLATE_VEHICLE),
 		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
 
 		SLE_VAR(TemplateVehicle, engine_type,               SLE_UINT16),

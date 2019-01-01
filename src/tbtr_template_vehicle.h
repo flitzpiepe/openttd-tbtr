@@ -59,6 +59,7 @@ public:
 	TemplateVehicle* next;              ///< pointer to the next template vehicle in the chain
 	TemplateVehicle* prev;              ///< NOSAVE: pointer to the previous template vehicle in the chain
 	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
+	TemplateVehicle* last;              ///< NOSAVE: pointer to the last template vehicle in the chain
 
 	/** essential template info */
 	Owner owner;                        ///< template owner

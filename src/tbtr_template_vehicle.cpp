@@ -65,6 +65,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 		return false;
 
 	this->first = chainHead ? chainHead : this;
+	this->first->last = this;
 	this->engine_type = train->engine_type;
 	this->subtype = train->subtype;
 	this->railtype = train->railtype;
