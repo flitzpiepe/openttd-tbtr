@@ -389,20 +389,35 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 }
 
 // TODO comment
+/**
+ * @param p1:   pointer to the template vehicle, this can be any member of a template train
+ * @param p2:   engine ID to be added
+ */
 CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
 	// TODO
 
 	TemplateID tid = static_cast<TemplateID>(p1);
-	TemplateVehicle* tv = NULL;
+	//EngineID eid = static_cast<EngineID>(p2);
+	const Engine* engine = Engine::Get(p2);
 
-	if ( flags == DC_EXEC)
-	{
-		if ( tid == INVALID_VEHICLE )
-			tv = new TemplateVehicle();
-		else
-			tv = TemplateVehicle::Get(p1);
+	if ( flags == DC_EXEC) {
+		if (!TemplateVehicle::CanAllocateItem())
+			return CMD_ERROR;
+		TemplateVehicle* tv = new TemplateVehicle();
+		tv->engine_type = p2;
+		// TODO update all attributes
+		if ( tid != INVALID_VEHICLE ) {
+			TemplateVehicle* head = TemplateVehicle::Get(p1)->first;
+			// TODO last must be set for all members of the existing_tv chain
+			//head->UpdateLastVehicle(tv);
+			head->last->next = tv;
+			tv->prev = head->last;
+			head->last = tv;
+			tv->first = head;
+		}
 	}
+
 	return CommandCost();
 }
 

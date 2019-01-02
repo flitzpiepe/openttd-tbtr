@@ -610,9 +610,12 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			/* get the selected engine */
 			if ( index_selected_engine == -1 )
 				return;
+			// TODO needed?
 			const Engine* engine = Engine::Get(engines[index_selected_engine]);
 			if ( engine == NULL )
 				return;
+
+			EngineID eid = engines[index_selected_engine];
 
 			/* get the currently selected template */
 			TemplateID tvid = INVALID_TEMPLATE;
@@ -620,7 +623,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				tvid = TemplateVehicle::Get(templates[index_selected_template]->index)->index;
 
 			/* add the engine */
-			DoCommandP(INVALID_TILE, tvid, 0, CMD_TEMPLATE_ADD_ENGINE);
+			DoCommandP(0, tvid, eid, CMD_TEMPLATE_ADD_ENGINE);
 
 			// TODO update the template list and update the gui
 
