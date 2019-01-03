@@ -215,3 +215,17 @@ bool TemplateVehicle::TrainNeedsReplacement(Train* t)
 	/* check if one chain ended before the other */
 	return (!tv && t) || (tv && !t);
 }
+
+/**
+ * Update the last pointer on each member of this chain of TemplateVehicle's
+ *
+ * @param last:   the new last vehicle
+ */
+void TemplateVehicle::UpdateLastVehicle(TemplateVehicle* last)
+{
+	TemplateVehicle* tmp = this->first;
+	while ( tmp ) {
+		tmp->last = last;
+		tmp = tmp->next;
+	}
+}

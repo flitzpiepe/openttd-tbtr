@@ -388,43 +388,44 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	return cc;
 }
 
-// TODO comment
 /**
- * @param p1:   pointer to the template vehicle, this can be any member of a template train
+ * Append a new engine to a template vehicle; if it doesn't exist yet, create a new template chain
+ *
+ * @param ti:   not used
+ * @param p1:   pointer to the template vehicle, this can be any member of a template train or even NULL, in
+ *              which case a new chain will be created
  * @param p2:   engine ID to be added
+ * @param msg:  not used
+ *
+ * @return:     either a default CommandCost object or CMD_ERROR
  */
 CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
-	// TODO
-
 	TemplateID tid = static_cast<TemplateID>(p1);
-	//EngineID eid = static_cast<EngineID>(p2);
 	const Engine* engine = Engine::Get(p2);
 
 	if ( flags == DC_EXEC) {
 		if (!TemplateVehicle::CanAllocateItem())
 			return CMD_ERROR;
 		TemplateVehicle* tv = new TemplateVehicle();
+
+		if ( tid != INVALID_VEHICLE ) {
+			TemplateVehicle* head = TemplateVehicle::Get(p1)->first;
+			head->last->next = tv;
+			tv->prev = head->last;
+			head->UpdateLastVehicle(tv);
+			tv->first = head;
+		}
+
 		tv->engine_type = p2;
-		// TODO update all attributes
-		//- this->subtype = train->subtype;
-		//- this->railtype = train->railtype;
-		//- this->cargo_type = train->cargo_type;
-		//- this->cargo_subtype = train->cargo_subtype;
+		tv->railtype = engine->u.rail.railtype;
+		tv->cargo_type = engine->GetDefaultCargoType();
+		tv->cargo_subtype = 0;
 		tv->cargo_cap = engine->GetDisplayDefaultCapacity();
 		tv->max_speed = engine->GetDisplayMaxSpeed();
 		tv->power = engine->GetPower();
 		tv->weight = engine->GetDisplayWeight();
 		tv->max_te = engine->GetDisplayMaxTractiveEffort();
-		if ( tid != INVALID_VEHICLE ) {
-			TemplateVehicle* head = TemplateVehicle::Get(p1)->first;
-			// TODO last must be set for all members of the existing_tv chain
-			//head->UpdateLastVehicle(tv);
-			head->last->next = tv;
-			tv->prev = head->last;
-			head->last = tv;
-			tv->first = head;
-		}
 	}
 
 	return CommandCost();

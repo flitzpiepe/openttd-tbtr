@@ -109,6 +109,8 @@ public:
 	void Draw(int, int, int) const;
 
 	bool TrainNeedsReplacement(Train*);
+
+	void UpdateLastVehicle(TemplateVehicle*);
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
