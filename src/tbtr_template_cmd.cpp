@@ -407,17 +407,22 @@ CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, u
 	if ( flags == DC_EXEC) {
 		if (!TemplateVehicle::CanAllocateItem())
 			return CMD_ERROR;
-		TemplateVehicle* tv = new TemplateVehicle();
+		TemplateVehicle* tv = new TemplateVehicle(p2);
 
-		if ( tid != INVALID_VEHICLE ) {
-			TemplateVehicle* head = TemplateVehicle::Get(p1)->first;
+		TemplateVehicle* head = TemplateVehicle::GetIfValid(tid);
+		if ( head ) {
+			head = head->first;
 			head->last->next = tv;
 			tv->prev = head->last;
 			head->UpdateLastVehicle(tv);
 			tv->first = head;
+			// TODO need to set subtype
+		}
+		else {
+			// TODO this subtype is specific for (single-headed?) engines
+			tv->subtype = 9;
 		}
 
-		tv->engine_type = p2;
 		tv->railtype = engine->u.rail.railtype;
 		tv->cargo_type = engine->GetDefaultCargoType();
 		tv->cargo_subtype = 0;

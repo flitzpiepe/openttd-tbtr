@@ -178,7 +178,8 @@ void TemplateVehicle::Init(EngineID eid)
 {
 	this->next = NULL;
 	this->prev = NULL;
-	this->first = NULL;
+	this->first = this;
+	this->last = this;
 
 	this->engine_type = eid;
 	this->owner = _current_company;
