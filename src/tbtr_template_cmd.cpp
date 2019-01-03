@@ -407,6 +407,15 @@ CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, u
 		TemplateVehicle* tv = new TemplateVehicle();
 		tv->engine_type = p2;
 		// TODO update all attributes
+		//- this->subtype = train->subtype;
+		//- this->railtype = train->railtype;
+		//- this->cargo_type = train->cargo_type;
+		//- this->cargo_subtype = train->cargo_subtype;
+		tv->cargo_cap = engine->GetDisplayDefaultCapacity();
+		tv->max_speed = engine->GetDisplayMaxSpeed();
+		tv->power = engine->GetPower();
+		tv->weight = engine->GetDisplayWeight();
+		tv->max_te = engine->GetDisplayMaxTractiveEffort();
 		if ( tid != INVALID_VEHICLE ) {
 			TemplateVehicle* head = TemplateVehicle::Get(p1)->first;
 			// TODO last must be set for all members of the existing_tv chain
