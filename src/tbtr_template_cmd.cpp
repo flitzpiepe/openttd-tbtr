@@ -38,6 +38,29 @@ TemplateVehicle* GetTemplateForTrain(Train* t)
 }
 
 /**
+ * Get the correct subtype for an engine for a new template
+ *
+ * @param e:         the engine
+ * @param is_head:   true if the new template will be the head of a new chain
+ */
+byte DetermineSubtype(const Engine* e, bool is_head)
+{
+	byte subtype = 0;
+	if ( e->u.rail.railveh_type == RAILVEH_WAGON ) {
+		subtype = 4;
+		if ( is_head )
+			subtype |= (1<<GVSF_FREE_WAGON);
+	}
+	else {
+		subtype = 8;
+		if ( is_head )
+			subtype |= (1<<GVSF_FRONT);
+	}
+
+	return subtype;
+}
+
+/**
  * Neutralize a train's status (group, orders, etc).
  * @param train:	the train to be neutralized
  */
@@ -416,11 +439,10 @@ CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, u
 			tv->prev = head->last;
 			head->UpdateLastVehicle(tv);
 			tv->first = head;
-			// TODO need to set subtype
+			tv->subtype = DetermineSubtype(engine, false);
 		}
 		else {
-			// TODO this subtype is specific for (single-headed?) engines
-			tv->subtype = 9;
+			tv->subtype = DetermineSubtype(engine, true);
 		}
 
 		tv->railtype = engine->u.rail.railtype;
