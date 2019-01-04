@@ -78,12 +78,12 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	this->weight = gcache->cached_weight;
 	this->max_te = gcache->cached_max_te / 1000;
 
-	if ( train->Next() )
+	if ( train->GetNextUnit() )
 	{
 		TemplateVehicle* tv = new TemplateVehicle();
 		if ( chainHead == NULL )
 			chainHead = this;
-		tv->CloneFromTrain(train->Next(), chainHead);
+		tv->CloneFromTrain(train->GetNextUnit(), chainHead);
 		this->next = tv;
 	}
 
