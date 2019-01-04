@@ -627,9 +627,16 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				//old = TemplateVehicle::Get(templates[index_selected_template]->index)->index;
 
 			/* add the engine */
-			DoCommandP(0, tid, eid, CMD_TEMPLATE_ADD_ENGINE);
+			bool successful = DoCommandP(0, tid, eid, CMD_TEMPLATE_ADD_ENGINE);
 
 			// TODO update the template list and update the gui
+			if ( successful )
+			{
+				BuildTemplateList();
+				/* if no template was selected, select the newly created chain */
+				if ( this->index_selected_template == -1 )
+					this->index_selected_template = this->templates.Length() - 1;
+			}
 
 			break;
 		}
@@ -656,7 +663,6 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
-
 	}
 	this->SetDirty();
 }
