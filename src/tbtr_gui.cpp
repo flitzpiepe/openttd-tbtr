@@ -16,12 +16,16 @@ enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
 
 	TRW_WIDGET_INSET_GROUPS,
-	TRW_WIDGET_TOP_MATRIX,
-	TRW_WIDGET_TOP_SCROLLBAR,
+	TRW_WIDGET_MATRIX_GROUPS,
+	TRW_WIDGET_SCROLLBAR_GROUPS,
 
 	TRW_WIDGET_INSET_TEMPLATES,
-	TRW_WIDGET_BOTTOM_MATRIX,
-	TRW_WIDGET_BOTTOM_SCROLLBAR,
+	TRW_WIDGET_MATRIX_TEMPLATES,
+	TRW_WIDGET_SCROLLBAR_TEMPLATES,
+
+	TRW_WIDGET_INSET_ENGINES,
+	TRW_WIDGET_MATRIX_ENGINES,
+	TRW_WIDGET_SCROLLBAR_ENGINES,
 
 	TRW_WIDGET_TMPL_INFO_INSET,
 	TRW_WIDGET_TMPL_INFO_PANEL,
@@ -55,10 +59,6 @@ enum TemplateReplaceWindowWidgets {
 	TRW_WIDGET_STOP,
 
 	TRW_WIDGET_SEL_TMPL_DISPLAY_CREATE,
-
-	// new engines
-	TRW_WIDGET_NEW_ENGINES_MATRIX,
-	TRW_WIDGET_NEW_ENGINES_SCROLLBAR,
 };
 
 static const NWidgetPart _widgets[] = {
@@ -74,9 +74,12 @@ static const NWidgetPart _widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 
 		/* New engines */
-		NWidget(NWID_HORIZONTAL),
-			NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_NEW_ENGINES_MATRIX), SetMinimalSize(100, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_NEW_ENGINES_SCROLLBAR),
-			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_NEW_ENGINES_SCROLLBAR),
+		NWidget(NWID_VERTICAL),
+			NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_ENGINES), SetMinimalSize(216,12), SetFill(1,0),  SetDataTip(STR_TBTR_AVAILABLE_ENGINES, STR_TBTR_AVAILABLE_ENGINES), SetResize(1, 0), EndContainer(),
+			NWidget(NWID_HORIZONTAL),
+				NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_ENGINES), SetMinimalSize(100, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_SCROLLBAR_ENGINES),
+				NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_ENGINES),
+			EndContainer(),
 		EndContainer(),
 
 		/* Template Ctrl */
@@ -85,16 +88,16 @@ static const NWidgetPart _widgets[] = {
 			NWidget(NWID_VERTICAL),
 				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_GROUPS), SetMinimalSize(216,12), SetDataTip(STR_TBTR_MAINGUI_DEFINEDGROUPS, STR_TBTR_MAINGUI_DEFINEDGROUPS), SetResize(1, 0), EndContainer(),
 				NWidget(NWID_HORIZONTAL),
-					NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_TOP_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_TOP_SCROLLBAR),
-					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_TOP_SCROLLBAR),
+					NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_GROUPS), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_SCROLLBAR_GROUPS),
+					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_GROUPS),
 				EndContainer(),
 			EndContainer(),
 			/* Template Display */
 			NWidget(NWID_VERTICAL),
 				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_TEMPLATES), SetMinimalSize(216,12), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), SetResize(1, 0), EndContainer(),
 				NWidget(NWID_HORIZONTAL),
-					NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_BOTTOM_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR),
-					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_BOTTOM_SCROLLBAR),
+					NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_TEMPLATES), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES),
+					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_TEMPLATES),
 				EndContainer(),
 			EndContainer(),
 			/* Info Area */
@@ -206,10 +209,10 @@ static int CDECL TrainEnginesThenWagonsSorter(const EngineID* a, const EngineID*
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
-	this->vscroll_engines = GetScrollbar(TRW_WIDGET_NEW_ENGINES_SCROLLBAR);
+	this->vscroll_engines = GetScrollbar(TRW_WIDGET_SCROLLBAR_ENGINES);
 	this->vscroll_engines->SetStepSize(line_height);
-	this->vscroll_groups = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
-	this->vscroll_templates = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
+	this->vscroll_groups = GetScrollbar(TRW_WIDGET_SCROLLBAR_GROUPS);
+	this->vscroll_templates = GetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES);
 	this->vscroll_groups->SetStepSize(line_height / 2);
 	this->vscroll_templates->SetStepSize(line_height);
 	/* VEH_TRAIN should be 0; we want only 1 instance of this GUI to be present at the same time anyway, so
@@ -239,15 +242,15 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 {
 	switch (widget)
 	{
-		case TRW_WIDGET_TOP_MATRIX:
+		case TRW_WIDGET_MATRIX_GROUPS:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
 			size->height = 8 * resize->height;
 			break;
-		case TRW_WIDGET_BOTTOM_MATRIX:
+		case TRW_WIDGET_MATRIX_TEMPLATES:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP);
 			size->height = 4 * resize->height;
 			break;
-		case TRW_WIDGET_NEW_ENGINES_MATRIX:
+		case TRW_WIDGET_MATRIX_ENGINES:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
 			size->height = 4 * resize->height;
 			break;
@@ -325,15 +328,15 @@ void TbtrGui::BuildTemplateList()
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
-		case TRW_WIDGET_TOP_MATRIX: {
+		case TRW_WIDGET_MATRIX_GROUPS: {
 			this->DrawGroups(r);
 			break;
 		}
-		case TRW_WIDGET_BOTTOM_MATRIX: {
+		case TRW_WIDGET_MATRIX_TEMPLATES: {
 			this->DrawTemplates(r);
 			break;
 		}
-		case TRW_WIDGET_NEW_ENGINES_MATRIX: {
+		case TRW_WIDGET_MATRIX_ENGINES: {
 			this->DrawEngines(r);
 			break;
 		}
@@ -554,9 +557,9 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			break;
 		}
-		case TRW_WIDGET_NEW_ENGINES_MATRIX:
+		case TRW_WIDGET_MATRIX_ENGINES:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_NEW_ENGINES_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_engines->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_ENGINES]->pos_y) / (this->line_height/2) ) + this->vscroll_engines->GetPosition();
 			if ( index_new >= this->engines.Length() )
 				this->index_selected_engine = -1;
 			else if ( this->index_selected_engine == index_new )
@@ -565,9 +568,9 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_engine = index_new;
 			break;
 		}
-		case TRW_WIDGET_TOP_MATRIX:
+		case TRW_WIDGET_MATRIX_GROUPS:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_GROUPS]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
 			if ( index_new >= this->groups.Length() )
 				this->index_selected_group = -1;
 			else if ( this->index_selected_group == index_new )
@@ -576,9 +579,9 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_group = index_new;
 			break;
 		}
-		case TRW_WIDGET_BOTTOM_MATRIX:
+		case TRW_WIDGET_MATRIX_TEMPLATES:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_BOTTOM_MATRIX]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_TEMPLATES]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
 			if ( index_new >= this->templates.Length() )
 				this->index_selected_template = -1;
 			else if ( this->index_selected_template == index_new )
@@ -684,18 +687,18 @@ void TbtrGui::OnPaint()
 void TbtrGui::OnResize()
 {
 	/* Top Matrix */
-	NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
-	this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
+	NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_GROUPS);
+	this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_GROUPS);
 	nwi->widget_data = (this->vscroll_groups->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
 	/* Bottom Matrix */
-	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
-	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
+	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_TEMPLATES);
+	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
 	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
 	/* Engines List */
-	NWidgetCore* nwi3 = this->GetWidget<NWidgetCore>(TRW_WIDGET_NEW_ENGINES_MATRIX);
-	this->vscroll_engines->SetCapacityFromWidget(this, TRW_WIDGET_NEW_ENGINES_MATRIX);
+	NWidgetCore* nwi3 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_ENGINES);
+	this->vscroll_engines->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_ENGINES);
 	nwi3->widget_data = (this->vscroll_engines->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 

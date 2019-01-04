@@ -315,6 +315,7 @@ STR_SORT_BY_RATING                                              :Rating
 STR_TBTR_RPL_TITLE												:{WHITE}Template Replacement
 STR_TBTR_TEMPLATE_REPLACEMENT									:Template Replacement
 STR_TBTR_TRAINS_IN_GROUP										:{BLACK}Trains in group
+STR_TBTR_AVAILABLE_ENGINES									    :{BLACK}Available Engines
 STR_TBTR_AVAILABLE_TEMPLATES									:{BLACK}Available Templates
 STR_TBTR_ADD_TEMPLATE										    :{BLACK}Add Template
 STR_TBTR_CREATE_CLONE_VEH										:{BLACK}Clone
