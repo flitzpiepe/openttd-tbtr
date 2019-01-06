@@ -359,10 +359,14 @@ void TbtrGui::DrawEngines(const Rect& r) const
 		if ( this->index_selected_engine == (int)i ) {
 			GfxFillRect(left, y-(this->line_height)/4, r.right, y+(this->line_height)/4, _colour_gradient[COLOUR_GREY][3]);
 		}
-		/* Draw the engine */
+		/* Draw the engine's image */
 		EngineID eid = (this->engines)[i];
 		const Engine* engine = Engine::Get(eid);
 		DrawVehicleEngine(r.left+10, r.right, r.left, y, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
+
+		/* Draw the engine's name */
+		DrawString(r.left+60, r.right, y-3, engine->info.string_id, TC_BLACK);
+
 		y += this->line_height / 2;
 	}
 }
