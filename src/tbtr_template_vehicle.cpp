@@ -144,17 +144,14 @@ int TemplateVehicle::CountGroups() const
 void TemplateVehicle::Draw(uint left, uint right, int y) const
 {
 	/* don't draw outside of the bounding box'es area */
-	uint spr_width = 0, spr_height = 0;
-	int sx = 0, sy = 0;
-	GetTrainSpriteSize(this->engine_type, spr_width, spr_height, sx, sy, EIT_PURCHASE);
-	if ( spr_width + left >= right )
+	if ( this->sprite_width + left >= right )
 		return;
 
 	/* draw this + rest of the chain */
 	DrawVehicleEngine(left, right, left, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
 	TemplateVehicle* next = this->GetNextUnit();
 	if ( next )
-		next->Draw(left+spr_width, right, y);
+		next->Draw(left+this->sprite_width, right, y);
 }
 
 /*
@@ -187,6 +184,9 @@ void TemplateVehicle::Init(EngineID eid)
 	this->owner = _current_company;
 	this->real_length = 0;
 	this->image_width = 0;
+
+	/* cache the sprite dimensions for this template's engine */
+	GetTrainSpriteSize(this->engine_type, this->sprite_width, this->sprite_height, this->sprite_xoff, this->sprite_yoff, EIT_PURCHASE);
 
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;
