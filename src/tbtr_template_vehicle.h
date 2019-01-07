@@ -106,7 +106,7 @@ public:
 	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
 
-	void Draw(int, int, int) const;
+	void Draw(uint, uint, int) const;
 
 	bool TrainNeedsReplacement(Train*);
 

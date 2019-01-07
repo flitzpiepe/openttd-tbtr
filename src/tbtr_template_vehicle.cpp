@@ -141,18 +141,20 @@ int TemplateVehicle::CountGroups() const
  * @param right: right border of the bounding box
  * @param y:     y-coordinate of the bounding box
  */
-void TemplateVehicle::Draw(int left, int right, int y) const
+void TemplateVehicle::Draw(uint left, uint right, int y) const
 {
-	DrawVehicleEngine(left+50, right, left+50, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
+	/* don't draw outside of the bounding box'es area */
+	uint spr_width = 0, spr_height = 0;
+	int sx = 0, sy = 0;
+	GetTrainSpriteSize(this->engine_type, spr_width, spr_height, sx, sy, EIT_PURCHASE);
+	if ( spr_width + left >= right )
+		return;
 
+	/* draw this + rest of the chain */
+	DrawVehicleEngine(left, right, left, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
 	TemplateVehicle* next = this->GetNextUnit();
 	if ( next )
-	{
-		uint spr_width = 0, spr_height = 0;
-		int sx = 0, sy = 0;
-		GetTrainSpriteSize(this->engine_type, spr_width, spr_height, sx, sy, EIT_PURCHASE);
 		next->Draw(left+spr_width, right, y);
-	}
 }
 
 /*
