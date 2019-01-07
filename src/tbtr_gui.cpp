@@ -216,6 +216,7 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->vscroll_engines = GetScrollbar(TRW_WIDGET_SCROLLBAR_ENGINES);
 	this->vscroll_engines->SetStepSize(line_height);
 	this->vscroll_groups = GetScrollbar(TRW_WIDGET_SCROLLBAR_GROUPS);
+	this->hscroll_templates = GetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES_HORIZ);
 	this->vscroll_templates = GetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES);
 	this->vscroll_groups->SetStepSize(line_height / 2);
 	this->vscroll_templates->SetStepSize(line_height);
@@ -708,6 +709,9 @@ void TbtrGui::OnResize()
 	/* Bottom Matrix */
 	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_TEMPLATES);
 	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
+	// TODO
+	this->hscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
+	//this->hscroll_templates->SetCapacity(nwi->current_x - this->header_width - this->count_width);
 	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
 	/* Engines List */

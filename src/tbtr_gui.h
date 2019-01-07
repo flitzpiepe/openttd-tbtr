@@ -56,7 +56,8 @@ private:
 
 	Scrollbar* vscroll_engines;         ///< Scrollbar for the engines list
 	Scrollbar* vscroll_groups;          ///< Scrollbar for the group list
-	Scrollbar* vscroll_templates;       ///< Scrollbar for the template list
+	Scrollbar* hscroll_templates;       ///< Horizontal scrollbar for the template list
+	Scrollbar* vscroll_templates;       ///< Vertical scrollbar for the template list
 	uint16 line_height = 26;            ///< step size for the matrix widgets
 	int index_selected_engine = -1;
 	int index_selected_group = -1;
