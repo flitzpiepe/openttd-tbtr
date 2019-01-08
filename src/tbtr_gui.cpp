@@ -496,7 +496,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		tv->Draw(left, right, y, hscroll_templates->GetPosition());
+		tv->Draw(left+50, right, y, hscroll_templates->GetPosition()+50);
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
