@@ -154,6 +154,17 @@ void TemplateVehicle::Draw(uint left, uint right, int y) const
 		next->Draw(left+this->sprite_width, right, y);
 }
 
+/**
+ * Calculate the sum of all sprite widths of this template and the rest of the chain
+ */
+uint TemplateVehicle::GetChainDisplayLength() const
+{
+	uint sum = 0;
+	for ( const TemplateVehicle* tmp=this; tmp; tmp=tmp->next )
+		sum += tmp->sprite_width;
+	return sum;
+}
+
 /*
  * Return the next 'real' unit following this template, i.e. disregarding articulated parts.
  *

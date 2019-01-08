@@ -109,6 +109,7 @@ public:
 	/* Count the number of groups which use this template vehicle */
 	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
+	uint GetChainDisplayLength() const;			///< the sum of the sprite lengths of this template and all following chain members
 
 	void Draw(uint, uint, int) const;
 
