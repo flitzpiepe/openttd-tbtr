@@ -320,14 +320,11 @@ void TbtrGui::BuildTemplateList()
 	FOR_ALL_TEMPLATES(tv) {
 		if (tv->HasOwner(this->owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
 			*(this->templates.Append()) = tv;
-
 	}
 
 	this->templates.RebuildDone();
 	this->vscroll_templates->SetCount(this->templates.Length());
-	if ( this->templates.Length() > 0 ) {
-		hscroll_templates->SetCount(templates[0]->GetChainDisplayLength());
-	}
+	this->hscroll_templates->SetCount(this->FindLongestTemplateLength());
 }
 
 /*
@@ -531,6 +528,17 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 
 		y += this->line_height;
 	}
+}
+
+uint TbtrGui::FindLongestTemplateLength() const
+{
+	uint max_len = 0;
+	for ( uint i=0; i<this->templates.Length(); ++i ) {
+		uint len = this->templates[i]->GetChainDisplayLength();
+		if ( len > max_len )
+			max_len = len;
+	}
+	return max_len;
 }
 
 int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
