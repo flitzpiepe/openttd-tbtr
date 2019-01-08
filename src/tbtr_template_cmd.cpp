@@ -543,7 +543,7 @@ CommandCost CmdCloneTemplateFromTrain(TileIndex ti, DoCommandFlag flags, uint32 
 
 	if ( flags == DC_EXEC )
 	{
-		TemplateVehicle* tv  = new TemplateVehicle();
+		TemplateVehicle* tv  = new TemplateVehicle(train->engine_type);
 		tv->CloneFromTrain(train, NULL);
 		tv->real_length = CeilDiv(train->gcache.cached_total_length * 10, TILE_SIZE);
 	}

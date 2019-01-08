@@ -51,8 +51,8 @@ enum TBTR_REPLACEMENT_OPTS {
  * trains. */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
 public:
-	TemplateVehicle(EngineID);
 	TemplateVehicle();
+	TemplateVehicle(EngineID);
 	~TemplateVehicle();
 	TemplateID index;                   ///< Vehicle index
 
@@ -111,7 +111,7 @@ public:
 	TemplateVehicle* GetNextUnit() const;
 	uint GetChainDisplayLength() const;			///< the sum of the sprite lengths of this template and all following chain members
 
-	void Draw(uint, uint, int, uint) const;
+	void Draw(uint, uint, int, int) const;
 
 	bool TrainNeedsReplacement(Train*);
 
