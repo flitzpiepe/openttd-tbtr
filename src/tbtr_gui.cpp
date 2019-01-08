@@ -325,6 +325,9 @@ void TbtrGui::BuildTemplateList()
 
 	this->templates.RebuildDone();
 	this->vscroll_templates->SetCount(this->templates.Length());
+	if ( this->templates.Length() > 0 ) {
+		hscroll_templates->SetCount(templates[0]->GetChainDisplayLength());
+	}
 }
 
 /*
@@ -496,7 +499,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		tv->Draw(left+50, right, y);
+		tv->Draw(left, right, y, hscroll_templates->GetPosition());
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
@@ -709,9 +712,7 @@ void TbtrGui::OnResize()
 	/* Bottom Matrix */
 	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_TEMPLATES);
 	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
-	// TODO
 	this->hscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
-	//this->hscroll_templates->SetCapacity(nwi->current_x - this->header_width - this->count_width);
 	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
 	/* Engines List */

@@ -141,17 +141,19 @@ int TemplateVehicle::CountGroups() const
  * @param right: right border of the bounding box
  * @param y:     y-coordinate of the bounding box
  */
-void TemplateVehicle::Draw(uint left, uint right, int y) const
+void TemplateVehicle::Draw(uint left, uint right, int y, uint x_offset=0) const
 {
 	/* don't draw outside of the bounding box'es area */
+	// TODO need to include the yoff here somewhere
 	if ( this->sprite_width + left >= right )
 		return;
 
 	/* draw this + rest of the chain */
-	DrawVehicleEngine(left, right, left, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
+	if ( left >= x_offset )
+		DrawVehicleEngine(left, right, left, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
 	TemplateVehicle* next = this->GetNextUnit();
 	if ( next )
-		next->Draw(left+this->sprite_width, right, y);
+		next->Draw(left+this->sprite_width, right, y, x_offset);
 }
 
 /**
