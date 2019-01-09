@@ -662,6 +662,27 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			break;
 		}
+		case TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH:
+		{
+			/* get the currently selected template */
+			TemplateID tid = INVALID_TEMPLATE;
+			if ( index_selected_template >= 0 )
+				tid = this->templates[index_selected_template]->index;
+			else
+				return;
+
+			/* delete the last engine */
+			bool successful = DoCommandP(0, tid, 0, CMD_TEMPLATE_DELETE_ENGINE);
+
+			if ( successful )
+			{
+				BuildTemplateList();
+				// TODO reset the index if the template has been removed completely
+				//this->index_selected_template = -1;
+			}
+
+			break;
+		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {

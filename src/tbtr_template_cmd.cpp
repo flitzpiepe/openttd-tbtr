@@ -458,6 +458,13 @@ CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, u
 	return CommandCost();
 }
 
+// TODO
+// p1: template vehicle id
+CommandCost CmdTemplateDeleteEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	return CommandCost();
+}
+
 /**
  * Start or stop the template relacement for a given group by assigning a template to it
  *
