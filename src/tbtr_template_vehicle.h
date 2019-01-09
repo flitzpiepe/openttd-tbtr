@@ -84,6 +84,7 @@ public:
 	uint32 sprite_width;                ///< used for drawing in a GUI
 	int sprite_xoff;                    ///< used for drawing in a GUI
 	int sprite_yoff;                    ///< used for drawing in a GUI
+	bool cached_sprite_size;
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot
@@ -111,7 +112,7 @@ public:
 	TemplateVehicle* GetNextUnit() const;
 	uint GetChainDisplayLength() const;			///< the sum of the sprite lengths of this template and all following chain members
 
-	void Draw(uint, uint, int, int) const;
+	void Draw(uint, uint, int, int);
 
 	bool TrainNeedsReplacement(Train*);
 

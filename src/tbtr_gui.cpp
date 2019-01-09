@@ -477,10 +477,10 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	int y = r.top;
 
 	uint max = min(vscroll_templates->GetPosition() + vscroll_templates->GetCapacity(), this->templates.Length());
-	const TemplateVehicle* tv;
+	TemplateVehicle* tv;
 	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i)
 	{
-		tv = (this->templates)[i];
+		tv = TemplateVehicle::Get((this->templates)[i]->index);
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
 		if ( this->index_selected_template == (int32)i ) {
