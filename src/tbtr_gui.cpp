@@ -326,7 +326,7 @@ void TbtrGui::BuildTemplateList()
 
 	this->templates.RebuildDone();
 	this->vscroll_templates->SetCount(this->templates.Length());
-	this->hscroll_templates->SetCount(this->FindLongestTemplateLength());
+	this->hscroll_templates->SetCount(this->FindLongestTemplateLength() + this->template_x_offset);
 }
 
 /*
@@ -498,7 +498,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		tv->Draw(left+50, right, y, hscroll_templates->GetPosition()+50);
+		tv->Draw(left+this->template_x_offset, right, y, hscroll_templates->GetPosition());
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
