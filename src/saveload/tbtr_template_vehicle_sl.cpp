@@ -20,7 +20,9 @@ const SaveLoad* GTD() {
 	static const SaveLoad _template_vehicle_desc[] = {
 		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
+		SLE_REF(TemplateVehicle, prev,                      REF_TEMPLATE_VEHICLE),
 		SLE_REF(TemplateVehicle, first,                     REF_TEMPLATE_VEHICLE),
+		SLE_REF(TemplateVehicle, last,                      REF_TEMPLATE_VEHICLE),
 		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),
 
 		SLE_VAR(TemplateVehicle, engine_type,               SLE_UINT16),
@@ -36,8 +38,6 @@ const SaveLoad* GTD() {
 		SLE_VAR(TemplateVehicle, railtype,                  SLE_UINT8),
 
 		SLE_VAR(TemplateVehicle, real_length,               SLE_UINT16),
-		SLE_VAR(TemplateVehicle, spritenum,                 SLE_UINT8),
-		SLE_VAR(TemplateVehicle, cur_image,                 SLE_UINT32),
 		SLE_VAR(TemplateVehicle, image_width,               SLE_UINT32),
 
 		SLE_VAR(TemplateVehicle, reuse_depot_vehicles,      SLE_UINT8),

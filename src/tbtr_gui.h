@@ -16,6 +16,7 @@
 #include "strings_func.h"
 #include "window_gui.h"
 #include "vehicle_gui_base.h"
+#include "engine_gui.h"
 
 #include "group.h"
 #include "company_func.h"
@@ -43,18 +44,27 @@ public:
 private:
 	void BuildGroupList();
 	void BuildTemplateList();
+	void BuildTemplateEngineList();
+	void CalculateTemplatesHScroll();
+	void DrawEngines(const Rect&) const;
 	void DrawGroups(const Rect&) const;
 	void DrawTemplateInfo(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
+	uint FindLongestTemplateLength() const;
 	int FindTemplateInGuiList(TemplateID) const;
 
+	Scrollbar* vscroll_engines;         ///< Scrollbar for the engines list
 	Scrollbar* vscroll_groups;          ///< Scrollbar for the group list
-	Scrollbar* vscroll_templates;       ///< Scrollbar for the template list
+	Scrollbar* hscroll_templates;       ///< Horizontal scrollbar for the template list
+	Scrollbar* vscroll_templates;       ///< Vertical scrollbar for the template list
 	uint16 line_height = 26;            ///< step size for the matrix widgets
+	uint16 template_x_offset = 50;      ///< LHS spacing for templates in the GUI
+	int index_selected_engine = -1;
 	int index_selected_group = -1;
 	int index_selected_template = -1;
+	GUIEngineList engines;              ///< List of new engines to add to the templates
 	GUIGroupList groups;                ///< List of groups
-	GUITemplateList templates;
+	GUITemplateList templates;          ///< List of templates
 	RailType railtype;
 };
 

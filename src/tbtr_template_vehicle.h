@@ -51,14 +51,15 @@ enum TBTR_REPLACEMENT_OPTS {
  * trains. */
 struct TemplateVehicle : TemplatePool::PoolItem<&_template_pool>, BaseVehicle {
 public:
-	TemplateVehicle(EngineID);
 	TemplateVehicle();
+	TemplateVehicle(EngineID);
 	~TemplateVehicle();
 	TemplateID index;                   ///< Vehicle index
 
 	TemplateVehicle* next;              ///< pointer to the next template vehicle in the chain
-	TemplateVehicle* prev;              ///< NOSAVE: pointer to the previous template vehicle in the chain
-	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
+	TemplateVehicle* prev;              ///< pointer to the previous template vehicle in the chain
+	TemplateVehicle* first;             ///< pointer to the first template vehicle in the chain
+	TemplateVehicle* last;              ///< pointer to the last template vehicle in the chain
 
 	/** essential template info */
 	Owner owner;                        ///< template owner
@@ -78,10 +79,12 @@ public:
 
 	/** Vehicle drawing information */
 	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
-	byte spritenum;                     ///< used for drawing in a GUI
-	SpriteID cur_image;                 ///< used for drawing in a GUI
 	uint32 image_width;                 ///< used for drawing in a GUI
-	const SpriteGroup* sgroup;          ///< used for drawing in a GUI
+	uint32 sprite_height;               ///< used for drawing in a GUI
+	uint32 sprite_width;                ///< used for drawing in a GUI
+	int sprite_xoff;                    ///< used for drawing in a GUI
+	int sprite_yoff;                    ///< used for drawing in a GUI
+	bool cached_sprite_size;            ///< whether the sprite dimensions have already been cached for this template
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot
@@ -107,16 +110,20 @@ public:
 	/* Count the number of groups which use this template vehicle */
 	int CountGroups() const;
 	TemplateVehicle* GetNextUnit() const;
+	uint GetChainDisplayLength();       ///< the sum of the sprite lengths of this template and all following chain members
 
-	void Draw(int, int, int) const;
+	void Draw(uint, uint, int, int);
 
 	bool TrainNeedsReplacement(Train*);
+
+	void UpdateLastVehicle(TemplateVehicle*);
 };
 
 TemplateID FindTemplateIndexForGroup(GroupID);
 
 
 /* Command functions */
+CommandCost CmdTemplateAddEngine(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdTemplateReplacement(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdStartStopTbtr(TileIndex, DoCommandFlag, uint32, uint32, char const*);
 CommandCost CmdCloneTemplateFromTrain(TileIndex, DoCommandFlag, uint32, uint32, char const*);

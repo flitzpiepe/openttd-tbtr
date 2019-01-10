@@ -38,6 +38,29 @@ TemplateVehicle* GetTemplateForTrain(Train* t)
 }
 
 /**
+ * Get the correct subtype for an engine for a new template
+ *
+ * @param e:         the engine
+ * @param is_head:   true if the new template will be the head of a new chain
+ */
+byte DetermineSubtype(const Engine* e, bool is_head)
+{
+	byte subtype = 0;
+	if ( e->u.rail.railveh_type == RAILVEH_WAGON ) {
+		subtype = 4;
+		if ( is_head )
+			subtype |= (1<<GVSF_FREE_WAGON);
+	}
+	else {
+		subtype = 8;
+		if ( is_head )
+			subtype |= (1<<GVSF_FRONT);
+	}
+
+	return subtype;
+}
+
+/**
  * Neutralize a train's status (group, orders, etc).
  * @param train:	the train to be neutralized
  */
@@ -389,6 +412,82 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 }
 
 /**
+ * Append a new engine to a template vehicle; if it doesn't exist yet, create a new template chain
+ *
+ * @param ti:   not used
+ * @param p1:   pointer to the template vehicle, this can be any member of a template train or even NULL, in
+ *              which case a new chain will be created
+ * @param p2:   engine ID to be added
+ * @param msg:  not used
+ *
+ * @return:     either a default CommandCost object or CMD_ERROR
+ */
+CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateID tid = static_cast<TemplateID>(p1);
+	const Engine* engine = Engine::Get(p2);
+
+	if ( flags == DC_EXEC) {
+		if (!TemplateVehicle::CanAllocateItem())
+			return CMD_ERROR;
+		TemplateVehicle* tv = new TemplateVehicle(p2);
+
+		TemplateVehicle* head = TemplateVehicle::GetIfValid(tid);
+		if ( head ) {
+			head = head->first;
+			head->last->next = tv;
+			tv->prev = head->last;
+			head->UpdateLastVehicle(tv);
+			tv->first = head;
+			tv->subtype = DetermineSubtype(engine, false);
+		}
+		else {
+			tv->subtype = DetermineSubtype(engine, true);
+		}
+
+		tv->railtype = engine->u.rail.railtype;
+		tv->cargo_type = engine->GetDefaultCargoType();
+		tv->cargo_subtype = 0;
+		tv->cargo_cap = engine->GetDisplayDefaultCapacity();
+		tv->max_speed = engine->GetDisplayMaxSpeed();
+		tv->power = engine->GetPower();
+		tv->weight = engine->GetDisplayWeight();
+		tv->max_te = engine->GetDisplayMaxTractiveEffort();
+	}
+
+	return CommandCost();
+}
+
+/**
+ * Delete the last engine of a template
+ *
+ * @param tile:  not used
+ * @param p1:    template id, this is assumed to be the head of the template chain
+ * @param p2:    not used
+ * @param msg:   not used
+ */
+CommandCost CmdTemplateDeleteEngine(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+{
+	TemplateVehicle* tv = TemplateVehicle::Get(p1);
+	if ( tv == NULL )
+		return CMD_ERROR;
+
+	if ( flags == DC_EXEC ) {
+		if ( tv == tv->last ) {
+			delete tv;
+			return CommandCost();
+		}
+		TemplateVehicle* last = tv->last;
+		last->prev->next = NULL;
+		tv->last = last->prev;
+		delete last;
+		tv->UpdateLastVehicle(tv->last);
+	}
+
+	return CommandCost();
+}
+
+/**
  * Start or stop the template relacement for a given group by assigning a template to it
  *
  * @param tile:     unused
@@ -473,7 +572,7 @@ CommandCost CmdCloneTemplateFromTrain(TileIndex ti, DoCommandFlag flags, uint32 
 
 	if ( flags == DC_EXEC )
 	{
-		TemplateVehicle* tv  = new TemplateVehicle();
+		TemplateVehicle* tv  = new TemplateVehicle(train->engine_type);
 		tv->CloneFromTrain(train, NULL);
 		tv->real_length = CeilDiv(train->gcache.cached_total_length * 10, TILE_SIZE);
 	}

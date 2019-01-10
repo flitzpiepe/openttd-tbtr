@@ -2,6 +2,7 @@
 #include "stdafx.h"
 
 #include "tbtr_template_vehicle.h"
+#include "engine_gui.h"
 
 TemplatePool _template_pool("Template");
 INSTANTIATE_POOL_METHODS(Template)
@@ -64,6 +65,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 		return false;
 
 	this->first = chainHead ? chainHead : this;
+	this->first->last = this;
 	this->engine_type = train->engine_type;
 	this->subtype = train->subtype;
 	this->railtype = train->railtype;
@@ -75,19 +77,14 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	this->power = gcache->cached_power;
 	this->weight = gcache->cached_weight;
 	this->max_te = gcache->cached_max_te / 1000;
-	this->spritenum = train->spritenum;
-	VehicleSpriteSeq seq;
-	train->GetImage(DIR_W, EIT_PURCHASE, &seq);
-	this->cur_image = seq.seq[0].sprite;
-	Point* p = new Point();
-	this->image_width = train->GetDisplayImageWidth(p);
 
-	if ( train->GetNextVehicle() )
+	if ( train->GetNextUnit() )
 	{
 		TemplateVehicle* tv = new TemplateVehicle();
 		if ( chainHead == NULL )
 			chainHead = this;
-		tv->CloneFromTrain(train->Next(), chainHead);
+		tv->CloneFromTrain(train->GetNextUnit(), chainHead);
+		tv->prev = this;
 		this->next = tv;
 	}
 
@@ -141,18 +138,46 @@ int TemplateVehicle::CountGroups() const
 /**
  * Draw a template
  *
- * @param left:  left border of the bounding box
- * @param right: right border of the bounding box
- * @param y:     y-coordinate of the bounding box
+ * @param left:     left border of the bounding box
+ * @param right:    right border of the bounding box
+ * @param y:        y-coordinate of the bounding box
+ * @param x_offset: how many pixels to skip at the start before starting to draw any template
  */
-void TemplateVehicle::Draw(int left, int right, int y) const
+void TemplateVehicle::Draw(uint left, uint right, int y, int x_offset=0)
 {
-	int offset = left;
-	PaletteID pal = GetEnginePalette(this->engine_type, this->owner);
-	DrawSprite(this->cur_image, pal, offset, y+12);
+	/* cache the sprite dimensions for this template's engine */
+	if ( this->cached_sprite_size == false ) {
+		GetTrainSpriteSize(this->engine_type, this->sprite_width, this->sprite_height, this->sprite_xoff, this->sprite_yoff, EIT_PURCHASE);
+		this->cached_sprite_size = true;
+	}
 
-	if (this->next)
-		this->next->Draw(offset+this->image_width, right, y);
+	/* don't draw outside of the bounding box'es area */
+	if ( this->sprite_width + left >= right )
+		return;
+
+	/* draw this + rest of the chain */
+	if ( x_offset <= 0 ) {
+		DrawVehicleEngine(left, right, left, y+10, this->engine_type, GetEnginePalette(this->engine_type, this->owner), EIT_PURCHASE);
+		left += this->sprite_width;
+	}
+	TemplateVehicle* next = this->GetNextUnit();
+	if ( next )
+		next->Draw(left, right, y, x_offset-this->sprite_width);
+}
+
+/**
+ * Calculate the sum of all sprite widths of this template and the rest of the chain
+ * Not const, might cache the sprite dimensions of a vehicle if it has not already been done.
+ */
+uint TemplateVehicle::GetChainDisplayLength()
+{
+	uint sum = 0;
+	for ( TemplateVehicle* tmp=this; tmp; tmp=tmp->next ) {
+		if ( tmp->cached_sprite_size == false )
+			GetTrainSpriteSize(tmp->engine_type, tmp->sprite_width, tmp->sprite_height, tmp->sprite_xoff, tmp->sprite_yoff, EIT_PURCHASE);
+		sum += tmp->sprite_width;
+	}
+	return sum;
 }
 
 /*
@@ -178,13 +203,14 @@ void TemplateVehicle::Init(EngineID eid)
 {
 	this->next = NULL;
 	this->prev = NULL;
-	this->first = NULL;
+	this->first = this;
+	this->last = this;
 
 	this->engine_type = eid;
 	this->owner = _current_company;
 	this->real_length = 0;
-
-	this->cur_image = SPR_IMG_QUERY;
+	this->image_width = 0;
+	this->cached_sprite_size = false;
 
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;
@@ -215,4 +241,18 @@ bool TemplateVehicle::TrainNeedsReplacement(Train* t)
 	}
 	/* check if one chain ended before the other */
 	return (!tv && t) || (tv && !t);
+}
+
+/**
+ * Update the last pointer on each member of this chain of TemplateVehicle's
+ *
+ * @param last:   the new last vehicle
+ */
+void TemplateVehicle::UpdateLastVehicle(TemplateVehicle* last)
+{
+	TemplateVehicle* tmp = this->first;
+	while ( tmp ) {
+		tmp->last = last;
+		tmp = tmp->next;
+	}
 }

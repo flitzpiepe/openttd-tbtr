@@ -9,17 +9,24 @@
 #include "string_func.h"
 #include "tbtr_gui.h"
 #include "command_func.h"
+#include "engine_gui.h"
+
 
 enum TemplateReplaceWindowWidgets {
 	TRW_CAPTION,
 
 	TRW_WIDGET_INSET_GROUPS,
-	TRW_WIDGET_TOP_MATRIX,
-	TRW_WIDGET_TOP_SCROLLBAR,
+	TRW_WIDGET_MATRIX_GROUPS,
+	TRW_WIDGET_SCROLLBAR_GROUPS,
 
 	TRW_WIDGET_INSET_TEMPLATES,
-	TRW_WIDGET_BOTTOM_MATRIX,
-	TRW_WIDGET_BOTTOM_SCROLLBAR,
+	TRW_WIDGET_MATRIX_TEMPLATES,
+	TRW_WIDGET_SCROLLBAR_TEMPLATES,
+	TRW_WIDGET_SCROLLBAR_TEMPLATES_HORIZ,
+
+	TRW_WIDGET_INSET_ENGINES,
+	TRW_WIDGET_MATRIX_ENGINES,
+	TRW_WIDGET_SCROLLBAR_ENGINES,
 
 	TRW_WIDGET_TMPL_INFO_INSET,
 	TRW_WIDGET_TMPL_INFO_PANEL,
@@ -31,10 +38,10 @@ enum TemplateReplaceWindowWidgets {
 	TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT,
 	TRW_WIDGET_TMPL_BUTTONS_CONFIG_RIGHTPANEL,
 
-	TRW_WIDGET_TMPL_BUTTONS_DEFINE,
-	TRW_WIDGET_TMPL_BUTTONS_EDIT,
+	TRW_WIDGET_TMPL_BUTTONS_ADD,
 	TRW_WIDGET_TMPL_BUTTONS_CLONE,
 	TRW_WIDGET_TMPL_BUTTONS_DELETE,
+	TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH,
 	TRW_WIDGET_TMPL_BUTTONS_RPLALL,
 	TRW_WIDGET_TMPL_BUTTON_FLUFF,
 	TRW_WIDGET_TMPL_BUTTONS_EDIT_RIGHTPANEL,
@@ -64,57 +71,78 @@ static const NWidgetPart _widgets[] = {
 		NWidget(WWT_SHADEBOX, COLOUR_GREY),
 		NWidget(WWT_STICKYBOX, COLOUR_GREY),
 	EndContainer(),
-	/*Top Matrix */
-	NWidget(NWID_VERTICAL),
-		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_GROUPS), SetMinimalSize(216,12), SetDataTip(STR_TBTR_MAINGUI_DEFINEDGROUPS, STR_TBTR_MAINGUI_DEFINEDGROUPS), SetResize(1, 0), EndContainer(),
-		NWidget(NWID_HORIZONTAL),
-			NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_TOP_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_TOP_SCROLLBAR),
-			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_TOP_SCROLLBAR),
-		EndContainer(),
-	EndContainer(),
-	/* Template Display */
-	NWidget(NWID_VERTICAL),
-		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_TEMPLATES), SetMinimalSize(216,12), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), SetResize(1, 0), EndContainer(),
-		NWidget(NWID_HORIZONTAL),
-			NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_BOTTOM_MATRIX), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR),
-			NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_BOTTOM_SCROLLBAR),
-		EndContainer(),
-	EndContainer(),
-	/* Info Area */
-	NWidget(NWID_VERTICAL),
-		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_INSET), SetMinimalSize(216,12), SetResize(1,0), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), EndContainer(),
-		NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_PANEL), SetMinimalSize(216,50), SetResize(1,0), EndContainer(),
-	EndContainer(),
-	/* Control Area */
-	NWidget(NWID_VERTICAL),
-		/* Spacing */
-		NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_PRE_BUTTON_FLUFF), SetMinimalSize(139, 12), SetResize(1,0), EndContainer(),
-		/* Config buttons */
-		NWidget(NWID_HORIZONTAL),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_USEDEPOT, STR_TBTR_SET_USEDEPOT_TIP),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_KEEPREMAINDERS, STR_TBTR_SET_KEEPREMAINDERS_TIP),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_REFIT, STR_TBTR_SET_REFIT_TIP),
-			NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIG_RIGHTPANEL), SetMinimalSize(12,12), SetResize(1,0), EndContainer(),
-		EndContainer(),
-		/* Edit buttons */
-		NWidget(NWID_HORIZONTAL),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DEFINE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DEFINE_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_EDIT), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_EDIT_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-			NWidget(WWT_TEXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CLONE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_CREATE_CLONE_VEH, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DELETE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DELETE_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-			NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_RPLALL), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_RPL_ALL_TMPL, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-			NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_EDIT_RIGHTPANEL), SetMinimalSize(50,12), SetResize(1,0), EndContainer(),
-		EndContainer(),
-	EndContainer(),
-	/* Start/Stop buttons */
+
+	/* Toplevel container */
 	NWidget(NWID_HORIZONTAL),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_START), SetMinimalSize(150, 12), SetDataTip(STR_TBTR_RPL_START, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
-		NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TRAIN_FLUFF_LEFT), SetMinimalSize(15, 12), EndContainer(),
-		NWidget(WWT_DROPDOWN, COLOUR_GREY, TRW_WIDGET_TRAIN_RAILTYPE_DROPDOWN), SetMinimalSize(150, 12), SetDataTip(0x0, STR_REPLACE_HELP_RAILTYPE), SetResize(1, 0),
-		NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TRAIN_FLUFF_RIGHT), SetMinimalSize(16, 12), EndContainer(),
-		NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_STOP), SetMinimalSize(150, 12), SetDataTip(STR_TBTR_RPL_STOP, STR_REPLACE_REMOVE_WAGON_HELP),
-		NWidget(WWT_RESIZEBOX, COLOUR_GREY),
-	EndContainer(),
+
+		/* New engines */
+		NWidget(NWID_VERTICAL),
+			NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_ENGINES), SetMinimalSize(216,12), SetFill(1,0),  SetDataTip(STR_TBTR_AVAILABLE_ENGINES, STR_TBTR_AVAILABLE_ENGINES), SetResize(1, 0), EndContainer(),
+			NWidget(NWID_HORIZONTAL),
+				NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_ENGINES), SetMinimalSize(100, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_SCROLLBAR_ENGINES),
+				NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_ENGINES),
+			EndContainer(),
+		EndContainer(),
+
+		/* Template Ctrl */
+		NWidget(NWID_VERTICAL),
+			/*Top Matrix */
+			NWidget(NWID_VERTICAL),
+				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_GROUPS), SetMinimalSize(216,12), SetDataTip(STR_TBTR_MAINGUI_DEFINEDGROUPS, STR_TBTR_MAINGUI_DEFINEDGROUPS), SetResize(1, 0), EndContainer(),
+				NWidget(NWID_HORIZONTAL),
+					NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_GROUPS), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_LEFT_ARRAY), SetResize(1, 0), SetScrollbar(TRW_WIDGET_SCROLLBAR_GROUPS),
+					NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_GROUPS),
+				EndContainer(),
+			EndContainer(),
+			/* Template Display */
+			NWidget(NWID_VERTICAL),
+				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_INSET_TEMPLATES), SetMinimalSize(216,12), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), SetResize(1, 0), EndContainer(),
+				NWidget(NWID_VERTICAL),
+					NWidget(NWID_HORIZONTAL),
+						NWidget(WWT_MATRIX, COLOUR_GREY, TRW_WIDGET_MATRIX_TEMPLATES), SetMinimalSize(216, 0), SetFill(1, 1), SetDataTip(0x1, STR_REPLACE_HELP_RIGHT_ARRAY), SetResize(1, 1), SetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES),
+						NWidget(NWID_VSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_TEMPLATES),
+					EndContainer(),
+					NWidget(NWID_HSCROLLBAR, COLOUR_GREY, TRW_WIDGET_SCROLLBAR_TEMPLATES_HORIZ),
+				EndContainer(),
+			EndContainer(),
+			/* Info Area */
+			NWidget(NWID_VERTICAL),
+				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_INSET), SetMinimalSize(216,12), SetResize(1,0), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), EndContainer(),
+				NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_PANEL), SetMinimalSize(216,50), SetResize(1,0), EndContainer(),
+			EndContainer(),
+			/* Control Area */
+			NWidget(NWID_VERTICAL),
+				/* Spacing */
+				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_PRE_BUTTON_FLUFF), SetMinimalSize(139, 12), SetResize(1,0), EndContainer(),
+				/* Config buttons */
+				NWidget(NWID_HORIZONTAL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_USEDEPOT, STR_TBTR_SET_USEDEPOT_TIP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_KEEP), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_KEEPREMAINDERS, STR_TBTR_SET_KEEPREMAINDERS_TIP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_SET_REFIT, STR_TBTR_SET_REFIT_TIP),
+					NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CONFIG_RIGHTPANEL), SetMinimalSize(12,12), SetResize(1,0), EndContainer(),
+				EndContainer(),
+				/* Edit buttons */
+				NWidget(NWID_HORIZONTAL),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_ADD), SetMinimalSize(100,12), SetResize(0,0), SetDataTip(STR_TBTR_ADD_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DELETE_TEMPLATE_LAST_VEH, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_TEXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CLONE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_CREATE_CLONE_VEH, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DELETE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DELETE_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_RPLALL), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_RPL_ALL_TMPL, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_EDIT_RIGHTPANEL), SetMinimalSize(50,12), SetResize(1,0), EndContainer(),
+				EndContainer(),
+			EndContainer(),
+			/* Start/Stop buttons */
+			NWidget(NWID_HORIZONTAL),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_START), SetMinimalSize(150, 12), SetDataTip(STR_TBTR_RPL_START, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+				NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TRAIN_FLUFF_LEFT), SetMinimalSize(15, 12), EndContainer(),
+				NWidget(WWT_DROPDOWN, COLOUR_GREY, TRW_WIDGET_TRAIN_RAILTYPE_DROPDOWN), SetMinimalSize(150, 12), SetDataTip(0x0, STR_REPLACE_HELP_RAILTYPE), SetResize(1, 0),
+				NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TRAIN_FLUFF_RIGHT), SetMinimalSize(16, 12), EndContainer(),
+				NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_STOP), SetMinimalSize(150, 12), SetDataTip(STR_TBTR_RPL_STOP, STR_REPLACE_REMOVE_WAGON_HELP),
+				NWidget(WWT_RESIZEBOX, COLOUR_GREY),
+			EndContainer(),
+		EndContainer(),	// END Template Ctrl
+
+	EndContainer(), // END Toplevel container
 };
 
 static WindowDesc _tbtr_gui_desc(
@@ -149,21 +177,54 @@ static int CDECL GroupNameSorter(const Group * const *a, const Group * const *b)
 	return r;
 }
 
+/* Sorting functions copied from build_vehicle_gui.cpp */
+
+/**
+ * Determines order of engines by engineID
+ * @param *a first engine to compare
+ * @param *b second engine to compare
+ * @return for descending order: returns < 0 if a < b and > 0 for a > b. Vice versa for ascending order and 0 for equal
+ */
+static int CDECL EngineNumberSorter(const EngineID *a, const EngineID *b)
+{
+	int r = Engine::Get(*a)->list_position - Engine::Get(*b)->list_position;
+
+	return _engine_sort_direction ? -r : r;
+}
+
+/**
+ * Determines order of train engines by engine / wagon
+ * @param *a first engine to compare
+ * @param *b second engine to compare
+ * @return for descending order: returns < 0 if a < b and > 0 for a > b. Vice versa for ascending order and 0 for equal
+ */
+static int CDECL TrainEnginesThenWagonsSorter(const EngineID* a, const EngineID* b)
+{
+	int val_a = (RailVehInfo(*a)->railveh_type == RAILVEH_WAGON ? 1 : 0);
+	int val_b = (RailVehInfo(*b)->railveh_type == RAILVEH_WAGON ? 1 : 0);
+	int r = val_a - val_b;
+
+	/* Use EngineID to sort instead since we want consistent sorting */
+	if (r == 0) return EngineNumberSorter(a, b);
+	return _engine_sort_direction ? -r : r;
+}
+
 /**
  * Constructor, initialize GUI with a window descriptor
  */
 TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 {
 	CreateNestedTree(wdesc);
-	this->vscroll_groups = GetScrollbar(TRW_WIDGET_TOP_SCROLLBAR);
-	this->vscroll_templates = GetScrollbar(TRW_WIDGET_BOTTOM_SCROLLBAR);
+	this->vscroll_engines = GetScrollbar(TRW_WIDGET_SCROLLBAR_ENGINES);
+	this->vscroll_engines->SetStepSize(line_height);
+	this->vscroll_groups = GetScrollbar(TRW_WIDGET_SCROLLBAR_GROUPS);
+	this->hscroll_templates = GetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES_HORIZ);
+	this->vscroll_templates = GetScrollbar(TRW_WIDGET_SCROLLBAR_TEMPLATES);
 	this->vscroll_groups->SetStepSize(line_height / 2);
 	this->vscroll_templates->SetStepSize(line_height);
 	/* VEH_TRAIN should be 0; we want only 1 instance of this GUI to be present at the same time anyway, so
 	 * this should be ok */
 	FinishInitNested(VEH_TRAIN);
-
-	this->line_height = this->resize.step_height * 2;
 
 	/* will be used to build the internal group and template lists
 	 *
@@ -171,14 +232,16 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	 * INVALID_OWNER again */
 	this->owner = _local_company;
 
+	this->engines.ForceRebuild();
+
 	this->groups.ForceRebuild();
 	this->groups.NeedResort();
 	this->BuildGroupList();
 	this->groups.Sort(&GroupNameSorter);
 
 	BuildTemplateList();
-}
 
+}
 /*
  * Recalculate the size of the window's components
  */
@@ -186,15 +249,40 @@ void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &pad
 {
 	switch (widget)
 	{
-		case TRW_WIDGET_TOP_MATRIX:
+		case TRW_WIDGET_MATRIX_GROUPS:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
 			size->height = 8 * resize->height;
 			break;
-		case TRW_WIDGET_BOTTOM_MATRIX:
+		case TRW_WIDGET_MATRIX_TEMPLATES:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP);
 			size->height = 4 * resize->height;
 			break;
+		case TRW_WIDGET_MATRIX_ENGINES:
+			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
+			size->height = 4 * resize->height;
+			break;
 	}
+}
+
+/**
+ * Build the list of engines that can be selected for new or existing templates
+ */
+void TbtrGui::BuildTemplateEngineList()
+{
+	if (!this->engines.NeedRebuild()) {
+		return;
+	}
+	this->engines.Clear();
+	const Engine* e;
+	FOR_ALL_ENGINES_OF_TYPE(e, VEH_TRAIN) {
+		if ( e->IsEnabled() )
+			if ( HasBit(e->company_avail, this->owner) )
+				*(this->engines).Append() = e->index;
+	}
+	this->engines.Compact();
+	this->engines.RebuildDone();
+	this->vscroll_engines->SetCount(this->engines.Length());
+	this->engines.Sort(&TrainEnginesThenWagonsSorter);
 }
 
 /*
@@ -234,11 +322,19 @@ void TbtrGui::BuildTemplateList()
 	FOR_ALL_TEMPLATES(tv) {
 		if (tv->HasOwner(this->owner) && (tv->IsPrimaryVehicle() || tv->IsFreeWagonChain()) && tv->ContainsRailType(railtype))
 			*(this->templates.Append()) = tv;
-
 	}
 
 	this->templates.RebuildDone();
 	this->vscroll_templates->SetCount(this->templates.Length());
+	this->CalculateTemplatesHScroll();
+}
+
+/**
+ * Calculate and set the size of the template's horizontal scrollbar, based on the maximum length of all templates.
+ */
+void TbtrGui::CalculateTemplatesHScroll()
+{
+	this->hscroll_templates->SetCount(this->FindLongestTemplateLength() + this->template_x_offset);
 }
 
 /*
@@ -247,18 +343,46 @@ void TbtrGui::BuildTemplateList()
 void TbtrGui::DrawWidget(const Rect& r, int widget) const
 {
 	switch(widget) {
-		case TRW_WIDGET_TOP_MATRIX: {
+		case TRW_WIDGET_MATRIX_GROUPS: {
 			this->DrawGroups(r);
 			break;
 		}
-		case TRW_WIDGET_BOTTOM_MATRIX: {
+		case TRW_WIDGET_MATRIX_TEMPLATES: {
 			this->DrawTemplates(r);
+			break;
+		}
+		case TRW_WIDGET_MATRIX_ENGINES: {
+			this->DrawEngines(r);
 			break;
 		}
 		case TRW_WIDGET_TMPL_INFO_PANEL: {
 			DrawTemplateInfo(r);
 			break;
 		}
+	}
+}
+
+/*
+ * Draw all engines
+ */
+void TbtrGui::DrawEngines(const Rect& r) const
+{
+	uint max = min(vscroll_engines->GetPosition() + vscroll_engines->GetCapacity(), this->engines.Length());
+	uint y = r.top + 6;
+	for ( uint i = vscroll_engines->GetPosition(); i<max; ++i ) {
+		/* Fill the background of the current cell in a darker tone for the currently selected group */
+		if ( this->index_selected_engine == (int)i ) {
+			GfxFillRect(left, y-(this->line_height)/4, r.right, y+(this->line_height)/4, _colour_gradient[COLOUR_GREY][3]);
+		}
+		/* Draw the engine's image */
+		EngineID eid = (this->engines)[i];
+		const Engine* engine = Engine::Get(eid);
+		DrawVehicleEngine(r.left+10, r.right, r.left, y, engine->index, GetEnginePalette(engine->index, this->owner), EIT_PURCHASE);
+
+		/* Draw the engine's name */
+		DrawString(r.left+60, r.right, y-3, engine->info.string_id, TC_BLACK);
+
+		y += this->line_height / 2;
 	}
 }
 
@@ -361,10 +485,10 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	int y = r.top;
 
 	uint max = min(vscroll_templates->GetPosition() + vscroll_templates->GetCapacity(), this->templates.Length());
-	const TemplateVehicle* tv;
+	TemplateVehicle* tv;
 	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i)
 	{
-		tv = (this->templates)[i];
+		tv = TemplateVehicle::Get((this->templates)[i]->index);
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
 		if ( this->index_selected_template == (int32)i ) {
@@ -382,7 +506,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 		DrawString(left, right-4, y+2, STR_TINY_BLACK_DECIMAL, TC_BLACK, SA_RIGHT);
 
 		/* Draw the template */
-		tv->Draw(left+50, right, y);
+		tv->Draw(left+this->template_x_offset, right, y, hscroll_templates->GetPosition());
 
 		/* Buying cost */
 		SetDParam(0, tv->CalculateCost());
@@ -416,6 +540,18 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	}
 }
 
+uint TbtrGui::FindLongestTemplateLength() const
+{
+	uint max_len = 0;
+	for ( uint i=0; i<this->templates.Length(); ++i ) {
+		TemplateVehicle* tv = TemplateVehicle::Get(this->templates[i]->index);
+		uint len = tv->GetChainDisplayLength();
+		if ( len > max_len )
+			max_len = len;
+	}
+	return max_len;
+}
+
 int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
 {
 	for ( uint i=0; i<templates.Length(); ++i )
@@ -445,16 +581,28 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
 			TemplateID tid = this->templates[this->index_selected_template]->index;
 			bool template_deleted = DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
-			if ( template_deleted )
-			{
+			if ( template_deleted ) {
 				this->index_selected_template = -1;
 			}
+			BuildTemplateList();
+			this->CalculateTemplatesHScroll();
 
 			break;
 		}
-		case TRW_WIDGET_TOP_MATRIX:
+		case TRW_WIDGET_MATRIX_ENGINES:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_TOP_MATRIX]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_ENGINES]->pos_y) / (this->line_height/2) ) + this->vscroll_engines->GetPosition();
+			if ( index_new >= this->engines.Length() )
+				this->index_selected_engine = -1;
+			else if ( this->index_selected_engine == index_new )
+				this->index_selected_engine = -1;
+			else
+				this->index_selected_engine = index_new;
+			break;
+		}
+		case TRW_WIDGET_MATRIX_GROUPS:
+		{
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_GROUPS]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
 			if ( index_new >= this->groups.Length() )
 				this->index_selected_group = -1;
 			else if ( this->index_selected_group == index_new )
@@ -463,9 +611,9 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_group = index_new;
 			break;
 		}
-		case TRW_WIDGET_BOTTOM_MATRIX:
+		case TRW_WIDGET_MATRIX_TEMPLATES:
 		{
-			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_BOTTOM_MATRIX]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
+			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_TEMPLATES]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
 			if ( index_new >= this->templates.Length() )
 				this->index_selected_template = -1;
 			else if ( this->index_selected_template == index_new )
@@ -492,6 +640,56 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
+		case TRW_WIDGET_TMPL_BUTTONS_ADD:
+		{
+			/* get the selected engine */
+			if ( index_selected_engine == -1 )
+				return;
+
+			/* selected engine */
+			EngineID eid = this->engines[index_selected_engine];
+
+			/* selected template */
+			TemplateID tid = INVALID_TEMPLATE;
+			if ( index_selected_template >= 0 )
+				tid = this->templates[index_selected_template]->index;
+
+			/* add the engine */
+			bool successful = DoCommandP(0, tid, eid, CMD_TEMPLATE_ADD_ENGINE);
+
+			if ( successful ) {
+				BuildTemplateList();
+				/* if no template was selected, select the newly created chain */
+				if ( this->index_selected_template == -1 )
+					this->index_selected_template = this->templates.Length() - 1;
+				this->CalculateTemplatesHScroll();
+			}
+
+			break;
+		}
+		case TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH:
+		{
+			/* get the currently selected template */
+			TemplateID tid = INVALID_TEMPLATE;
+			if ( index_selected_template >= 0 )
+				tid = this->templates[index_selected_template]->index;
+			else
+				return;
+
+			/* delete the last engine */
+			uint num_templates = this->templates.Length();
+			bool successful = DoCommandP(0, tid, 0, CMD_TEMPLATE_DELETE_ENGINE);
+
+			if ( successful ) {
+				BuildTemplateList();
+				/* in case that the last engine of the template has been removed, reset the selected index */
+				if ( this->templates.Length() < num_templates )
+					this->index_selected_template = -1;
+				this->CalculateTemplatesHScroll();
+			}
+
+			break;
+		}
 		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
 		{
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
@@ -515,7 +713,6 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
-
 	}
 	this->SetDirty();
 }
@@ -534,6 +731,7 @@ void TbtrGui::OnInvalidateData(int data = 0, bool gui_scope = true)
  */
 void TbtrGui::OnPaint()
 {
+	this->BuildTemplateEngineList();
 	this->BuildGroupList();
 	this->BuildTemplateList();
 	this->DrawWidgets();
@@ -545,14 +743,20 @@ void TbtrGui::OnPaint()
 void TbtrGui::OnResize()
 {
 	/* Top Matrix */
-	NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_TOP_MATRIX);
-	this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_TOP_MATRIX);
+	NWidgetCore* nwi = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_GROUPS);
+	this->vscroll_groups->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_GROUPS);
 	nwi->widget_data = (this->vscroll_groups->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 
 	/* Bottom Matrix */
-	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_BOTTOM_MATRIX);
-	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_BOTTOM_MATRIX);
+	NWidgetCore* nwi2 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_TEMPLATES);
+	this->vscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
+	this->hscroll_templates->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_TEMPLATES);
 	nwi2->widget_data = (this->vscroll_templates->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
+
+	/* Engines List */
+	NWidgetCore* nwi3 = this->GetWidget<NWidgetCore>(TRW_WIDGET_MATRIX_ENGINES);
+	this->vscroll_engines->SetCapacityFromWidget(this, TRW_WIDGET_MATRIX_ENGINES);
+	nwi3->widget_data = (this->vscroll_engines->GetCapacity() << MAT_ROW_START) + (1 << MAT_COL_START);
 }
 
 /*
@@ -574,6 +778,8 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
 	ResetObjectToPlace();
 	this->SetDirty();
+
+	this->CalculateTemplatesHScroll();
 
 	return true;
 }
