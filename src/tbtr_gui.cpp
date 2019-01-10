@@ -672,13 +672,15 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				return;
 
 			/* delete the last engine */
+			uint num_templates = this->templates.Length();
 			bool successful = DoCommandP(0, tid, 0, CMD_TEMPLATE_DELETE_ENGINE);
 
 			if ( successful )
 			{
 				BuildTemplateList();
-				// TODO reset the index if the template has been removed completely
-				//this->index_selected_template = -1;
+				/* in case that the last engine of the template has been removed, reset the selected index */
+				if ( this->templates.Length() < num_templates )
+					this->index_selected_template = -1;
 			}
 
 			break;
