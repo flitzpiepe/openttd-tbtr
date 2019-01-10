@@ -65,7 +65,7 @@ private:
 	int index_selected_group = -1;
 	int index_selected_template = -1;
 	GUIGroupList groups;                ///< List of groups
-	GUITemplateEngineList engines;              ///< List of new engines to add to the templates
+	GUITemplateEngineList engines;      ///< List of new engines to add to the templates
 	GUITemplateList templates;
 	RailType railtype;
 };

@@ -84,7 +84,7 @@ public:
 	uint32 sprite_width;                ///< used for drawing in a GUI
 	int sprite_xoff;                    ///< used for drawing in a GUI
 	int sprite_yoff;                    ///< used for drawing in a GUI
-	bool cached_sprite_size;
+	bool cached_sprite_size;            ///< whether the sprite dimensions have already been cached for this template
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot

@@ -138,9 +138,10 @@ int TemplateVehicle::CountGroups() const
 /**
  * Draw a template
  *
- * @param left:  left border of the bounding box
- * @param right: right border of the bounding box
- * @param y:     y-coordinate of the bounding box
+ * @param left:     left border of the bounding box
+ * @param right:    right border of the bounding box
+ * @param y:        y-coordinate of the bounding box
+ * @param x_offset: how many pixels to skip at the start before starting to draw any template
  */
 void TemplateVehicle::Draw(uint left, uint right, int y, int x_offset=0)
 {
