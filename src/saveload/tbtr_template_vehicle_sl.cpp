@@ -20,6 +20,7 @@ const SaveLoad* GTD() {
 	static const SaveLoad _template_vehicle_desc[] = {
 		SLE_VAR(TemplateVehicle, index,                     SLE_UINT16),
 		SLE_REF(TemplateVehicle, next,                      REF_TEMPLATE_VEHICLE),
+		SLE_REF(TemplateVehicle, prev,                      REF_TEMPLATE_VEHICLE),
 		SLE_REF(TemplateVehicle, first,                     REF_TEMPLATE_VEHICLE),
 		SLE_REF(TemplateVehicle, last,                      REF_TEMPLATE_VEHICLE),
 		SLE_VAR(TemplateVehicle, owner,                     SLE_UINT32),

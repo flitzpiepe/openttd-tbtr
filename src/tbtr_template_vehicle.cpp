@@ -84,6 +84,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 		if ( chainHead == NULL )
 			chainHead = this;
 		tv->CloneFromTrain(train->GetNextUnit(), chainHead);
+		tv->prev = this;
 		this->next = tv;
 	}
 
