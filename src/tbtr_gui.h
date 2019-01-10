@@ -16,6 +16,7 @@
 #include "strings_func.h"
 #include "window_gui.h"
 #include "vehicle_gui_base.h"
+#include "engine_gui.h"
 
 #include "group.h"
 #include "company_func.h"
@@ -23,12 +24,8 @@
 
 #include "tbtr_template_vehicle.h"
 
-// TODO prefix these names with TBTR or something
-//		e.g. GUIEngineList was already taken
-// TODO use a common prefix for all 3, i.e. rename GUITemplateEngineList into something else
 typedef GUIList<const Group*> GUIGroupList;
 typedef GUIList<const TemplateVehicle*> GUITemplateList;
-typedef GUIList<EngineID> GUITemplateEngineList;
 
 /*
  * TBTR's main window - for managing templates and setting up train groups for replacement.
@@ -65,9 +62,9 @@ private:
 	int index_selected_engine = -1;
 	int index_selected_group = -1;
 	int index_selected_template = -1;
+	GUIEngineList engines;              ///< List of new engines to add to the templates
 	GUIGroupList groups;                ///< List of groups
-	GUITemplateEngineList engines;      ///< List of new engines to add to the templates
-	GUITemplateList templates;
+	GUITemplateList templates;          ///< List of templates
 	RailType railtype;
 };
 

@@ -458,9 +458,15 @@ CommandCost CmdTemplateAddEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, u
 	return CommandCost();
 }
 
-// TODO
-// p1: template vehicle id, assumed to be the head of the chain
-CommandCost CmdTemplateDeleteEngine(TileIndex ti, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
+/**
+ * Delete the last engine of a template
+ *
+ * @param tile:  not used
+ * @param p1:    template id, this is assumed to be the head of the template chain
+ * @param p2:    not used
+ * @param msg:   not used
+ */
+CommandCost CmdTemplateDeleteEngine(TileIndex tile, DoCommandFlag flags, uint32 p1, uint32 p2, char const* msg)
 {
 	TemplateVehicle* tv = TemplateVehicle::Get(p1);
 	if ( tv == NULL )

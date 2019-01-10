@@ -330,7 +330,7 @@ void TbtrGui::BuildTemplateList()
 }
 
 /**
- * TODO
+ * Calculate and set the size of the template's horizontal scrollbar, based on the maximum length of all templates.
  */
 void TbtrGui::CalculateTemplatesHScroll()
 {
@@ -645,23 +645,18 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			/* get the selected engine */
 			if ( index_selected_engine == -1 )
 				return;
-			// TODO needed?
-			const Engine* engine = Engine::Get(engines[index_selected_engine]);
-			if ( engine == NULL )
-				return;
 
+			/* selected engine */
 			EngineID eid = this->engines[index_selected_engine];
 
-			/* get the currently selected template */
+			/* selected template */
 			TemplateID tid = INVALID_TEMPLATE;
 			if ( index_selected_template >= 0 )
 				tid = this->templates[index_selected_template]->index;
-				//old = TemplateVehicle::Get(templates[index_selected_template]->index)->index;
 
 			/* add the engine */
 			bool successful = DoCommandP(0, tid, eid, CMD_TEMPLATE_ADD_ENGINE);
 
-			// TODO update the template list and update the gui
 			if ( successful ) {
 				BuildTemplateList();
 				/* if no template was selected, select the newly created chain */
