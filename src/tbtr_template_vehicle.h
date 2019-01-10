@@ -57,9 +57,9 @@ public:
 	TemplateID index;                   ///< Vehicle index
 
 	TemplateVehicle* next;              ///< pointer to the next template vehicle in the chain
-	TemplateVehicle* prev;              ///< NOSAVE: pointer to the previous template vehicle in the chain
-	TemplateVehicle* first;             ///< NOSAVE: pointer to the first template vehicle in the chain
-	TemplateVehicle* last;              ///< NOSAVE: pointer to the last template vehicle in the chain
+	TemplateVehicle* prev;              ///< pointer to the previous template vehicle in the chain
+	TemplateVehicle* first;             ///< pointer to the first template vehicle in the chain
+	TemplateVehicle* last;              ///< pointer to the last template vehicle in the chain
 
 	/** essential template info */
 	Owner owner;                        ///< template owner
@@ -84,6 +84,7 @@ public:
 	uint32 sprite_width;                ///< used for drawing in a GUI
 	int sprite_xoff;                    ///< used for drawing in a GUI
 	int sprite_yoff;                    ///< used for drawing in a GUI
+	bool cached_sprite_size;
 
 	/** Template usage configuration */
 	bool reuse_depot_vehicles;          ///< whether to allow using exising vehicles from a depot
@@ -111,7 +112,7 @@ public:
 	TemplateVehicle* GetNextUnit() const;
 	uint GetChainDisplayLength() const;			///< the sum of the sprite lengths of this template and all following chain members
 
-	void Draw(uint, uint, int, int) const;
+	void Draw(uint, uint, int, int);
 
 	bool TrainNeedsReplacement(Train*);
 

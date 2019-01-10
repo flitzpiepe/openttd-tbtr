@@ -84,6 +84,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 		if ( chainHead == NULL )
 			chainHead = this;
 		tv->CloneFromTrain(train->GetNextUnit(), chainHead);
+		tv->prev = this;
 		this->next = tv;
 	}
 
@@ -141,8 +142,14 @@ int TemplateVehicle::CountGroups() const
  * @param right: right border of the bounding box
  * @param y:     y-coordinate of the bounding box
  */
-void TemplateVehicle::Draw(uint left, uint right, int y, int x_offset=0) const
+void TemplateVehicle::Draw(uint left, uint right, int y, int x_offset=0)
 {
+	/* cache the sprite dimensions for this template's engine */
+	if ( this->cached_sprite_size == false ) {
+		GetTrainSpriteSize(this->engine_type, this->sprite_width, this->sprite_height, this->sprite_xoff, this->sprite_yoff, EIT_PURCHASE);
+		this->cached_sprite_size = true;
+	}
+
 	/* don't draw outside of the bounding box'es area */
 	if ( this->sprite_width + left >= right )
 		return;
@@ -198,9 +205,7 @@ void TemplateVehicle::Init(EngineID eid)
 	this->owner = _current_company;
 	this->real_length = 0;
 	this->image_width = 0;
-
-	/* cache the sprite dimensions for this template's engine */
-	GetTrainSpriteSize(this->engine_type, this->sprite_width, this->sprite_height, this->sprite_xoff, this->sprite_yoff, EIT_PURCHASE);
+	this->cached_sprite_size = false;
 
 	this->reuse_depot_vehicles = true;
 	this->keep_remaining_vehicles = true;

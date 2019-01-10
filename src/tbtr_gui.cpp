@@ -41,6 +41,7 @@ enum TemplateReplaceWindowWidgets {
 	TRW_WIDGET_TMPL_BUTTONS_ADD,
 	TRW_WIDGET_TMPL_BUTTONS_CLONE,
 	TRW_WIDGET_TMPL_BUTTONS_DELETE,
+	TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH,
 	TRW_WIDGET_TMPL_BUTTONS_RPLALL,
 	TRW_WIDGET_TMPL_BUTTON_FLUFF,
 	TRW_WIDGET_TMPL_BUTTONS_EDIT_RIGHTPANEL,
@@ -123,6 +124,7 @@ static const NWidgetPart _widgets[] = {
 				/* Edit buttons */
 				NWidget(NWID_HORIZONTAL),
 					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_ADD), SetMinimalSize(100,12), SetResize(0,0), SetDataTip(STR_TBTR_ADD_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
+					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DELETE_TEMPLATE_LAST_VEH, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
 					NWidget(WWT_TEXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_CLONE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_CREATE_CLONE_VEH, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
 					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_DELETE), SetMinimalSize(75,12), SetResize(0,0), SetDataTip(STR_TBTR_DELETE_TEMPLATE, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
 					NWidget(WWT_PUSHTXTBTN, COLOUR_GREY, TRW_WIDGET_TMPL_BUTTONS_RPLALL), SetMinimalSize(150,12), SetResize(0,0), SetDataTip(STR_TBTR_RPL_ALL_TMPL, STR_REPLACE_ENGINE_WAGON_SELECT_HELP),
@@ -475,10 +477,10 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	int y = r.top;
 
 	uint max = min(vscroll_templates->GetPosition() + vscroll_templates->GetCapacity(), this->templates.Length());
-	const TemplateVehicle* tv;
+	TemplateVehicle* tv;
 	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i)
 	{
-		tv = (this->templates)[i];
+		tv = TemplateVehicle::Get((this->templates)[i]->index);
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
 		if ( this->index_selected_template == (int32)i ) {
@@ -656,6 +658,29 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				/* if no template was selected, select the newly created chain */
 				if ( this->index_selected_template == -1 )
 					this->index_selected_template = this->templates.Length() - 1;
+			}
+
+			break;
+		}
+		case TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH:
+		{
+			/* get the currently selected template */
+			TemplateID tid = INVALID_TEMPLATE;
+			if ( index_selected_template >= 0 )
+				tid = this->templates[index_selected_template]->index;
+			else
+				return;
+
+			/* delete the last engine */
+			uint num_templates = this->templates.Length();
+			bool successful = DoCommandP(0, tid, 0, CMD_TEMPLATE_DELETE_ENGINE);
+
+			if ( successful )
+			{
+				BuildTemplateList();
+				/* in case that the last engine of the template has been removed, reset the selected index */
+				if ( this->templates.Length() < num_templates )
+					this->index_selected_template = -1;
 			}
 
 			break;
