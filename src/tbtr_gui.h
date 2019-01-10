@@ -48,6 +48,7 @@ private:
 	void BuildGroupList();
 	void BuildTemplateList();
 	void BuildTemplateEngineList();
+	void CalculateTemplatesHScroll();
 	void DrawEngines(const Rect&) const;
 	void DrawGroups(const Rect&) const;
 	void DrawTemplateInfo(const Rect&) const;

@@ -326,6 +326,14 @@ void TbtrGui::BuildTemplateList()
 
 	this->templates.RebuildDone();
 	this->vscroll_templates->SetCount(this->templates.Length());
+	this->CalculateTemplatesHScroll();
+}
+
+/**
+ * TODO
+ */
+void TbtrGui::CalculateTemplatesHScroll()
+{
 	this->hscroll_templates->SetCount(this->FindLongestTemplateLength() + this->template_x_offset);
 }
 
@@ -536,7 +544,8 @@ uint TbtrGui::FindLongestTemplateLength() const
 {
 	uint max_len = 0;
 	for ( uint i=0; i<this->templates.Length(); ++i ) {
-		uint len = this->templates[i]->GetChainDisplayLength();
+		TemplateVehicle* tv = TemplateVehicle::Get(this->templates[i]->index);
+		uint len = tv->GetChainDisplayLength();
 		if ( len > max_len )
 			max_len = len;
 	}
@@ -572,10 +581,11 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		case TRW_WIDGET_TMPL_BUTTONS_DELETE: {
 			TemplateID tid = this->templates[this->index_selected_template]->index;
 			bool template_deleted = DoCommandP(0, tid, 0, CMD_DELETE_TEMPLATE);
-			if ( template_deleted )
-			{
+			if ( template_deleted ) {
 				this->index_selected_template = -1;
 			}
+			BuildTemplateList();
+			this->CalculateTemplatesHScroll();
 
 			break;
 		}
@@ -652,12 +662,12 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			bool successful = DoCommandP(0, tid, eid, CMD_TEMPLATE_ADD_ENGINE);
 
 			// TODO update the template list and update the gui
-			if ( successful )
-			{
+			if ( successful ) {
 				BuildTemplateList();
 				/* if no template was selected, select the newly created chain */
 				if ( this->index_selected_template == -1 )
 					this->index_selected_template = this->templates.Length() - 1;
+				this->CalculateTemplatesHScroll();
 			}
 
 			break;
@@ -675,12 +685,12 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			uint num_templates = this->templates.Length();
 			bool successful = DoCommandP(0, tid, 0, CMD_TEMPLATE_DELETE_ENGINE);
 
-			if ( successful )
-			{
+			if ( successful ) {
 				BuildTemplateList();
 				/* in case that the last engine of the template has been removed, reset the selected index */
 				if ( this->templates.Length() < num_templates )
 					this->index_selected_template = -1;
+				this->CalculateTemplatesHScroll();
 			}
 
 			break;
@@ -773,6 +783,8 @@ bool TbtrGui::OnVehicleSelect(const Vehicle* v)
 	this->ToggleWidgetLoweredState(TRW_WIDGET_TMPL_BUTTONS_CLONE);
 	ResetObjectToPlace();
 	this->SetDirty();
+
+	this->CalculateTemplatesHScroll();
 
 	return true;
 }

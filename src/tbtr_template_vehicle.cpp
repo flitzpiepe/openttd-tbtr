@@ -167,12 +167,16 @@ void TemplateVehicle::Draw(uint left, uint right, int y, int x_offset=0)
 
 /**
  * Calculate the sum of all sprite widths of this template and the rest of the chain
+ * Not const, might cache the sprite dimensions of a vehicle if it has not already been done.
  */
-uint TemplateVehicle::GetChainDisplayLength() const
+uint TemplateVehicle::GetChainDisplayLength()
 {
 	uint sum = 0;
-	for ( const TemplateVehicle* tmp=this; tmp; tmp=tmp->next )
+	for ( TemplateVehicle* tmp=this; tmp; tmp=tmp->next ) {
+		if ( tmp->cached_sprite_size == false )
+			GetTrainSpriteSize(tmp->engine_type, tmp->sprite_width, tmp->sprite_height, tmp->sprite_xoff, tmp->sprite_yoff, EIT_PURCHASE);
 		sum += tmp->sprite_width;
+	}
 	return sum;
 }
 
