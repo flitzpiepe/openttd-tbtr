@@ -247,8 +247,7 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
  */
 void TbtrGui::UpdateWidgetSize(int widget, Dimension *size, const Dimension &padding, Dimension *fill, Dimension *resize)
 {
-	switch (widget)
-	{
+	switch (widget) {
 		case TRW_WIDGET_MATRIX_GROUPS:
 			resize->height = GetVehicleListHeight(VEH_TRAIN, FONT_HEIGHT_NORMAL + WD_MATRIX_TOP) / 2;
 			size->height = 8 * resize->height;
@@ -332,7 +331,7 @@ void TbtrGui::BuildTemplateList()
  */
 void TbtrGui::CalculateTemplatesHScroll()
 {
-	this->hscroll_templates->SetCount(this->FindLongestTemplateLength() + this->template_x_offset);
+	this->hscroll_templates->SetCount(this->FindLongestTemplateDisplayWidth() + this->template_x_offset);
 }
 
 /*
@@ -411,9 +410,8 @@ void TbtrGui::DrawGroups(const Rect& r) const
 
 		/* Draw the index of the selected template for this group
 		 * Note, that this is the index into the group list, not the template's ID. */
-		if (group->template_id >= 0)
-		{
-			SetDParam(0, FindTemplateInGuiList(group->template_id));
+		if (group->template_id >= 0) {
+			SetDParam(0, FindTemplateIndexInGui(group->template_id));
 			DrawString ( left, right, y+2, STR_TBTR_TEMPLATE_USED_BY_GROUP, TC_BLACK, SA_HOR_CENTER);
 		}
 
@@ -476,6 +474,9 @@ void TbtrGui::DrawTemplateInfo(const Rect &r) const
 	}
 }
 
+/**
+ * Draw all templates in the GUI
+ */
 void TbtrGui::DrawTemplates(const Rect& r) const
 {
 	int left = r.left;
@@ -484,8 +485,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 
 	uint max = min(vscroll_templates->GetPosition() + vscroll_templates->GetCapacity(), this->templates.Length());
 	TemplateVehicle* tv;
-	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i)
-	{
+	for ( uint i = vscroll_templates->GetPosition(); i<max; ++i) {
 		tv = TemplateVehicle::Get((this->templates)[i]->index);
 
 		/* Fill the background of the current cell in a darker tone for the currently selected template */
@@ -516,8 +516,7 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 
 		/* Draw whether the current template is in use by any group */
 		int n_groups = tv->CountGroups();
-		if ( n_groups > 0 )
-		{
+		if ( n_groups > 0 ) {
 			SetDParam(0, n_groups);
 			DrawString(left+200, right, y + this->line_height - FONT_HEIGHT_SMALL - WD_FRAMERECT_BOTTOM - 2, STR_TBTR_TEMPLATE_IN_USE, TC_GREEN, SA_LEFT);
 		}
@@ -538,7 +537,10 @@ void TbtrGui::DrawTemplates(const Rect& r) const
 	}
 }
 
-uint TbtrGui::FindLongestTemplateLength() const
+/**
+ * Find the longest template with respect to the combined sprite width of the whole chain
+ */
+uint TbtrGui::FindLongestTemplateDisplayWidth() const
 {
 	uint max_len = 0;
 	for ( uint i=0; i<this->templates.Length(); ++i ) {
@@ -550,7 +552,13 @@ uint TbtrGui::FindLongestTemplateLength() const
 	return max_len;
 }
 
-int TbtrGui::FindTemplateInGuiList(TemplateID tid) const
+/**
+ * Return the index at which a given template is stored in the GUI
+ *
+ * @param tid: template id to look up
+ * @return:    index in the gui, default -1
+ */
+int TbtrGui::FindTemplateIndexInGui(TemplateID tid) const
 {
 	for ( uint i=0; i<templates.Length(); ++i )
 		if ( templates[i]->index == tid )
@@ -622,8 +630,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_START:
 		{
-			if ( this->index_selected_group>=0 && this->index_selected_template>=0 )
-			{
+			if ( this->index_selected_group>=0 && this->index_selected_template>=0 ) {
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
 				const Group* g = *(this->groups.Get(this->index_selected_group));
 				DoCommandP(0, g->index | (1 << 16), tv->index, CMD_START_STOP_TBTR);
@@ -632,8 +639,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 		}
 		case TRW_WIDGET_STOP:
 		{
-			if ( this->index_selected_group>=0 )
-			{
+			if ( this->index_selected_group>=0 ) {
 				DoCommandP(0, this->index_selected_group, 0, CMD_START_STOP_TBTR);
 			}
 			break;

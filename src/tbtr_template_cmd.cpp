@@ -104,10 +104,8 @@ CommandCost NeutralizeStatus(Train* train)
 CommandCost NeutralizeRemainderChain(Train* train) {
 	CommandCost cc = CommandCost();
 	Train* nextVeh = train->GetNextUnit();
-	while ( train != NULL )
-	{
-		if ( HasBit(train->subtype, GVSF_ENGINE) )
-		{
+	while ( train != NULL ) {
+		if ( HasBit(train->subtype, GVSF_ENGINE) ) {
 			cc.AddCost(DoCommand(train->tile, train->index, INVALID_VEHICLE, DC_EXEC, CMD_MOVE_RAIL_VEHICLE));
 			NeutralizeStatus(train);
 		}
@@ -127,8 +125,7 @@ CommandCost NeutralizeRemainderChain(Train* train) {
  */
 bool NotInChain(const Train* t, const Train* chain)
 {
-	while ( chain )
-	{
+	while ( chain ) {
 		if ( t == chain )
 			return false;
 		chain = chain->GetNextUnit();
@@ -149,24 +146,20 @@ void TransferCargo(Train* src, Train* dest)
 {
 	assert(dest->IsPrimaryVehicle());
 
-	while ( src )
-	{
+	while ( src ) {
 		CargoID _cargo_type = src->cargo_type;
 		byte _cargo_subtype = src->cargo_subtype;
 
 		/* how much cargo has to be moved (if possible) */
 		uint remainingAmount = src->cargo.TotalCount();
 		/* each vehicle in the new chain shall be given as much of the old cargo as possible, until none is left */
-		for (Train* tmp=dest; tmp!=NULL && remainingAmount>0; tmp=tmp->GetNextUnit())
-		{
-			if (tmp->cargo_type == _cargo_type && tmp->cargo_subtype == _cargo_subtype)
-			{
+		for (Train* tmp=dest; tmp!=NULL && remainingAmount>0; tmp=tmp->GetNextUnit()) {
+			if (tmp->cargo_type == _cargo_type && tmp->cargo_subtype == _cargo_subtype) {
 				/* calculate the free space for new cargo on the current vehicle */
 				uint curCap = tmp->cargo_cap - tmp->cargo.TotalCount();
 				uint moveAmount = std::min(remainingAmount, curCap);
 				/* move (parts of) the old vehicle's cargo onto the current vehicle of the new chain */
-				if (moveAmount > 0)
-				{
+				if (moveAmount > 0) {
 					src->cargo.Shift(moveAmount, &tmp->cargo);
 					remainingAmount -= moveAmount;
 				}
@@ -240,11 +233,9 @@ Train* FindMatchingTrainInDepot(TemplateVehicle* tv, TileIndex tile, Train* igno
 				&& ((train->IsPrimaryVehicle() && train->IsStoppedInDepot()) || train->IsFreeWagon())
 				&& train->engine_type == tv->engine_type
 				&& train->group_id == DEFAULT_GROUP
-				&& (ignore==NULL || NotInChain(train, ignore)) )
-		{
+				&& (ignore==NULL || NotInChain(train, ignore)) ) {
 			/* already found a matching vehicle, keep checking for matching refit + cargo amount */
-			if ( found != NULL && check_refit == true)
-			{
+			if ( found != NULL && check_refit == true) {
 				if ( train->cargo_type==tv->cargo_type && train->cargo_subtype==tv->cargo_subtype )
 					/* find something with a minimal amount of cargo, so that we can transfer more
 					 * from the original chain into it later */
@@ -311,8 +302,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	 * 		- buying a new one
 	 * The new vehicle is refitted as the template (if the template says so).
 	 */
-	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() )
-	{
+	for ( TemplateVehicle* cur_tmpl=template_vehicle ; cur_tmpl!=NULL ; cur_tmpl=cur_tmpl->GetNextUnit() ) {
 		/* try to find a matching vehicle in the incoming train */
 		Train* new_vehicle = FindMatchingTrainInChain(cur_tmpl, incoming);
 
@@ -321,44 +311,38 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			new_vehicle = FindMatchingTrainInDepot(cur_tmpl, tile, new_chain);
 
 		/* found a matching vehicle somewhere: use it ... */
-		if ( new_vehicle != NULL )
-		{
+		if ( new_vehicle != NULL ) {
 			/* find the first vehicle in incoming, which is != new_vehicle */
 			incoming = (new_vehicle == incoming) ? incoming->GetNextUnit() : incoming;
 
-			if ( new_chain == NULL )
-			{
+			if ( new_chain == NULL ) {
 				/* move the vehicle from the old chain to the new */
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 				if ( flags == DC_EXEC )
 					cc.AddCost(ccMove);
 				new_chain = new_vehicle;
 			 }
-			 else
-			 {
+			 else {
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->Last()->index, flags, CMD_MOVE_RAIL_VEHICLE);
 				if ( flags == DC_EXEC )
 					cc.AddCost(ccMove);
 			 }
 		}
 		/* ... otherwise buy a new one */
-		else
-		{
+		else {
 			CommandCost ccBuild = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
 			cc.AddCost(ccBuild);
 			new_vehicle = Train::Get(_new_vehicle_id);
 
 			/* form the new chain */
-			if ( new_chain == NULL )
-			{
+			if ( new_chain == NULL ) {
 				new_chain = new_vehicle;
 				CommandCost ccMove = DoCommand(tile, new_chain->Last()->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
 				if ( flags == DC_EXEC )
 					cc.AddCost(ccMove);
 			}
 			/* or just append to it, if it already exists */
-			else
-			{
+			else {
 				CommandCost ccMove = DoCommand(tile, new_vehicle->index, new_chain->Last()->index, flags, CMD_MOVE_RAIL_VEHICLE);
 				if ( flags == DC_EXEC )
 					cc.AddCost(ccMove);
@@ -366,8 +350,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 		}
 
 		/* maybe refit as template */
-		if ( refit_train )
-		{
+		if ( refit_train ) {
 			CargoID cargo_type = cur_tmpl->cargo_type;
 			byte cargo_subtype = cur_tmpl->cargo_subtype;
 			CommandCost ccRefit = DoCommand(0, new_vehicle->index, cargo_type | (cargo_subtype<<8) | (1<<16), flags, GetCmdRefitVeh(new_vehicle));
@@ -380,8 +363,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	}
 
 	/* some postprocessing steps */
-	if ( flags == DC_EXEC )
-	{
+	if ( flags == DC_EXEC ) {
 		/* train orders, group, etc. */
 		CommandCost ccCopy = CopyHeadSpecificThings(old_head, new_chain, flags);
 		cc.AddCost(ccCopy);
@@ -391,8 +373,7 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			TransferCargo(incoming, new_chain);
 
 		/* make the remainders sit peacefully in the depot */
-		if ( !sellRemainders )
-		{
+		if ( !sellRemainders ) {
 			if ( incoming && incoming != new_chain )
 				incoming->unitnumber = GetFreeUnitNumber(incoming->type);
 			if ( incoming )
@@ -570,8 +551,7 @@ CommandCost CmdCloneTemplateFromTrain(TileIndex ti, DoCommandFlag flags, uint32 
 	if (!TemplateVehicle::CanAllocateItem())
 		return CMD_ERROR;
 
-	if ( flags == DC_EXEC )
-	{
+	if ( flags == DC_EXEC ) {
 		TemplateVehicle* tv  = new TemplateVehicle(train->engine_type);
 		tv->CloneFromTrain(train, NULL);
 		tv->real_length = CeilDiv(train->gcache.cached_total_length * 10, TILE_SIZE);
@@ -596,11 +576,9 @@ CommandCost CmdDeleteTemplate(TileIndex ti, DoCommandFlag flags, uint32 p1, uint
 	if ( tv == NULL )
 		return CMD_ERROR;
 
-	if ( flags == DC_EXEC )
-	{
+	if ( flags == DC_EXEC ) {
 		Group* g;
-		FOR_ALL_GROUPS(g)
-		{
+		FOR_ALL_GROUPS(g) {
 			if ( g->template_id == tid )
 				g->template_id = INVALID_TEMPLATE;
 		}

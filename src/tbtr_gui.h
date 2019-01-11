@@ -50,8 +50,8 @@ private:
 	void DrawGroups(const Rect&) const;
 	void DrawTemplateInfo(const Rect&) const;
 	void DrawTemplates(const Rect&) const;
-	uint FindLongestTemplateLength() const;
-	int FindTemplateInGuiList(TemplateID) const;
+	uint FindLongestTemplateDisplayWidth() const;
+	int FindTemplateIndexInGui(TemplateID) const;
 
 	Scrollbar* vscroll_engines;         ///< Scrollbar for the engines list
 	Scrollbar* vscroll_groups;          ///< Scrollbar for the group list

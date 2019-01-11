@@ -79,7 +79,6 @@ public:
 
 	/** Vehicle drawing information */
 	uint16 real_length;                 ///< template length in tile units, for drawing in the gui
-	uint32 image_width;                 ///< used for drawing in a GUI
 	uint32 sprite_height;               ///< used for drawing in a GUI
 	uint32 sprite_width;                ///< used for drawing in a GUI
 	int sprite_xoff;                    ///< used for drawing in a GUI

@@ -78,8 +78,7 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
 	this->weight = gcache->cached_weight;
 	this->max_te = gcache->cached_max_te / 1000;
 
-	if ( train->GetNextUnit() )
-	{
+	if ( train->GetNextUnit() ) {
 		TemplateVehicle* tv = new TemplateVehicle();
 		if ( chainHead == NULL )
 			chainHead = this;
@@ -131,8 +130,7 @@ int TemplateVehicle::CountGroups() const
 {
 	int count = 0;
 	Group* g;
-	FOR_ALL_GROUPS(g)
-	{
+	FOR_ALL_GROUPS(g) {
 		if (g->owner == this->owner && g->template_id == this->index)
 			++count;
 	}
@@ -213,7 +211,6 @@ void TemplateVehicle::Init(EngineID eid)
 	this->engine_type = eid;
 	this->owner = _current_company;
 	this->real_length = 0;
-	this->image_width = 0;
 	this->cached_sprite_size = false;
 
 	this->reuse_depot_vehicles = true;
@@ -230,8 +227,7 @@ void TemplateVehicle::Init(EngineID eid)
 bool TemplateVehicle::TrainNeedsReplacement(Train* t)
 {
 	TemplateVehicle* tv = this;
-	while ( tv && t )
-	{
+	while ( tv && t ) {
 		if ( t->engine_type != tv->engine_type )
 			return true;
 		if ( t->subtype != tv->subtype )
