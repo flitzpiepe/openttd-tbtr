@@ -99,6 +99,10 @@ bool TemplateVehicle::CloneFromTrain(const Train* train, TemplateVehicle* chainH
  */
 bool TemplateVehicle::ContainsRailType(RailType railtype) const
 {
+	/* filtering disabled */
+	if ( railtype == INVALID_RAILTYPE )
+		return true;
+
 	const TemplateVehicle* tv = this;
 	/* For non-electrified rail engines, the whole chain must not contain any electrified engines or wagons */
 	if ( railtype == RAILTYPE_BEGIN || railtype == RAILTYPE_RAIL ) {

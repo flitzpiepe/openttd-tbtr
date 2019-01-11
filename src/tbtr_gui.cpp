@@ -231,6 +231,7 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	 * NOTE: has to be set after FinishInitNested(...) because this function will set the owner back to
 	 * INVALID_OWNER again */
 	this->owner = _local_company;
+	this->railtype = INVALID_RAILTYPE;
 
 	this->engines.ForceRebuild();
 
@@ -240,7 +241,6 @@ TbtrGui::TbtrGui(WindowDesc* wdesc) : Window(wdesc)
 	this->groups.Sort(&GroupNameSorter);
 
 	BuildTemplateList();
-
 }
 /*
  * Recalculate the size of the window's components
@@ -311,8 +311,6 @@ void TbtrGui::BuildGroupList()
 
 /*
  * Update the list of templates to display for a given owner and rail type.
- *
- * @param owner
  */
 void TbtrGui::BuildTemplateList()
 {
