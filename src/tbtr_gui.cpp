@@ -107,7 +107,7 @@ static const NWidgetPart _widgets[] = {
 			EndContainer(),
 			/* Info Area */
 			NWidget(NWID_VERTICAL),
-				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_INSET), SetMinimalSize(216,12), SetResize(1,0), SetDataTip(STR_TBTR_AVAILABLE_TEMPLATES, STR_TBTR_AVAILABLE_TEMPLATES), EndContainer(),
+				NWidget(WWT_INSET, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_INSET), SetMinimalSize(216,12), SetResize(1,0), SetDataTip(STR_TBTR_TEMPLATE_INFO, STR_TBTR_TEMPLATE_INFO), EndContainer(),
 				NWidget(WWT_PANEL, COLOUR_GREY, TRW_WIDGET_TMPL_INFO_PANEL), SetMinimalSize(216,50), SetResize(1,0), EndContainer(),
 			EndContainer(),
 			/* Control Area */

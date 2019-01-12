@@ -327,7 +327,7 @@ STR_TBTR_CANCEL                                                 :{BLACK}Cancel
 STR_TBTR_NEW                                                    :{BLACK}New Template Vehicle
 STR_TBTR_REFIT                                                  :{BLACK}Refit
 STR_TBTR_GROUP_INFO                                             :{BLACK}Group Info: {ORANGE}
-STR_TBTR_TEMPLATE_INFO                                          :{BLACK}Template Info: {ORANGE}
+STR_TBTR_TEMPLATE_INFO                                          :{BLACK}Template Info
 STR_TBTR_RPL_START                                              :{BLACK}Start replacing
 STR_TBTR_RPL_STOP                                               :{BLACK}Stop replacing
 STR_TBTR_TRAIN_OVR_VALUE                                        :{TINY_FONT}{BLACK}Train Value: {CURRENCY_SHORT}
