@@ -552,18 +552,15 @@ CommandCost CmdToggleTemplateOption(TileIndex ti, DoCommandFlag flags, uint32 p1
 
 	if ( flags == DC_EXEC ) {
 		switch (p2) {
-			case TBTR_OPT_KEEP_REMAINDERS:
-			{
+			case TBTR_OPT_KEEP_REMAINDERS: {
 				tv->keep_remaining_vehicles = !tv->keep_remaining_vehicles;
 				break;
 			}
-			case TBTR_OPT_REFIT_VEHICLE:
-			{
+			case TBTR_OPT_REFIT_VEHICLE: {
 				tv->refit_as_template = !tv->refit_as_template;
 				break;
 			}
-			case TBTR_OPT_REUSE_DEPOT_VEHICLES:
-			{
+			case TBTR_OPT_REUSE_DEPOT_VEHICLES: {
 				tv->reuse_depot_vehicles = !tv->reuse_depot_vehicles;
 				break;
 			}

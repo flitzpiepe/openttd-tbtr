@@ -595,8 +595,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			break;
 		}
-		case TRW_WIDGET_MATRIX_ENGINES:
-		{
+		case TRW_WIDGET_MATRIX_ENGINES: {
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_ENGINES]->pos_y) / (this->line_height/2) ) + this->vscroll_engines->GetPosition();
 			if ( index_new >= this->engines.Length() )
 				this->index_selected_engine = -1;
@@ -606,8 +605,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_engine = index_new;
 			break;
 		}
-		case TRW_WIDGET_MATRIX_GROUPS:
-		{
+		case TRW_WIDGET_MATRIX_GROUPS: {
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_GROUPS]->pos_y) / (this->line_height/2) ) + this->vscroll_groups->GetPosition();
 			if ( index_new >= this->groups.Length() )
 				this->index_selected_group = -1;
@@ -617,8 +615,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_group = index_new;
 			break;
 		}
-		case TRW_WIDGET_MATRIX_TEMPLATES:
-		{
+		case TRW_WIDGET_MATRIX_TEMPLATES: {
 			uint16 index_new = (uint16)((pt.y - this->nested_array[TRW_WIDGET_MATRIX_TEMPLATES]->pos_y) / this->line_height ) + this->vscroll_templates->GetPosition();
 			if ( index_new >= this->templates.Length() )
 				this->index_selected_template = -1;
@@ -628,8 +625,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 				this->index_selected_template = index_new;
 			break;
 		}
-		case TRW_WIDGET_START:
-		{
+		case TRW_WIDGET_START: {
 			if ( this->index_selected_group>=0 && this->index_selected_template>=0 ) {
 				const TemplateVehicle* tv = *(this->templates.Get(this->index_selected_template));
 				const Group* g = *(this->groups.Get(this->index_selected_group));
@@ -637,15 +633,13 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
-		case TRW_WIDGET_STOP:
-		{
+		case TRW_WIDGET_STOP: {
 			if ( this->index_selected_group>=0 ) {
 				DoCommandP(0, this->index_selected_group, 0, CMD_START_STOP_TBTR);
 			}
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_ADD:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_ADD: {
 			/* get the selected engine */
 			if ( index_selected_engine == -1 )
 				return;
@@ -671,8 +665,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_DELETE_LAST_VEH: {
 			/* get the currently selected template */
 			TemplateID tid = INVALID_TEMPLATE;
 			if ( index_selected_template >= 0 )
@@ -694,8 +687,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REUSE: {
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
 				TemplateID template_index = ((this->templates)[index_selected_template])->index;
 				DoCommandP(0, template_index, TBTR_OPT_REUSE_DEPOT_VEHICLES, CMD_TOGGLE_TEMPLATE_OPTION);
@@ -709,8 +701,7 @@ void TbtrGui::OnClick(Point pt, int widget, int click_count)
 			}
 			break;
 		}
-		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT:
-		{
+		case TRW_WIDGET_TMPL_BUTTONS_CONFIGTMPL_REFIT: {
 			if ( index_selected_template >= 0 && index_selected_template < (int)(this->templates.Length()) ) {
 				TemplateID template_index = ((this->templates)[index_selected_template])->index;
 				DoCommandP(0, template_index, TBTR_OPT_REFIT_VEHICLE, CMD_TOGGLE_TEMPLATE_OPTION);
