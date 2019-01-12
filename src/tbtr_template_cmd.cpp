@@ -292,6 +292,18 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 	SavedRandomSeeds saved_seeds;
 	SaveRandomSeeds(&saved_seeds);
 
+	/* backup the incoming chain in order to possibly restore it */
+	std::list<VehicleID> backup_incoming;
+	/* remember the IDs of vehicles that were bought during the replacement process */
+	std::list<VehicleID> backup_new_vehicles;
+	if ( flags == DC_EXEC ) {
+		Train* tmp = incoming;
+		while ( tmp ) {
+			backup_incoming.push_back(tmp->index);
+			tmp = tmp->GetNextUnit();
+		}
+	}
+
 	/*
 	 * Procedure
 	 *
@@ -333,11 +345,15 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 			CommandCost ccBuild = DoCommand(tile, cur_tmpl->engine_type, 0, flags, CMD_BUILD_VEHICLE);
 			cc.AddCost(ccBuild);
 			new_vehicle = Train::Get(_new_vehicle_id);
+			/* remember this vehicle in case we want to restore the original train later */
+			if ( flags == DC_EXEC )
+				backup_new_vehicles.push_back(new_vehicle->index);
 
 			/* form the new chain */
 			if ( new_chain == NULL ) {
 				new_chain = new_vehicle;
-				CommandCost ccMove = DoCommand(tile, new_chain->Last()->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				CommandCost ccMove = DoCommand(tile, new_chain->index, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+				/* a move to INVALID_VEHICLE will fail under flags==DC_NONE */
 				if ( flags == DC_EXEC )
 					cc.AddCost(ccMove);
 			}
@@ -360,6 +376,29 @@ CommandCost CmdTemplateReplacement(TileIndex ti, DoCommandFlag flags, uint32 p1,
 
 		/* restore seeds from before the replacement */
 		RestoreRandomSeeds(saved_seeds);
+	}
+
+	/* restore backup */
+	if ( flags == DC_EXEC && cc.Succeeded() == false ) {
+		CommandCost ccRestore = CommandCost();
+		auto it = backup_incoming.begin();
+
+		/* re-create the original chain */
+		DoCommand(tile, *it, INVALID_VEHICLE, flags, CMD_MOVE_RAIL_VEHICLE);
+		Train* restore_chain = Train::Get(*it);
+		for ( ++it; it != backup_incoming.end(); ++it )
+			DoCommand(tile, *it, restore_chain->Last()->index, flags, CMD_MOVE_RAIL_VEHICLE);
+
+		/* sell all vehicles that have been bought during the replacement */
+		for ( auto bought=backup_new_vehicles.begin(); bought!=backup_new_vehicles.end(); ++bought ) {
+			CommandCost sell = DoCommand(tile, *bought, 0, flags, CMD_SELL_VEHICLE);
+			ccRestore.AddCost(sell);
+			_new_vehicle_id = 0;
+		}
+
+		/* launch the original train again */
+		restore_chain->vehstatus &= ~VS_STOPPED;
+		return CMD_ERROR;
 	}
 
 	/* some postprocessing steps */
