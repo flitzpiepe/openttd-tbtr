@@ -132,9 +132,9 @@ static inline void SetTileType(TileIndex tile, TileType type)
 }
 
 /**
- * Checks if a tile is a give tiletype.
+ * Checks if a tile is a given tiletype.
  *
- * This function checks if a tile got the given tiletype.
+ * This function checks if a tile has the given tiletype.
  *
  * @param tile The tile to check
  * @param type The type to check against
@@ -293,7 +293,7 @@ int GetTilePixelZOutsideMap(int x, int y);
 
 /**
  * Get top height of the tile
- * @param t Tile to compute height of
+ * @param tile Tile to compute height of
  * @return Maximum height of the tile
  */
 static inline int GetTileMaxPixelZ(TileIndex tile)

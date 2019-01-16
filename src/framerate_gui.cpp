@@ -15,18 +15,21 @@
 #include "window_gui.h"
 #include "table/sprites.h"
 #include "strings_func.h"
-#include "debug.h"
 #include "console_func.h"
 #include "console_type.h"
+#include "guitimer_func.h"
 
 #include "widgets/framerate_widget.h"
 
 
+/**
+ * Private declarations for performance measurement implementation
+ */
 namespace {
 
 	/** Number of data points to keep in buffer for each performance measurement */
 	const int NUM_FRAMERATE_POINTS = 512;
-	/** Units a second is divided into in performance measurements */
+	/** %Units a second is divided into in performance measurements */
 	const TimingMeasurement TIMESTAMP_PRECISION = 1000000;
 
 	struct PerformanceData {
@@ -51,8 +54,15 @@ namespace {
 		/** Start time for current accumulation cycle */
 		TimingMeasurement acc_timestamp;
 
+		/**
+		 * Initialize a data element with an expected collection rate
+		 * @param expected_rate
+		 * Expected number of cycles per second of the performance element. Use 1 if unknown or not relevant.
+		 * The rate is used for highlighting slow-running elements in the GUI.
+		 */
 		explicit PerformanceData(double expected_rate) : expected_rate(expected_rate), next_index(0), prev_index(0), num_valid(0) { }
 
+		/** Collect a complete measurement, given start and ending times for a processing block */
 		void Add(TimingMeasurement start_time, TimingMeasurement end_time)
 		{
 			this->durations[this->next_index] = end_time - start_time;
@@ -63,6 +73,7 @@ namespace {
 			this->num_valid = min(NUM_FRAMERATE_POINTS, this->num_valid + 1);
 		}
 
+		/** Begin an accumulation of multiple measurements into a single value, from a given start time */
 		void BeginAccumulate(TimingMeasurement start_time)
 		{
 			this->timestamps[this->next_index] = this->acc_timestamp;
@@ -76,11 +87,13 @@ namespace {
 			this->acc_timestamp = start_time;
 		}
 
+		/** Accumulate a period onto the current measurement */
 		void AddAccumulate(TimingMeasurement duration)
 		{
 			this->acc_duration += duration;
 		}
 
+		/** Indicate a pause/expected discontinuity in processing the element */
 		void AddPause(TimingMeasurement start_time)
 		{
 			if (this->durations[this->prev_index] != INVALID_DURATION) {
@@ -125,11 +138,11 @@ namespace {
 			int last_point = this->next_index - this->num_valid;
 			if (last_point < 0) last_point += NUM_FRAMERATE_POINTS;
 
-			/** Number of data points collected */
+			/* Number of data points collected */
 			int count = 0;
-			/** Time of previous data point */
+			/* Time of previous data point */
 			TimingMeasurement last = this->timestamps[point];
-			/** Total duration covered by collected points */
+			/* Total duration covered by collected points */
 			TimingMeasurement total = 0;
 
 			while (point != last_point) {
@@ -149,9 +162,14 @@ namespace {
 		}
 	};
 
-	/** Game loop rate, cycles per second */
+	/** %Game loop rate, cycles per second */
 	static const double GL_RATE = 1000.0 / MILLISECONDS_PER_TICK;
 
+	/**
+	 * Storage for all performance element measurements.
+	 * Elements are initialized with the expected rate in recorded values per second.
+	 * @hideinitializer
+	 */
 	PerformanceData _pf_data[PFE_MAX] = {
 		PerformanceData(GL_RATE),               // PFE_GAMELOOP
 		PerformanceData(1),                     // PFE_ACC_GL_ECONOMY
@@ -182,7 +200,10 @@ static TimingMeasurement GetPerformanceTimer()
 }
 
 
-/** Begin a cycle of a measured element. */
+/**
+ * Begin a cycle of a measured element.
+ * @param elem The element to be measured
+ */
 PerformanceMeasurer::PerformanceMeasurer(PerformanceElement elem)
 {
 	assert(elem < PFE_MAX);
@@ -203,14 +224,20 @@ void PerformanceMeasurer::SetExpectedRate(double rate)
 	_pf_data[this->elem].expected_rate = rate;
 }
 
-/** Indicate that a cycle of "pause" where no processing occurs. */
+/**
+ * Indicate that a cycle of "pause" where no processing occurs.
+ * @param elem The element not currently being processed
+ */
 void PerformanceMeasurer::Paused(PerformanceElement elem)
 {
 	_pf_data[elem].AddPause(GetPerformanceTimer());
 }
 
 
-/** Begin measuring one block of the accumulating value. */
+/**
+ * Begin measuring one block of the accumulating value.
+ * @param elem The element to be measured
+ */
 PerformanceAccumulator::PerformanceAccumulator(PerformanceElement elem)
 {
 	assert(elem < PFE_MAX);
@@ -225,7 +252,11 @@ PerformanceAccumulator::~PerformanceAccumulator()
 	_pf_data[this->elem].AddAccumulate(GetPerformanceTimer() - this->start_time);
 }
 
-/** Store the previous accumulator value and reset for a new cycle of accumulating measurements. */
+/**
+ * Store the previous accumulator value and reset for a new cycle of accumulating measurements.
+ * @note This function must be called once per frame, otherwise measurements are not collected.
+ * @param elem The element to begin a new measurement cycle of
+ */
 void PerformanceAccumulator::Reset(PerformanceElement elem)
 {
 	_pf_data[elem].BeginAccumulate(GetPerformanceTimer());
@@ -235,6 +266,7 @@ void PerformanceAccumulator::Reset(PerformanceElement elem)
 void ShowFrametimeGraphWindow(PerformanceElement elem);
 
 
+/** @hideinitializer */
 static const NWidgetPart _framerate_window_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
@@ -263,7 +295,7 @@ static const NWidgetPart _framerate_window_widgets[] = {
 
 struct FramerateWindow : Window {
 	bool small;
-	uint32 next_update;
+	GUITimer next_update;
 
 	struct CachedDecimal {
 		StringID strid;
@@ -307,21 +339,24 @@ struct FramerateWindow : Window {
 		this->InitNested(number);
 		this->small = this->IsShaded();
 		this->UpdateData();
+		this->next_update.SetInterval(100);
 	}
 
-	virtual void OnTick()
+	virtual void OnRealtimeTick(uint delta_ms)
 	{
+		bool elapsed = this->next_update.Elapsed(delta_ms);
+
 		/* Check if the shaded state has changed, switch caption text if it has */
 		if (this->small != this->IsShaded()) {
 			this->small = this->IsShaded();
 			this->GetWidget<NWidgetLeaf>(WID_FRW_CAPTION)->SetDataTip(this->small ? STR_FRAMERATE_CAPTION_SMALL : STR_FRAMERATE_CAPTION, STR_TOOLTIP_WINDOW_TITLE_DRAG_THIS);
-			this->next_update = 0;
+			elapsed = true;
 		}
 
-		if (_realtime_tick >= this->next_update) {
+		if (elapsed) {
 			this->UpdateData();
 			this->SetDirty();
-			this->next_update = _realtime_tick + 100;
+			this->next_update.SetInterval(100);
 		}
 	}
 
@@ -418,7 +453,7 @@ struct FramerateWindow : Window {
 	void DrawElementTimesColumn(const Rect &r, StringID heading_str, const CachedDecimal *values) const
 	{
 		int y = r.top;
-		DrawString(r.left, r.right, y, heading_str, TC_FROMSTRING, SA_CENTER);
+		DrawString(r.left, r.right, y, heading_str, TC_FROMSTRING, SA_CENTER, true);
 		y += FONT_HEIGHT_NORMAL + VSPACING;
 
 		for (PerformanceElement e = PFE_FIRST; e < PFE_MAX; e++) {
@@ -478,6 +513,7 @@ static WindowDesc _framerate_display_desc(
 );
 
 
+/** @hideinitializer */
 static const NWidgetPart _frametime_graph_window_widgets[] = {
 	NWidget(NWID_HORIZONTAL),
 		NWidget(WWT_CLOSEBOX, COLOUR_GREY),
@@ -494,7 +530,7 @@ static const NWidgetPart _frametime_graph_window_widgets[] = {
 struct FrametimeGraphWindow : Window {
 	int vertical_scale;       ///< number of TIMESTAMP_PRECISION units vertically
 	int horizontal_scale;     ///< number of half-second units horizontally
-	uint32 next_scale_update; ///< realtime tick for next scale update
+	GUITimer next_scale_update; ///< interval for next scale update
 
 	PerformanceElement element; ///< what element this window renders graph for
 	Dimension graph_size;       ///< size of the main graph area (excluding axis labels)
@@ -504,7 +540,7 @@ struct FrametimeGraphWindow : Window {
 		this->element = (PerformanceElement)number;
 		this->horizontal_scale = 4;
 		this->vertical_scale = TIMESTAMP_PRECISION / 10;
-		this->next_scale_update = 0;
+		this->next_scale_update.SetInterval(1);
 
 		this->InitNested(number);
 	}
@@ -616,12 +652,12 @@ struct FrametimeGraphWindow : Window {
 		this->SelectVerticalScale(peak_value);
 	}
 
-	virtual void OnTick()
+	virtual void OnRealtimeTick(uint delta_ms)
 	{
 		this->SetDirty();
 
-		if (this->next_scale_update < _realtime_tick) {
-			this->next_scale_update = _realtime_tick + 500;
+		if (this->next_scale_update.Elapsed(delta_ms)) {
+			this->next_scale_update.SetInterval(500);
 			this->UpdateScale();
 		}
 	}
@@ -758,17 +794,20 @@ static WindowDesc _frametime_graph_window_desc(
 
 
 
+/** Open the general framerate window */
 void ShowFramerateWindow()
 {
 	AllocateWindowDescFront<FramerateWindow>(&_framerate_display_desc, 0);
 }
 
+/** Open a graph window for a performance element */
 void ShowFrametimeGraphWindow(PerformanceElement elem)
 {
 	if (elem < PFE_FIRST || elem >= PFE_MAX) return; // maybe warn?
 	AllocateWindowDescFront<FrametimeGraphWindow>(&_frametime_graph_window_desc, elem, true);
 }
 
+/** Print performance statistics to game console */
 void ConPrintFramerate()
 {
 	const int count1 = NUM_FRAMERATE_POINTS / 8;

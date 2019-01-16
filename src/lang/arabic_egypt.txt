@@ -1119,6 +1119,7 @@ STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD                      :السماح ب
 STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}تغير هذا الخيار غير متاح عندما يكون هناك عربات
 STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :صيانة البنية التحتية: {STRING}
 
+
 STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :المطارات لا تنتهي صلاحيتها {STRING}
 
 STR_CONFIG_SETTING_WARN_LOST_VEHICLE                            :حذر إذا فقدت المركبة {STRING}
@@ -3667,7 +3668,6 @@ STR_ERROR_TOO_MANY_STATIONS_LOADING                             :{WHITE}يوجد
 STR_ERROR_TOO_MANY_STATION_SPECS                                :{WHITE}يوجد الكثير من قطاعات محطه السكه الحديديه
 STR_ERROR_TOO_MANY_BUS_STOPS                                    :{WHITE}يوجد الكثير من محطات الحافلات
 STR_ERROR_TOO_MANY_TRUCK_STOPS                                  :{WHITE}يوجد الكثير من محطات الشاحنات
-STR_ERROR_TOO_CLOSE_TO_ANOTHER_STATION                          :{WHITE}قريب للغايه من محطه اخرى
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_DOCK                             :{WHITE}قريب للغايه من مَرسَى اخر
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_AIRPORT                          :{WHITE}قريب للغايه من مطار اخر
 STR_ERROR_CAN_T_RENAME_STATION                                  :{WHITE}تعذر إعاده تسميه المحطه...

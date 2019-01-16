@@ -37,6 +37,8 @@
 #include "game/game.hpp"
 #include "video/video_driver.hpp"
 #include "framerate_type.h"
+#include "network/network_func.h"
+#include "guitimer_func.h"
 
 #include "safeguards.h"
 
@@ -49,7 +51,7 @@ enum ViewportAutoscrolling {
 };
 
 static Point _drag_delta; ///< delta between mouse cursor and upper left corner of dragged window
-static Window *_mouseover_last_w = NULL; ///< Window of the last #MOUSEOVER event.
+static Window *_mouseover_last_w = NULL; ///< Window of the last OnMouseOver event.
 static Window *_last_scroll_window = NULL; ///< Window of the last scroll event.
 
 /** List of windows opened at the screen sorted from the front. */
@@ -938,6 +940,8 @@ static void DrawOverlappedWindow(Window *w, int left, int top, int right, int bo
 void DrawOverlappedWindowForAll(int left, int top, int right, int bottom)
 {
 	Window *w;
+
+	DrawPixelInfo *old_dpi = _cur_dpi;
 	DrawPixelInfo bk;
 	_cur_dpi = &bk;
 
@@ -951,6 +955,7 @@ void DrawOverlappedWindowForAll(int left, int top, int right, int bottom)
 			DrawOverlappedWindow(w, max(left, w->left), max(top, w->top), min(right, w->left + w->width), min(bottom, w->top + w->height));
 		}
 	}
+	_cur_dpi = old_dpi;
 }
 
 /**
@@ -1115,7 +1120,7 @@ Window *FindWindowById(WindowClass cls, WindowNumber number)
 
 /**
  * Find any window by its class. Useful when searching for a window that uses
- * the window number as a #WindowType, like #WC_SEND_NETWORK_MSG.
+ * the window number as a #WindowClass, like #WC_SEND_NETWORK_MSG.
  * @param cls Window class
  * @return Pointer to the found window, or \c NULL if not available
  */
@@ -1430,7 +1435,6 @@ static void BringWindowToFront(Window *w)
 
 /**
  * Initializes the data (except the position and initial size) of a new Window.
- * @param desc          Window description.
  * @param window_number Number being assigned to the new window
  * @return Window pointer of the newly created window
  * @pre If nested widgets are used (\a widget is \c NULL), #nested_root and #nested_array_size must be initialized.
@@ -1739,7 +1743,7 @@ static Point LocalGetWindowPlacement(const WindowDesc *desc, int16 sm_width, int
 	int16 default_width  = max(desc->GetDefaultWidth(),  sm_width);
 	int16 default_height = max(desc->GetDefaultHeight(), sm_height);
 
-	if (desc->parent_cls != 0 /* WC_MAIN_WINDOW */ && (w = FindWindowById(desc->parent_cls, window_number)) != NULL) {
+	if (desc->parent_cls != WC_NONE && (w = FindWindowById(desc->parent_cls, window_number)) != NULL) {
 		bool rtl = _current_text_dir == TD_RTL;
 		if (desc->parent_cls == WC_BUILD_TOOLBAR || desc->parent_cls == WC_SCEN_LAND_GEN) {
 			pt.x = w->left + (rtl ? w->width - default_width : 0);
@@ -1917,6 +1921,8 @@ void ResetWindowSystem()
 
 static void DecreaseWindowCounters()
 {
+	if (_scroller_click_timeout != 0) _scroller_click_timeout--;
+
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
 		if (_scroller_click_timeout == 0) {
@@ -2000,7 +2006,7 @@ static void HandleMouseOver()
 {
 	Window *w = FindWindowFromPt(_cursor.pos.x, _cursor.pos.y);
 
-	/* We changed window, put a MOUSEOVER event to the last window */
+	/* We changed window, put an OnMouseOver event to the last window */
 	if (_mouseover_last_w != NULL && _mouseover_last_w != w) {
 		/* Reset mouse-over coordinates of previous window */
 		Point pt = { -1, -1 };
@@ -2749,18 +2755,17 @@ static void HandleAutoscroll()
 	y -= vp->top;
 
 	/* here allows scrolling in both x and y axis */
-#define scrollspeed 3
+	static const int SCROLLSPEED = 3;
 	if (x - 15 < 0) {
-		w->viewport->dest_scrollpos_x += ScaleByZoom((x - 15) * scrollspeed, vp->zoom);
+		w->viewport->dest_scrollpos_x += ScaleByZoom((x - 15) * SCROLLSPEED, vp->zoom);
 	} else if (15 - (vp->width - x) > 0) {
-		w->viewport->dest_scrollpos_x += ScaleByZoom((15 - (vp->width - x)) * scrollspeed, vp->zoom);
+		w->viewport->dest_scrollpos_x += ScaleByZoom((15 - (vp->width - x)) * SCROLLSPEED, vp->zoom);
 	}
 	if (y - 15 < 0) {
-		w->viewport->dest_scrollpos_y += ScaleByZoom((y - 15) * scrollspeed, vp->zoom);
+		w->viewport->dest_scrollpos_y += ScaleByZoom((y - 15) * SCROLLSPEED, vp->zoom);
 	} else if (15 - (vp->height - y) > 0) {
-		w->viewport->dest_scrollpos_y += ScaleByZoom((15 - (vp->height - y)) * scrollspeed, vp->zoom);
+		w->viewport->dest_scrollpos_y += ScaleByZoom((15 - (vp->height - y)) * SCROLLSPEED, vp->zoom);
 	}
-#undef scrollspeed
 }
 
 enum MouseClick {
@@ -3045,7 +3050,6 @@ void InputLoop()
 	assert(HasModalProgress() || IsLocalCompany());
 
 	CheckSoftLimit();
-	HandleKeyScrolling();
 
 	/* Do the actual free of the deleted windows. */
 	for (Window *v = _z_front_window; v != NULL; /* nothing */) {
@@ -3058,9 +3062,6 @@ void InputLoop()
 		free(w);
 	}
 
-	if (_scroller_click_timeout != 0) _scroller_click_timeout--;
-	DecreaseWindowCounters();
-
 	if (_input_events_this_tick != 0) {
 		/* The input loop is called only once per GameLoop() - so we can clear the counter here */
 		_input_events_this_tick = 0;
@@ -3070,7 +3071,17 @@ void InputLoop()
 
 	/* HandleMouseEvents was already called for this tick */
 	HandleMouseEvents();
-	HandleAutoscroll();
+}
+
+/**
+ * Dispatch OnRealtimeTick event over all windows
+ */
+void CallWindowRealtimeTickEvent(uint delta_ms)
+{
+	Window *w;
+	FOR_ALL_WINDOWS_FROM_FRONT(w) {
+		w->OnRealtimeTick(delta_ms);
+	}
 }
 
 /**
@@ -3078,16 +3089,47 @@ void InputLoop()
  */
 void UpdateWindows()
 {
+	static uint32 last_realtime_tick = _realtime_tick;
+	uint delta_ms = _realtime_tick - last_realtime_tick;
+	last_realtime_tick = _realtime_tick;
+
+	if (delta_ms == 0) return;
+
 	PerformanceMeasurer framerate(PFE_DRAWING);
 	PerformanceAccumulator::Reset(PFE_DRAWWORLD);
 
+	CallWindowRealtimeTickEvent(delta_ms);
+
+#ifdef ENABLE_NETWORKING
+	static GUITimer network_message_timer = GUITimer(1);
+	if (network_message_timer.Elapsed(delta_ms)) {
+		network_message_timer.SetInterval(1000);
+		NetworkChatMessageLoop();
+	}
+#endif
+
 	Window *w;
 
-	static int highlight_timer = 1;
-	if (--highlight_timer == 0) {
-		highlight_timer = 15;
+	static GUITimer window_timer = GUITimer(1);
+	if (window_timer.Elapsed(delta_ms)) {
+		if (_network_dedicated) window_timer.SetInterval(MILLISECONDS_PER_TICK);
+
+		extern int _caret_timer;
+		_caret_timer += 3;
+		CursorTick();
+
+		HandleKeyScrolling();
+		HandleAutoscroll();
+		DecreaseWindowCounters();
+	}
+
+	static GUITimer highlight_timer = GUITimer(1);
+	if (highlight_timer.Elapsed(delta_ms)) {
+		highlight_timer.SetInterval(450);
 		_window_highlight_colour = !_window_highlight_colour;
 	}
+
+	if (!_pause_mode || _game_mode == GM_EDITOR || _settings_game.construction.command_pause_level > CMDPL_NO_CONSTRUCTION) MoveAllTextEffects(delta_ms);
 
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
 		w->ProcessScheduledInvalidations();
@@ -3098,21 +3140,23 @@ void UpdateWindows()
 	 * But still empty the invalidation queues above. */
 	if (_network_dedicated) return;
 
-	static int we4_timer = 0;
-	int t = we4_timer + 1;
+	static GUITimer hundredth_timer = GUITimer(1);
+	if (hundredth_timer.Elapsed(delta_ms)) {
+		hundredth_timer.SetInterval(3000); // Historical reason: 100 * MILLISECONDS_PER_TICK
 
-	if (t >= 100) {
 		FOR_ALL_WINDOWS_FROM_FRONT(w) {
 			w->OnHundredthTick();
 		}
-		t = 0;
 	}
-	we4_timer = t;
 
-	FOR_ALL_WINDOWS_FROM_FRONT(w) {
-		if ((w->flags & WF_WHITE_BORDER) && --w->white_border_timer == 0) {
-			CLRBITS(w->flags, WF_WHITE_BORDER);
-			w->SetDirty();
+	if (window_timer.HasElapsed()) {
+		window_timer.SetInterval(MILLISECONDS_PER_TICK);
+
+		FOR_ALL_WINDOWS_FROM_FRONT(w) {
+			if ((w->flags & WF_WHITE_BORDER) && --w->white_border_timer == 0) {
+				CLRBITS(w->flags, WF_WHITE_BORDER);
+				w->SetDirty();
+			}
 		}
 	}
 
@@ -3262,13 +3306,13 @@ void InvalidateWindowClassesData(WindowClass cls, int data, bool gui_scope)
 }
 
 /**
- * Dispatch WE_TICK event over all windows
+ * Dispatch OnGameTick event over all windows
  */
-void CallWindowTickEvent()
+void CallWindowGameTickEvent()
 {
 	Window *w;
 	FOR_ALL_WINDOWS_FROM_FRONT(w) {
-		w->OnTick();
+		w->OnGameTick();
 	}
 }
 

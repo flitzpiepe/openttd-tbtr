@@ -817,6 +817,7 @@ STR_NEWS_MERGER_TAKEOVER_TITLE                                  :{BIG_FONT}{BLAC
 STR_PRESIDENT_NAME_MANAGER                                      :{BLACK}{PRESIDENT_NAME}{}(Presidente)
 
 STR_NEWS_NEW_TOWN                                               :{BLACK}{BIG_FONT}La {STRING} finanzia la costruzione della nuova cittadina di {TOWN}!
+STR_NEWS_NEW_TOWN_UNSPONSORED                                   :{BLACK}{BIG_FONT}È stata fondata una nuova città chiamata {TOWN}!
 
 STR_NEWS_INDUSTRY_CONSTRUCTION                                  :{BIG_FONT}{BLACK}Nuov{G o o a} {STRING} in costruzione vicino a {TOWN}!
 STR_NEWS_INDUSTRY_PLANTED                                       :{BIG_FONT}{BLACK}Nuov{G 0 o o a} {STRING} piantat{G 0 o o a} vicino a {TOWN}!
@@ -1280,6 +1281,7 @@ STR_CONFIG_SETTING_STOP_ON_COMPETITOR_ROAD_HELPTEXT             :Consente la cos
 STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}Non è possibile modificare questa impostazione quando esistono veicoli
 STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :Manutenzione infrastrutture: {STRING}
 STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE_HELPTEXT          :Se abilitata, le infrastrutture causano dei costi di manutenzione. I costi crescono in modo più che proporzionale alla dimensione della rete, influenzando maggiormente le compagnie più grandi rispetto alle piccole
+
 
 STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :Non rendere mai obsoleti i tipi di aeroporto: {STRING}
 STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS_HELPTEXT               :Abilitando questa impostazione, tutti i tipi di aeroporto rimangono disponibili indefinitamente dopo essere stati introdotti
@@ -2732,36 +2734,36 @@ STR_ABOUT_COPYRIGHT_OPENTTD                                     :{BLACK}OpenTTD 
 # Framerate display window
 STR_FRAMERATE_CAPTION                                           :{WHITE}Frame rate
 STR_FRAMERATE_CAPTION_SMALL                                     :{STRING}{WHITE} ({DECIMAL}x)
-STR_FRAMERATE_RATE_GAMELOOP                                     :{WHITE}Velocità simulazione: {STRING}
+STR_FRAMERATE_RATE_GAMELOOP                                     :{BLACK}Velocità simulazione: {STRING}
 STR_FRAMERATE_RATE_GAMELOOP_TOOLTIP                             :{BLACK}Numero di cicli di simulazione della partita in un secondo
-STR_FRAMERATE_RATE_BLITTER                                      :{WHITE}Frame rate grafica: {STRING}
+STR_FRAMERATE_RATE_BLITTER                                      :{BLACK}Frame rate grafica: {STRING}
 STR_FRAMERATE_RATE_BLITTER_TOOLTIP                              :{BLACK}Numero di fotogrammi video renderizzati in un secondo
-STR_FRAMERATE_SPEED_FACTOR                                      :{WHITE}Fattore di velocità corrente della partita: {DECIMAL}x
+STR_FRAMERATE_SPEED_FACTOR                                      :{BLACK}Fattore di velocità corrente della partita: {DECIMAL}x
 STR_FRAMERATE_SPEED_FACTOR_TOOLTIP                              :{BLACK}Prestazioni correnti della partita, confrontate con le prestazioni attese alla velocità di giorno normale.
 STR_FRAMERATE_CURRENT                                           :{WHITE}Corrente
 STR_FRAMERATE_AVERAGE                                           :{WHITE}Media
-STR_FRAMERATE_DATA_POINTS                                       :{WHITE}Dati basati su {COMMA} misurazioni
-STR_FRAMERATE_MS_GOOD                                           :{LTBLUE}{DECIMAL}{WHITE} ms
-STR_FRAMERATE_MS_WARN                                           :{YELLOW}{DECIMAL}{WHITE} ms
-STR_FRAMERATE_MS_BAD                                            :{RED}{DECIMAL}{WHITE} ms
-STR_FRAMERATE_FPS_GOOD                                          :{LTBLUE}{DECIMAL}{WHITE} frame/s
-STR_FRAMERATE_FPS_WARN                                          :{YELLOW}{DECIMAL}{WHITE} frame/s
-STR_FRAMERATE_FPS_BAD                                           :{RED}{DECIMAL}{WHITE} frame/s
+STR_FRAMERATE_DATA_POINTS                                       :{BLACK}Dati basati su {COMMA} misurazioni
+STR_FRAMERATE_MS_GOOD                                           :{LTBLUE}{DECIMAL} ms
+STR_FRAMERATE_MS_WARN                                           :{YELLOW}{DECIMAL} ms
+STR_FRAMERATE_MS_BAD                                            :{RED}{DECIMAL} ms
+STR_FRAMERATE_FPS_GOOD                                          :{LTBLUE}{DECIMAL} frame/s
+STR_FRAMERATE_FPS_WARN                                          :{YELLOW}{DECIMAL} frame/s
+STR_FRAMERATE_FPS_BAD                                           :{RED}{DECIMAL} frame/s
 STR_FRAMERATE_GRAPH_MILLISECONDS                                :{TINY_FONT}{COMMA} ms
 STR_FRAMERATE_GRAPH_SECONDS                                     :{TINY_FONT}{COMMA} s
 ############ Leave those lines in this order!!
-STR_FRAMERATE_GAMELOOP                                          :{WHITE}Totale ciclo simulazione:
-STR_FRAMERATE_GL_ECONOMY                                        :{WHITE}  Gestione carichi:
-STR_FRAMERATE_GL_TRAINS                                         :{WHITE}  Aggiornamento treni:
-STR_FRAMERATE_GL_ROADVEHS                                       :{WHITE}  Aggiornamento automezzi:
-STR_FRAMERATE_GL_SHIPS                                          :{WHITE}  Aggiornamento navi:
-STR_FRAMERATE_GL_AIRCRAFT                                       :{WHITE}  Aggiornamento aeromobili:
-STR_FRAMERATE_GL_LANDSCAPE                                      :{WHITE}  Aggiornamento mondo:
-STR_FRAMERATE_GL_LINKGRAPH                                      :{WHITE}  Ritardo grafo di distribuzione:
-STR_FRAMERATE_DRAWING                                           :{WHITE}Renderizzazione grafica:
-STR_FRAMERATE_DRAWING_VIEWPORTS                                 :{WHITE}  Visuali mondo:
-STR_FRAMERATE_VIDEO                                             :{WHITE}Output video:
-STR_FRAMERATE_SOUND                                             :{WHITE}Missaggio suoni:
+STR_FRAMERATE_GAMELOOP                                          :{BLACK}Totale ciclo simulazione:
+STR_FRAMERATE_GL_ECONOMY                                        :{BLACK}  Gestione carichi:
+STR_FRAMERATE_GL_TRAINS                                         :{BLACK}  Aggiornamento treni:
+STR_FRAMERATE_GL_ROADVEHS                                       :{BLACK}  Aggiornamento automezzi:
+STR_FRAMERATE_GL_SHIPS                                          :{BLACK}  Aggiornamento navi:
+STR_FRAMERATE_GL_AIRCRAFT                                       :{BLACK}  Aggiornamento aeromobili:
+STR_FRAMERATE_GL_LANDSCAPE                                      :{BLACK}  Aggiornamento mondo:
+STR_FRAMERATE_GL_LINKGRAPH                                      :{BLACK}  Ritardo grafo di distribuzione:
+STR_FRAMERATE_DRAWING                                           :{BLACK}Renderizzazione grafica:
+STR_FRAMERATE_DRAWING_VIEWPORTS                                 :{BLACK}  Visuali mondo:
+STR_FRAMERATE_VIDEO                                             :{BLACK}Output video:
+STR_FRAMERATE_SOUND                                             :{BLACK}Missaggio suoni:
 ############ End of leave-in-this-order
 ############ Leave those lines in this order!!
 STR_FRAMETIME_CAPTION_GAMELOOP                                  :Ciclo simulazione
@@ -2801,6 +2803,7 @@ STR_SAVELOAD_DETAIL_CAPTION                                     :{BLACK}Dettagli
 STR_SAVELOAD_DETAIL_NOT_AVAILABLE                               :{BLACK}Informazioni non disponibili
 STR_SAVELOAD_DETAIL_COMPANY_INDEX                               :{SILVER}{COMMA}: {WHITE}{STRING}
 STR_SAVELOAD_DETAIL_GRFSTATUS                                   :{SILVER}NewGRF: {WHITE}{STRING}
+STR_SAVELOAD_FILTER_TITLE                                       :{BLACK}Filtro:
 
 STR_SAVELOAD_OSKTITLE                                           :{BLACK}Inserire un nome per il salvataggio
 
@@ -2999,6 +3002,8 @@ STR_NEWGRF_ERROR_READ_BOUNDS                                    :Lettura oltre l
 STR_NEWGRF_ERROR_GRM_FAILED                                     :Risorsa GRF richiesta non disponibile (sprite {3:NUM})
 STR_NEWGRF_ERROR_FORCEFULLY_DISABLED                            :{1:STRING} è stato disabilitato da {STRING}
 STR_NEWGRF_ERROR_INVALID_SPRITE_LAYOUT                          :Formato di layout dello sprite sconosciuto o non valido (sprite {3:NUM})
+STR_NEWGRF_ERROR_LIST_PROPERTY_TOO_LONG                         :Troppi elementi nella lista valori di una proprietà (sprite {3:NUM}, proprietà {4:HEX})
+STR_NEWGRF_ERROR_INDPROD_CALLBACK                               :Callback di produzione industria non valido (sprite {3:NUM}, "{1:STRING}")
 
 # NewGRF related 'general' warnings
 STR_NEWGRF_POPUP_CAUTION_CAPTION                                :{WHITE}Attenzione!
@@ -3885,6 +3890,7 @@ STR_ORDER_CONDITIONAL_AGE                                       :Età (anni)
 STR_ORDER_CONDITIONAL_REQUIRES_SERVICE                          :Manutenzione richiesta
 STR_ORDER_CONDITIONAL_UNCONDITIONALLY                           :Sempre
 STR_ORDER_CONDITIONAL_REMAINING_LIFETIME                        :Vita rimanente (anni)
+STR_ORDER_CONDITIONAL_MAX_RELIABILITY                           :Affidabilità massima
 
 STR_ORDER_CONDITIONAL_COMPARATOR_TOOLTIP                        :{BLACK}Modalità di confronto del dato del veicolo con il valore inserito
 STR_ORDER_CONDITIONAL_COMPARATOR_EQUALS                         :è uguale a
@@ -4310,7 +4316,6 @@ STR_ERROR_TOO_MANY_STATIONS_LOADING                             :{WHITE}Troppe s
 STR_ERROR_TOO_MANY_STATION_SPECS                                :{WHITE}Stazione composta da troppe parti
 STR_ERROR_TOO_MANY_BUS_STOPS                                    :{WHITE}Troppe stazioni degli autobus
 STR_ERROR_TOO_MANY_TRUCK_STOPS                                  :{WHITE}Troppe aree di carico per camion
-STR_ERROR_TOO_CLOSE_TO_ANOTHER_STATION                          :{WHITE}Troppo vicino ad un'altra stazione/area di carico
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_DOCK                             :{WHITE}Troppo vicino ad un altro molo
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_AIRPORT                          :{WHITE}Troppo vicino ad un altro aeroporto
 STR_ERROR_CAN_T_RENAME_STATION                                  :{WHITE}Impossibile rinominare la stazione...

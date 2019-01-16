@@ -1453,6 +1453,7 @@ STR_CONFIG_SETTING_DYNAMIC_ENGINES_EXISTING_VEHICLES            :{WHITE}Cha ghab
 STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE                   :Cumail suas a' bhun-structair: {STRING}
 STR_CONFIG_SETTING_INFRASTRUCTURE_MAINTENANCE_HELPTEXT          :Nuair a bhios seo air, bidh cumail suas a' bhun-structair a' cosg airgid. Fàsaidh na cosgaisean nas luaithe na meud an lìonraidh, mar sin bheir an roghainn seo barrachd buaidh air companaidhean mòra
 
+
 STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS                        :Chan fhalbh an ùine air puirt-adhair: {STRING}
 STR_CONFIG_SETTING_NEVER_EXPIRE_AIRPORTS_HELPTEXT               :Nuair a chuireas tu an roghainn seo an comas, cumaidh gach port-adhair a' dol gu bràth an dèidh a thogail
 
@@ -4463,7 +4464,6 @@ STR_ERROR_TOO_MANY_STATIONS_LOADING                             :{WHITE}Cus stè
 STR_ERROR_TOO_MANY_STATION_SPECS                                :{WHITE}Cus pàirtean dhe stèisean-rèile
 STR_ERROR_TOO_MANY_BUS_STOPS                                    :{WHITE}Gus stèiseanan bus
 STR_ERROR_TOO_MANY_TRUCK_STOPS                                  :{WHITE}Tha cus ionadan-luchdaidh nan làraidh ann
-STR_ERROR_TOO_CLOSE_TO_ANOTHER_STATION                          :{WHITE}Ro fhaisg air stèisean/ionad-luchdaidh eile
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_DOCK                             :{WHITE}Ro fhaisg air port eile
 STR_ERROR_TOO_CLOSE_TO_ANOTHER_AIRPORT                          :{WHITE}Ro fhaisg air port-adhair eile
 STR_ERROR_CAN_T_RENAME_STATION                                  :{WHITE}Cha ghabh ainm an stèisein atharrachadh...

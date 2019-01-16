@@ -268,10 +268,7 @@ static const NWidgetPart _nested_company_finances_widgets[] = {
 	EndContainer(),
 };
 
-/**
- * Window class displaying the company finances.
- * @todo #money_width should be calculated dynamically.
- */
+/** Window class displaying the company finances. */
 struct CompanyFinancesWindow : Window {
 	static Money max_money; ///< The maximum amount of money a company has had this 'run'
 	bool small;             ///< Window is toggled to 'small'.
@@ -1509,9 +1506,6 @@ static WindowDesc _select_company_manager_face_desc(
  * Open the simple/advanced company manager face selection window
  *
  * @param parent the parent company window
- * @param adv    simple or advanced face selection window
- * @param top    previous top position of the window
- * @param left   previous left position of the window
  */
 static void DoSelectCompanyManagerFace(Window *parent)
 {
@@ -2200,16 +2194,16 @@ struct CompanyWindow : Window
 				uint y = r.top;
 
 				/* Collect rail and road counts. */
-				uint rail_pices = c->infrastructure.signal;
+				uint rail_pieces = c->infrastructure.signal;
 				uint road_pieces = 0;
-				for (uint i = 0; i < lengthof(c->infrastructure.rail); i++) rail_pices += c->infrastructure.rail[i];
+				for (uint i = 0; i < lengthof(c->infrastructure.rail); i++) rail_pieces += c->infrastructure.rail[i];
 				for (uint i = 0; i < lengthof(c->infrastructure.road); i++) road_pieces += c->infrastructure.road[i];
 
-				if (rail_pices == 0 && road_pieces == 0 && c->infrastructure.water == 0 && c->infrastructure.station == 0 && c->infrastructure.airport == 0) {
+				if (rail_pieces == 0 && road_pieces == 0 && c->infrastructure.water == 0 && c->infrastructure.station == 0 && c->infrastructure.airport == 0) {
 					DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_NONE);
 				} else {
-					if (rail_pices != 0) {
-						SetDParam(0, rail_pices);
+					if (rail_pieces != 0) {
+						SetDParam(0, rail_pieces);
 						DrawString(r.left, r.right, y, STR_COMPANY_VIEW_INFRASTRUCTURE_RAIL);
 						y += FONT_HEIGHT_NORMAL;
 					}

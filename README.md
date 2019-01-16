@@ -78,7 +78,7 @@ When you are sure it is not already reported you should:
 After you have done all that you can report the bug. Please include the
 following information in your bug report:
 
-- OpenTTD version (PLEASE test the latest SVN/nightly build)
+- OpenTTD version (PLEASE test the latest Git revision/nightly build)
 - Bug details, including instructions how to reproduce it
 - Platform (Windows, Linux, FreeBSD, …) and compiler (including version) if
    you compiled OpenTTD yourself.
@@ -511,16 +511,15 @@ create one after closing.
 
 ### Windows:
 
-You need Microsoft Visual Studio .NET. Open the project file
+You need Microsoft Visual Studio 2015 Update 3 or more recent. Open the project file
 and it should build automatically. In case you want to build with SDL support
 you need to add WITH_SDL to the project settings.
 
-PNG (WITH_PNG) and ZLIB (WITH_ZLIB) support is enabled by default. For these
-to work you need their development files. For best results, download the
-openttd-useful.zip file from https://www.openttd.org/download-openttd-useful.
-Put the header files into your compiler's include/ directory and the
-library (.lib) files into the lib/ directory.
-For more help with VS see docs/Readme_Windows_MSVC.txt.
+PNG (WITH_PNG), ZLIB (WITH_ZLIB), LZO (WITH_LZO), Freetype (WITH_FREETYPE) and
+LZMA (WITH_LZMA) support is enabled by default. For these to work you need their
+development files. To get them just use vcpkg from https://github.com/Microsoft/vcpkg
+using x86-windows-static and x64-windows-static triplets.
+For more help with VS see docs/Readme_Windows_MSVC.md.
 
 You can also build it using the Makefile with MSYS/MinGW or Cygwin/MinGW.
 Please read the Makefile for more information.
@@ -656,7 +655,7 @@ someone else may have already started translating to the same language.
 
 So, now that you have notified the development team about your intention to
 translate (You did, right? Of course you did.) you can pick up english.txt
-(found in the SVN repository under /src/lang) and translate.
+(found in the Git repository under /src/lang) and translate.
 
 You must change the first two lines of the file appropriately:
 
@@ -782,6 +781,7 @@ terms for Bootstrap documentation.
 - Christoph Elsenhans (frosch) - General coding (since 0.6)
 - Loïc Guilloux (glx) - Windows Expert (since 0.4.5)
 - Michael Lutz (michi_cc) - Path based signals (since 0.7)
+- Niels Martin Hansen (nielsm) - Music system, general coding (since 1.9)
 - Owen Rudge (orudge) - Forum host, OS/2 port (since 0.1)
 - Peter Nelson (peter1138) - Spiritual descendant from newGRF gods (since 0.4.5)
 - Ingo von Borstel (planetmaker) - General coding, Support (since 1.1)
