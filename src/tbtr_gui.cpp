@@ -367,9 +367,9 @@ void TbtrGui::DrawEngines(const Rect& r) const
 	uint max = min(vscroll_engines->GetPosition() + vscroll_engines->GetCapacity(), this->engines.Length());
 	uint y = r.top + 6;
 	for ( uint i = vscroll_engines->GetPosition(); i<max; ++i ) {
-		/* Fill the background of the current cell in a darker tone for the currently selected group */
+		/* Fill the background of the current cell in a darker tone for the currently selected engine */
 		if ( this->index_selected_engine == (int)i ) {
-			GfxFillRect(left, y-(this->line_height)/4, r.right, y+(this->line_height)/4, _colour_gradient[COLOUR_GREY][3]);
+			GfxFillRect(r.left, y-(this->line_height)/4, r.right, y+(this->line_height)/4, _colour_gradient[COLOUR_GREY][3]);
 		}
 		/* Draw the engine's image */
 		EngineID eid = (this->engines)[i];
